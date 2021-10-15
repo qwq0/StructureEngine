@@ -10,7 +10,7 @@ export class pointerData
     sx = 0; sy = 0; // 此指针的起始位置
     hold = false; // 当前此指针是否处于按下状态
     pressing = false; // 当前指针是否正在按下(按下事件)
-    constructor(x, y, vx, vy, sx, sy, down, pressing)
+    constructor(x, y, vx, vy, sx, sy, hold, pressing)
     {
         this.x = x;
         this.y = y;
@@ -18,7 +18,7 @@ export class pointerData
         this.vy = vy;
         this.sx = sx;
         this.sy = sy;
-        this.down = down;
+        this.hold = hold;
         this.pressing = pressing;
     }
 }

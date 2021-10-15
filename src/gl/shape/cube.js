@@ -1,5 +1,5 @@
 import { ScenesObject } from "../ScenesObject.js";
-import { glslProgram } from "../util/glslProgram.js";
+import { glslProgram } from "../shader/glslProgram.js";
 
 var cubeVer = new Float32Array([
     -0.5, 0.5, -0.5,

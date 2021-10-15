@@ -50,7 +50,7 @@ export class ScenesObject
     sz = 1;
     /**
      * 绘制此物体使用的着色器组(渲染程序)
-     * @type {import("./util/glslProgram").glslProgram}
+     * @type {import("./shader/glslProgram").glslProgram}
      */
     program = null;
     /**
@@ -76,12 +76,8 @@ export class ScenesObject
      */
     vao = null;
     /**
-     * [渲染时] 此物体的pal
-     * @type {number}
-     */
-    pal = -1;
-    /**
-     * [渲染时] 此物体的vao对应的缓冲区
+     * [渲染时] 此物体的缓冲区
+     * 用于释放内存使用
      * @type {WebGLBuffer}
      */
     buffer = null;

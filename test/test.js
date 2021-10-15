@@ -1,3 +1,4 @@
+import { keyboardBind } from "../src/controller/keyboard.js";
 import { touchBind } from "../src/controller/touch.js";
 import { degToRad } from "../src/gl/util/math.js";
 import { Camera, create_cube, initContext, Scenes, Texture } from "../src/index.js";
@@ -10,38 +11,43 @@ canvas.style.width = "100%";
 canvas.style.height = "100%";
 
 var gl = initContext(canvas);
-var scenes = new Scenes();
-var camera = new Camera(scenes, gl);
+var scenes = new Scenes(gl);
+var camera = new Camera(scenes);
 var keyMap = new Map();
 var lastTimeStamp = 0;
-var speed = 0.1;
+var speed = 0.01;
 function draw(timeStamp)
 {
+    var timeChange = timeStamp - lastTimeStamp;
     lastTimeStamp = timeStamp;
+    if (keyMap.get("Shift"))
+        speed = 0.02;
+    else
+        speed = 0.01;
     if (keyMap.get("w"))
     {
-        camera.x -= Math.sin(camera.ry) * speed;
-        camera.z -= Math.cos(camera.ry) * speed;
+        camera.x -= timeChange * Math.sin(camera.ry) * speed;
+        camera.z -= timeChange * Math.cos(camera.ry) * speed;
     }
     if (keyMap.get("s"))
     {
-        camera.x += Math.sin(camera.ry) * speed;
-        camera.z += Math.cos(camera.ry) * speed;
+        camera.x += timeChange * Math.sin(camera.ry) * speed;
+        camera.z += timeChange * Math.cos(camera.ry) * speed;
     }
     if (keyMap.get("a"))
     {
-        camera.x -= Math.cos(camera.ry) * speed;
-        camera.z += Math.sin(camera.ry) * speed;
+        camera.x -= timeChange * Math.cos(camera.ry) * speed;
+        camera.z += timeChange * Math.sin(camera.ry) * speed;
     }
     if (keyMap.get("d"))
     {
-        camera.x += Math.cos(camera.ry) * speed;
-        camera.z -= Math.sin(camera.ry) * speed;
+        camera.x += timeChange * Math.cos(camera.ry) * speed;
+        camera.z -= timeChange * Math.sin(camera.ry) * speed;
     }
     if (keyMap.get(" "))
-        camera.y += speed;
+        camera.y += timeChange * speed;
     if (keyMap.get("n"))
-        camera.y -= speed;
+        camera.y -= timeChange * speed;
     camera.draw();
     requestAnimationFrame(draw);
 }
@@ -65,8 +71,8 @@ console.log("cube count:", cubeCount);
 
 function mousemove(e)
 {
-    var rx = camera.rx - e.movementY * 0.008;
-    var ry = camera.ry - e.movementX * 0.008;
+    var rx = camera.rx - e.movementY * 0.005;
+    var ry = camera.ry - e.movementX * 0.005;
     if (rx < degToRad * -90)
         rx = degToRad * -90;
     if (rx > degToRad * 90)
@@ -78,8 +84,14 @@ function mousemove(e)
     camera.rx = rx;
     camera.ry = ry;
 }
-window.addEventListener("keydown", e => keyMap.set(e.key, true));
-window.addEventListener("keyup", e => keyMap.set(e.key, false));
+
+keyboardBind(window,e=>
+{
+    if(e.hold)
+        keyMap.set(e.key, true);
+    else
+        keyMap.set(e.key, false);
+})
 
 
 canvas.addEventListener("click", () =>

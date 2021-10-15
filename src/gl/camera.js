@@ -1,5 +1,5 @@
 import { m4 } from "../matrix/m4.js";
-import { glslProgram } from "./util/glslProgram.js";
+import { glslProgram } from "./shader/glslProgram.js";
 import { degToRad } from "./util/math.js";
 
 
@@ -51,38 +51,15 @@ export class Camera
      */
     gl = null;
 
-    /**
-     * 边框渲染器(用于调试)
-     * @type {glslProgram}
-     */
-    borderRendering = null;
-
 
     /**
      * @param {import("./scenes").Scenes} scenes
      * @param {WebGL2RenderingContext} gl
      */
-    constructor(scenes, gl)
+    constructor(scenes)
     {
         this.scenes = scenes;
-        this.gl = gl;
-        this.borderRendering = new glslProgram(gl, `#version 300 es
-        precision highp float;
-    
-        in vec4 a_position;
-        uniform mat4 u_matrix;
-    
-        void main() {
-            gl_Position = u_matrix * a_position;
-            gl_Position.z -= 0.01;
-        }
-        `, `#version 300 es
-        precision highp float;
-        out vec4 outColor;
-        void main() {
-            outColor = vec4(1, 0, 0, 1);
-        }
-        `);
+        this.gl = scenes.gl;
     }
 
     draw()
@@ -102,7 +79,7 @@ export class Camera
      * 递归渲染场景
      * 写给以后的自己和其他想要修改这部分的人:
      * 请不要随意改动你无法理解的部分
-     * webgl,甚至opengl的接口有些杂乱
+     * webgl以及opengl的接口有些杂乱
      * 我写了这个引擎 但也许我自己也不完全了解webglAPI
      * @param {WebGL2RenderingContext} gl webgl上下文
      * @param {import("./ScenesObject").ScenesObject} obje 场景中的物体对象(当前位置)
@@ -112,10 +89,16 @@ export class Camera
      */
     render(gl, obje, lase_matrix, cameraMatrix)
     {
+        /*
+            变换矩阵
+        */
         var matrix = lase_matrix.copy(). // 复制矩阵
             translation(obje.x, obje.y, obje.z). // 平移
             rotate(obje.rx, obje.ry, obje.rz). // 旋转
             scale(obje.sx, obje.sy, obje.sz); // 缩放
+        /*
+            绘制图像
+        */
         if (obje.faces) // 有"面数据" 则绘制
         {
             if (!obje.vao) // 初始化顶点数组(材质数组)
@@ -173,15 +156,10 @@ export class Camera
 
             gl.bindVertexArray(obje.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
             gl.drawArrays(gl.TRIANGLES, 0, obje.faces.verLen); // 绘制数据
-
-            if (false) // 绘制边框线
-            {
-                gl.useProgram(this.borderRendering.progra); // 修改着色器组(渲染程序)
-                gl.uniformMatrix4fv(gl.getUniformLocation(this.borderRendering.progra, "u_matrix"), false, matrix.a); // 设置矩阵
-                gl.bindVertexArray(obje.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-                gl.drawArrays(gl.LINES, 0, obje.faces.verLen); // 绘制数据
-            }
         }
+        /*
+            递归子节点
+        */
         if (obje.c)
             obje.c.forEach(o => this.render(gl, o, matrix, cameraMatrix));
     }

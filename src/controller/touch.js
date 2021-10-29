@@ -2,9 +2,9 @@ import { forEach } from "../util/forEach.js";
 import { pointerData } from "./pointerData.js";
 
 /**
- * 触摸(拖拽)事件处理
+ * 触摸(拖拽) 事件处理
  * @param {HTMLElement} element 
- * @param {function(pointerData)} callBack
+ * @param {function(pointerData):void} callBack
  */
 export function touchBind(element, callBack)
 {

@@ -1,3 +1,8 @@
+/**
+ * 此文件为测试文件
+ * 非项目示例
+ * @file 测试文件
+ */
 import { keyboardBind } from "../src/controller/keyboard.js";
 import { touchBind } from "../src/controller/touch.js";
 import { degToRad } from "../src/gl/util/math.js";
@@ -16,6 +21,10 @@ var camera = new Camera(scenes);
 var keyMap = new Map();
 var lastTimeStamp = 0;
 var speed = 0.01;
+/**
+ * 绘制函数 每帧调用
+ * @param {number} timeStamp 
+ */
 function draw(timeStamp)
 {
     var timeChange = timeStamp - lastTimeStamp;
@@ -85,12 +94,19 @@ function mousemove(e)
     camera.ry = ry;
 }
 
-keyboardBind(window,e=>
+keyboardBind(document.body, e =>
 {
-    if(e.hold)
+    if (e.hold)
         keyMap.set(e.key, true);
     else
         keyMap.set(e.key, false);
+    if (e.key == "c")
+    {
+        if(e.hold)
+            camera.fov = degToRad * 30;
+        else
+            camera.fov = degToRad * 90;
+    }
 })
 
 
@@ -114,5 +130,5 @@ touchBind(canvas, e => mousemove({
 
 
 // debug
-window.screenObj = scenes;
-window.camera = camera;
+window["screenObj"] = scenes;
+window["camera"] = camera;

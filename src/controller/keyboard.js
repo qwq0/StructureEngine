@@ -3,8 +3,8 @@ import { keyData } from "./keyData.js";
 
 /**
  * 键盘 事件处理
- * @param {HTMLElement} element 
- * @param {function(keyData)} callBack
+ * @param {HTMLElement} element
+ * @param {function(keyData):void} callBack
  */
 export function keyboardBind(element, callBack)
 {

@@ -1,0 +1,4 @@
+dist/*.wasm
+wasm/dist/*
+.vscode/c_cpp_properties.json
+.vscode/settings.json

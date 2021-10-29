@@ -39,6 +39,11 @@ export class Camera
      * @type {number}
      */
     rz = 0;
+    /**
+     * 相机视角场角度
+     * @type {number}
+     */
+    fov = degToRad * 90;
 
     /**
      * 绑定的场景
@@ -54,7 +59,6 @@ export class Camera
 
     /**
      * @param {import("./scenes").Scenes} scenes
-     * @param {WebGL2RenderingContext} gl
      */
     constructor(scenes)
     {
@@ -68,7 +72,7 @@ export class Camera
         this.render(
             this.gl,
             this.scenes.obje,
-            m4.perspective(degToRad * 90, this.gl.canvas.clientWidth / this.gl.canvas.clientHeight, 0.1, 2500).
+            m4.perspective(this.fov, this.gl.canvas.clientWidth / this.gl.canvas.clientHeight, 0.1, 2500).
                 rotate(-this.rx, -this.ry, -this.rz).
                 translation(-this.x, -this.y, -this.z),
             new m4()
@@ -85,7 +89,6 @@ export class Camera
      * @param {import("./ScenesObject").ScenesObject} obje 场景中的物体对象(当前位置)
      * @param {m4} lase_matrix 上一个矩阵(上一个位置角度与缩放)
      * @param {m4} cameraMatrix 相机偏移矩阵(已弃用)
-     * @param
      */
     render(gl, obje, lase_matrix, cameraMatrix)
     {

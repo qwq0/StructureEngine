@@ -56,10 +56,10 @@ export class ScenesObject
     /**
      * 面数据
      * @type {{
-     *  ver: Array<Float32Array>, // 顶点相对坐标(每个顶点3个, 每个面9个(每个面3个顶点))
+     *  ver: Float32Array, // 顶点相对坐标(每个顶点3个, 每个面9个(每个面3个顶点))
      *  verLen: number, // 顶点相对坐标数组中点的个数(每3个元素1个顶点)
      *  tex: import("./util/texture").Texture, // 纹理
-     *  texOff: Array<Float32Array> // 纹理偏移(每个材质坐标2个, 每个面4个(每个面2个材质坐标))
+     *  texOff: Float32Array // 纹理偏移(每个材质坐标2个, 每个面4个(每个面2个材质坐标))
      * }}
      */
     faces = null;

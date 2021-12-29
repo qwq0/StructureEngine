@@ -127,7 +127,6 @@ export class Camera
                 );
 
                 obje.vao = vao;
-                obje.faces.verLen = Math.floor(obje.faces.ver.length / 3);
 
                 if (obje.faces.tex)
                 {

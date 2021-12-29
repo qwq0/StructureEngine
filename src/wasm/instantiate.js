@@ -12,3 +12,19 @@ export async function instantiate(bytes, imports)
     var m = await WebAssembly.compile(bytes);
     return await WebAssembly.instantiate(m, imports);
 }
+
+/**
+ * 创建wasm内存
+ * @param {number} initial 初始大小 单位是wasmPages(65536 bytes 即 64 KiB)
+ * @param {number} [maximum]
+ * @param {boolean} [shared]
+ * @returns {WebAssembly.Memory}
+ */
+export function createMemory(initial, maximum = initial, shared = false)
+{
+    return new WebAssembly.Memory({
+        initial: initial,
+        maximum: maximum,
+        shared: shared
+    });
+}

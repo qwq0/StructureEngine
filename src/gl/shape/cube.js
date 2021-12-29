@@ -121,10 +121,12 @@ export function create_cube(gl, tex)
                 outColor = texture(u_texture, v_texcoord);
             }
         `);
-    cube.faces = {};
-    cube.faces.ver = cubeVer;
+    cube.faces = {
+        ver: cubeVer,
+        verLen: Math.floor(cubeVer.length / 3),
+        tex: tex,
+        texOff: cubeTexOff
+    };
     cube.program = cubeProgram;
-    cube.faces.tex = tex;
-    cube.faces.texOff = cubeTexOff;
     return cube;
 }

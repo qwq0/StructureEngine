@@ -7,6 +7,7 @@ import { keyboardBind } from "../src/controller/keyboard.js";
 import { touchBind } from "../src/controller/touch.js";
 import { degToRad } from "../src/gl/util/math.js";
 import { Camera, create_cube, initContext, Scenes, Texture } from "../src/index.js";
+import { initWM } from "../src/wasm/wasm.js";
 
 var canvas = document.body.appendChild(document.createElement("canvas"));
 canvas.style.position = "fixed";
@@ -76,7 +77,17 @@ for (var x = -2; x < 3; x++)
             cubeCount++;
         }
 console.log("cube count:", cubeCount);
+let cube = create_cube(gl, tex);
+cube.sx = 16;
+cube.y = -10;
+cube.sz = 16;
+scenes.obje.c.push(cube);
 
+(async () => // 异步自执行
+{
+    var wmApi = await initWM();
+    console.log("wmApi", wmApi);
+})();
 
 function mousemove(e)
 {
@@ -102,7 +113,7 @@ keyboardBind(document.body, e =>
         keyMap.set(e.key, false);
     if (e.key == "c")
     {
-        if(e.hold)
+        if (e.hold)
             camera.fov = degToRad * 30;
         else
             camera.fov = degToRad * 90;

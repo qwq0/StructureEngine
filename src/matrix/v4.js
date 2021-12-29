@@ -47,10 +47,10 @@ export class v4
     {
         var a = m.a;
         return new v4(
-            (x * a[0]) + (y * a[1]) + (z * a[2]) + (w * a[3]),
-            (x * a[4]) + (y * a[5]) + (z * a[6]) + (w * a[7]),
-            (x * a[8]) + (y * a[9]) + (z * a[10]) + (w * a[11]),
-            (x * a[12]) + (y * a[13]) + (z * a[14]) + (w * a[15])
+            (this.x * a[0]) + (this.y * a[1]) + (this.z * a[2]) + (this.w * a[3]),
+            (this.x * a[4]) + (this.y * a[5]) + (this.z * a[6]) + (this.w * a[7]),
+            (this.x * a[8]) + (this.y * a[9]) + (this.z * a[10]) + (this.w * a[11]),
+            (this.x * a[12]) + (this.y * a[13]) + (this.z * a[14]) + (this.w * a[15])
         );
     }
 }

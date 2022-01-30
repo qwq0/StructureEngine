@@ -7,7 +7,7 @@ import { keyboardBind } from "../src/controller/keyboard.js";
 import { touchBind } from "../src/controller/touch.js";
 import { degToRad } from "../src/gl/util/math.js";
 import { Camera, create_cube, initContext, Scenes, Texture } from "../src/index.js";
-import { initWM } from "../src/wasm/wasm.js";
+import { Manager } from "../src/manager/manager.js";
 
 var canvas = document.body.appendChild(document.createElement("canvas"));
 canvas.style.position = "fixed";
@@ -63,36 +63,22 @@ function draw(timeStamp)
 }
 requestAnimationFrame(draw);
 
-var tex = new Texture(gl, "./cube.png");
-var cubeCount = 0;
-for (var x = -2; x < 3; x++)
-    for (var y = -2; y < 3; y++)
-        for (var z = -2; z < 3; z++)
-        {
-            let cube = create_cube(gl, tex);
-            cube.x = x * 2;
-            cube.y = y * 2;
-            cube.z = z * 2;
-            scenes.obje.c.push(cube);
-            cubeCount++;
-        }
-console.log("cube count:", cubeCount);
-let cube = create_cube(gl, tex);
-cube.sx = 16;
-cube.y = -10;
-cube.sz = 16;
-scenes.obje.c.push(cube);
 
-(async () => // 异步自执行
-{
-    var wmApi = await initWM();
-    console.log("wmApi", wmApi);
-})();
+let cubeF = create_cube(gl, new Texture(gl, "./cube.png"));
+cubeF.sx = 16;
+cubeF.y = -10;
+cubeF.sz = 16;
+scenes.obje.c.push(cubeF);
+let cube0 = create_cube(gl, new Texture(gl, "./WoodFloor045_1K_Color.jpg"));
+cube0.x = 0;
+cube0.y = 9;
+cube0.z = 0;
+scenes.obje.c.push(cube0);
 
 function mousemove(e)
 {
-    var rx = camera.rx - e.movementY * 0.005;
-    var ry = camera.ry - e.movementX * 0.005;
+    var rx = camera.rx - (e.movementY * 0.005);
+    var ry = camera.ry - (e.movementX * 0.005);
     if (rx < degToRad * -90)
         rx = degToRad * -90;
     if (rx > degToRad * 90)
@@ -139,6 +125,28 @@ touchBind(canvas, e => mousemove({
     movementX: e.vx
 }));
 
+var man = new Manager();
+
+man.woker.addEventListener("message", (e) =>
+{
+    var data = e.data;
+    if (data.objects)
+    {
+        var info = data.objects[0];
+        // console.log(info);
+        cube0.x = info[0];
+        cube0.y = info[1];
+        cube0.z = info[2];
+        cube0.rx = info[3];
+        cube0.ry = info[4];
+        cube0.rz = info[5];
+        cube0.rw = info[6];
+    }
+    else if (data.isReady)
+        man.woker.postMessage(1);
+    else
+        console.log(e);
+});
 
 // debug
 window["screenObj"] = scenes;

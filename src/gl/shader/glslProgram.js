@@ -5,9 +5,20 @@
 export class glslProgram
 {
     /**
+     * @type {WebGL2RenderingContext}
+     */
+    gl = null;
+
+    /**
      * @type {WebGLProgram}
      */
     progra = null;
+
+    /**
+     * uniform变量表
+     * @type {Object<string,object>}
+     */
+    unif = {};
 
     /**
      * @param {WebGL2RenderingContext} gl webgl上下文
@@ -16,6 +27,7 @@ export class glslProgram
      */
     constructor(gl, vertexShader, fragmentShader)
     {
+        this.gl = gl;
         this.progra = gl.createProgram(); // 创建渲染程序
 
         gl.attachShader(this.progra, // 绑定顶点着色器
@@ -36,11 +48,49 @@ export class glslProgram
 
     /**
      * 删除一个渲染程序(释放内存)
-     * @param {WebGL2RenderingContext} gl webgl上下文
      */
-    deleteProgram(gl)
+    deleteProgram()
     {
-        gl.deleteProgram(this.progra);
+        this.gl.deleteProgram(this.progra);
+    }
+
+    /**
+     * 设置着色器的uniformMatrix4值(32位浮点数)
+     * @param {string} name 
+     * @param {Float32Array | Array<number>} value 
+     */
+    uniformMatrix4fv(name, value)
+    {
+        if (!this.unif[name])
+            this.unif[name] = this.gl.getUniformLocation(this.progra, name);
+        this.gl.uniformMatrix4fv(this.unif[name], false, value);
+    }
+
+    /**
+     * 设置着色器的uniformMatrix4值(32位浮点数)
+     * 开启转置
+     * @param {string} name 
+     * @param {Float32Array | Array<number>} value 
+     */
+    uniformMatrix4fv_tr(name, value)
+    {
+        if (!this.unif[name])
+            this.unif[name] = this.gl.getUniformLocation(this.progra, name);
+        this.gl.uniformMatrix4fv(this.unif[name], true, value);
+    }
+
+    /**
+     * 设置着色器的3单位向量值(浮点数)
+     * @param {string} name
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+    uniform3f(name, x, y, z)
+    {
+        if (!this.unif[name])
+            this.unif[name] = this.gl.getUniformLocation(this.progra, name);
+        this.gl.uniform3f(this.unif[name], x, y, z);
     }
 }
 

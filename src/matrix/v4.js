@@ -53,4 +53,62 @@ export class v4
             (this.x * a[12]) + (this.y * a[13]) + (this.z * a[14]) + (this.w * a[15])
         );
     }
+
+    /**
+     * 欧拉角到四元数
+     * 旋转顺序ZYX
+     * 单位弧度
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+    static Euler2Quaternion(x, y, z)
+    {
+        return new v4(
+            Math.sin(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) -
+            Math.cos(x / 2) * Math.sin(y / 2) * Math.sin(z / 2),
+
+            Math.cos(x / 2) * Math.sin(y / 2) * Math.cos(z / 2) +
+            Math.sin(x / 2) * Math.cos(y / 2) * Math.sin(z / 2),
+
+            Math.cos(x / 2) * Math.cos(y / 2) * Math.sin(z / 2) -
+            Math.sin(x / 2) * Math.sin(y / 2) * Math.cos(z / 2),
+
+            Math.cos(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) +
+            Math.sin(x / 2) * Math.sin(y / 2) * Math.sin(z / 2)
+        );
+    }
+
+    /**
+     * 欧拉角到方向向量
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+    static Euler2Direction(x, y, z)
+    {
+        return new v4(
+            -((Math.cos(y) * Math.sin(x) * Math.sin(z)) + (Math.sin(y) * Math.cos(z))),
+            (Math.cos(y) * Math.cos(z)) - (Math.sin(y) * Math.sin(x) * Math.sin(z)),
+            Math.cos(x) * Math.sin(z),
+            0
+        );
+    }
+
+    /**
+     * 归一化
+     * 将改变原向量
+     */
+    normalize()
+    {
+        var sum = Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
+        if(sum != 0)
+        {
+            this.x /= sum;
+            this.y /= sum;
+            this.z /= sum;
+            this.w /= sum;
+        }
+        return this;
+    }
 }

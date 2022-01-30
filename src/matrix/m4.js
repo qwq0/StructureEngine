@@ -75,6 +75,89 @@ export class m4
     }
 
     /**
+     * 矩阵求逆
+     * 不会改变原矩阵
+     * @returns {m4}
+     */
+    inverse()
+    {
+        var a = this.a;
+        var m00 = a[0 * 4 + 0], m01 = a[0 * 4 + 1], m02 = a[0 * 4 + 2], m03 = a[0 * 4 + 3];
+        var m10 = a[1 * 4 + 0], m11 = a[1 * 4 + 1], m12 = a[1 * 4 + 2], m13 = a[1 * 4 + 3];
+        var m20 = a[2 * 4 + 0], m21 = a[2 * 4 + 1], m22 = a[2 * 4 + 2], m23 = a[2 * 4 + 3];
+        var m30 = a[3 * 4 + 0], m31 = a[3 * 4 + 1], m32 = a[3 * 4 + 2], m33 = a[3 * 4 + 3];
+
+        var k0 = m22 * m33;
+        var k1 = m32 * m23;
+        var k2 = m12 * m33;
+        var k3 = m32 * m13;
+        var k4 = m12 * m23;
+        var k5 = m22 * m13;
+        var k6 = m02 * m33;
+        var k7 = m32 * m03;
+        var k8 = m02 * m23;
+        var k9 = m22 * m03;
+        var k10 = m02 * m13;
+        var k11 = m12 * m03;
+        var k12 = m20 * m31;
+        var k13 = m30 * m21;
+        var k14 = m10 * m31;
+        var k15 = m30 * m11;
+        var k16 = m10 * m21;
+        var k17 = m20 * m11;
+        var k18 = m00 * m31;
+        var k19 = m30 * m01;
+        var k20 = m00 * m21;
+        var k21 = m20 * m01;
+        var k22 = m00 * m11;
+        var k23 = m10 * m01;
+
+        var t0 = (k0 * m11 + k3 * m21 + k4 * m31) - (k1 * m11 + k2 * m21 + k5 * m31);
+        var t1 = (k1 * m01 + k6 * m21 + k9 * m31) - (k0 * m01 + k7 * m21 + k8 * m31);
+        var t2 = (k2 * m01 + k7 * m11 + k10 * m31) - (k3 * m01 + k6 * m11 + k11 * m31);
+        var t3 = (k5 * m01 + k8 * m11 + k11 * m21) - (k4 * m01 + k9 * m11 + k10 * m21);
+        var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
+
+        return new m4([
+            d * t0,
+            d * t1,
+            d * t2,
+            d * t3,
+
+            d * ((k1 * m10 + k2 * m20 + k5 * m30) - (k0 * m10 + k3 * m20 + k4 * m30)),
+            d * ((k0 * m00 + k7 * m20 + k8 * m30) - (k1 * m00 + k6 * m20 + k9 * m30)),
+            d * ((k3 * m00 + k6 * m10 + k11 * m30) - (k2 * m00 + k7 * m10 + k10 * m30)),
+            d * ((k4 * m00 + k9 * m10 + k10 * m20) - (k5 * m00 + k8 * m10 + k11 * m20)),
+
+            d * ((k12 * m13 + k15 * m23 + k16 * m33) - (k13 * m13 + k14 * m23 + k17 * m33)),
+            d * ((k13 * m03 + k18 * m23 + k21 * m33) - (k12 * m03 + k19 * m23 + k20 * m33)),
+            d * ((k14 * m03 + k19 * m13 + k22 * m33) - (k15 * m03 + k18 * m13 + k23 * m33)),
+            d * ((k17 * m03 + k20 * m13 + k23 * m23) - (k16 * m03 + k21 * m13 + k22 * m23)),
+
+            d * ((k14 * m22 + k17 * m32 + k13 * m12) - (k16 * m32 + k12 * m12 + k15 * m22)),
+            d * ((k20 * m32 + k12 * m02 + k19 * m22) - (k18 * m22 + k21 * m32 + k13 * m02)),
+            d * ((k18 * m12 + k23 * m32 + k15 * m02) - (k22 * m32 + k14 * m02 + k19 * m12)),
+            d * ((k22 * m22 + k16 * m02 + k21 * m12) - (k20 * m12 + k23 * m22 + k17 * m02)),
+        ]);
+    }
+
+    /**
+     * 矩阵转置
+     * 不会改变原矩阵
+     * @returns {m4}
+     */
+    transpose()
+    {
+        var a = this.a;
+        return new m4([
+            a[0 * 4 + 0], a[1 * 4 + 0], a[2 * 4 + 0], a[3 * 4 + 0],
+            a[0 * 4 + 1], a[1 * 4 + 1], a[2 * 4 + 1], a[3 * 4 + 1],
+            a[0 * 4 + 2], a[1 * 4 + 2], a[2 * 4 + 2], a[3 * 4 + 2],
+            a[0 * 4 + 3], a[1 * 4 + 3], a[2 * 4 + 3], a[3 * 4 + 3]
+        ]);
+    }
+
+    /**
      * 透视投影矩阵
      * @param {number} fieldOfViewInRadians 
      * @param {number} aspect 
@@ -109,6 +192,39 @@ export class m4
             0, -2 / h, 0, 0,
             0, 0, 2 / d, 0,
             -1, 1, 0, 1
+        ]);
+    }
+
+    /**
+     * 四元数转矩阵
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} w
+     * @returns {m4}
+     */
+    static quaternion(x, y, z, w)
+    {
+        return new m4([
+            1 - 2 * (y * y + z * z),
+            2 * (x * y - w * z),
+            2 * (x * z + w * y),
+            0,
+
+            2 * (x * y + w * z),
+            1 - 2 * (x * x + z * z),
+            2 * (y * z - w * x),
+            0,
+
+            2 * (x * z - w * y),
+            2 * (y * z + w * x),
+            1 - 2 * (x * x + y * y),
+            0,
+
+            0,
+            0,
+            0,
+            1
         ]);
     }
 
@@ -248,19 +364,47 @@ export class m4
         a[1 * 4 + 3] = r3 * cosZ - l3 * sinZ;
     }
     /**
-     * 旋转矩阵
+     * 旋转矩阵(旋转顺序ZYX)
      * 将改变原矩阵
      * @param {number} rx
      * @param {number} ry
      * @param {number} rz
      * @returns {m4}
      */
-    rotate(rx, ry, rz)
+    rotateZYX(rx, ry, rz)
+    {
+        this.rotateZ(rz);
+        this.rotateY(ry);
+        this.rotateX(rx);
+        return this;
+    }
+    /**
+     * 旋转矩阵(旋转顺序XYZ)
+     * 将改变原矩阵
+     * @param {number} rx
+     * @param {number} ry
+     * @param {number} rz
+     * @returns {m4}
+     */
+    rotateXYZ(rx, ry, rz)
     {
         this.rotateX(rx);
         this.rotateY(ry);
         this.rotateZ(rz);
         return this;
+    }
+    /**
+     * 旋转矩阵(根据四元数)
+     * 不会改变原矩阵
+     * @param {number} rx
+     * @param {number} ry
+     * @param {number} rz
+     * @param {number} rw
+     * @returns {m4}
+     */
+    rotateQuat(rx, ry, rz, rw)
+    {
+        return this.multiply(m4.quaternion(rx, ry, rz, rw));
     }
 
     /**

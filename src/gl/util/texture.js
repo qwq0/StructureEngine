@@ -4,6 +4,11 @@
 export class Texture
 {
     /**
+     * @type {WebGL2RenderingContext}
+     */
+    gl = null;
+
+    /**
      * 纹理对象
      * @type {WebGLTexture}
      */
@@ -16,6 +21,7 @@ export class Texture
      */
     constructor(gl, url)
     {
+        this.gl = gl;
         var texture = gl.createTexture(); // 创建纹理
         gl.bindTexture(gl.TEXTURE_2D, texture); // 绑定纹理(切换正在操作为当前纹理)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
@@ -29,5 +35,15 @@ export class Texture
             gl.generateMipmap(gl.TEXTURE_2D); // 生成mipmap纹理
         });
         this.tex = texture;
+    }
+
+    /**
+     * 绑定纹理(到指定编号的纹理单元)
+     * @param {number} ind
+     */
+    bindTexture(ind)
+    {
+        this.gl.activeTexture(this.gl.TEXTURE0 + ind); // 使用第ind纹理单元
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex); // 绑定纹理(切换正在操作为当前纹理)
     }
 }

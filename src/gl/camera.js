@@ -57,12 +57,6 @@ export class Camera
      */
     gl = null;
 
-    /**
-     * 相机方向向量(归一化)
-     * 每次渲染时计算
-     * @type {v4}
-    */
-    direction = new v4();
 
     /**
      * @param {import("./scenes").Scenes} scenes
@@ -76,13 +70,13 @@ export class Camera
     draw()
     {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        this.direction = v4.Euler2Direction(this.rx, this.ry, this.rz).normalize();
         this.render(
             this.gl,
             this.scenes.obje,
             m4.perspective(this.fov, this.gl.canvas.clientWidth / this.gl.canvas.clientHeight, 0.1, 2500).
                 rotateXYZ(-this.rx, -this.ry, -this.rz).
                 translation(-this.x, -this.y, -this.z),
+            new m4(),
             new m4()
         );
     }
@@ -95,17 +89,24 @@ export class Camera
      * 我写了这个引擎 但也许我自己也不完全了解webglAPI
      * @param {WebGL2RenderingContext} gl webgl上下文
      * @param {import("./ScenesObject").ScenesObject} obje 场景中的物体对象(当前位置)
-     * @param {m4} lase_matrix 上一个矩阵(上一个位置角度与缩放)
-     * @param {m4} lase_worldViewProjection 世界视图投影矩阵
+     * @param {m4} last_matrix 上一个矩阵(投影 位置 角度 缩放)
+     * @param {m4} last_worldViewProjection 世界视图投影矩阵
+     * @param {m4} last_worldMatrix 世界矩阵
      */
-    render(gl, obje, lase_matrix, lase_worldViewProjection)
+    render(gl, obje, last_matrix, last_worldViewProjection, last_worldMatrix)
     {
         // 变换矩阵
-        var matrix = lase_matrix.copy(). // 复制矩阵
+        var matrix = last_matrix.copy(). // 复制矩阵
             translation(obje.x, obje.y, obje.z). // 平移
             rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
             scale(obje.sx, obje.sy, obje.sz); // 缩放
-        var worldViewProjection = lase_worldViewProjection.copy(). // 复制矩阵
+
+        var worldViewProjection = last_worldViewProjection.copy(). // 复制矩阵
+            rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
+            scale(obje.sx, obje.sy, obje.sz); // 缩放
+
+        var worldMatrix = last_worldMatrix.copy(). // 复制矩阵
+            translation(obje.x, obje.y, obje.z). // 平移
             rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
             scale(obje.sx, obje.sy, obje.sz); // 缩放
         // -----
@@ -116,7 +117,9 @@ export class Camera
             gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
 
             obje.program.uniformMatrix4fv("u_matrix", matrix.a); // 设置矩阵
+            obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
             obje.program.uniformMatrix4fv_tr("u_worldViewProjection", worldViewProjection.inverse().a); // 设置世界视图投影矩阵
+            obje.program.uniform3f("u_viewPos", this.x, this.y, this.z);
             if (obje.faces.tex) // 如果有纹理
                 obje.faces.tex.bindTexture(0); // 绑定纹理
 
@@ -127,6 +130,6 @@ export class Camera
 
         // 递归子节点
         if (obje.c)
-            obje.c.forEach(o => this.render(gl, o, matrix, worldViewProjection));
+            obje.c.forEach(o => this.render(gl, o, matrix, worldViewProjection, worldMatrix));
     }
 }

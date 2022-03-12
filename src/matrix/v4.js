@@ -81,6 +81,7 @@ export class v4
 
     /**
      * 欧拉角到方向向量
+     * 单位弧度
      * @param {number} x
      * @param {number} y
      * @param {number} z
@@ -94,7 +95,7 @@ export class v4
             0
         );
     }
-
+    
     /**
      * 归一化
      * 将改变原向量
@@ -102,7 +103,7 @@ export class v4
     normalize()
     {
         var sum = Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
-        if(sum != 0)
+        if (sum != 0)
         {
             this.x /= sum;
             this.y /= sum;

@@ -45,9 +45,9 @@ Ammo(null, "../../lib/ammojs/ammo.wasm").then(function (Ammo)
         var body = bodyArray[i++];
         var transform = body.getWorldTransform();
         var origin = transform.getOrigin();
-        origin.setX(0);
+        origin.setX(5);
         origin.setY(9);
-        origin.setZ(0);
+        origin.setZ(5);
         body.activate();
         var rotation = transform.getRotation();
         var quat = v4.Euler2Quaternion(10, 0.5, 10);

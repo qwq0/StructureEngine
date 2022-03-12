@@ -148,38 +148,42 @@ export function create_cube(gl, tex)
 
             in vec2 a_texcoord;
             uniform mat4 u_matrix;
+            uniform mat4 u_worldMatrix;
             uniform mat4 u_worldViewProjection;
             
             out vec3 v_normal;
             out vec2 v_texcoord;
+            out vec3 v_thisPos;
             
             void main() {
                 gl_Position = u_matrix * a_position;
                 v_normal = mat3(u_worldViewProjection) * a_normal;
                 v_texcoord = a_texcoord;
+                v_thisPos = (u_worldMatrix * a_position).xyz;
             }
             `,
             `#version 300 es
             precision highp float;
             
             in vec3 v_normal;
+            in vec3 v_thisPos;
 
             in vec2 v_texcoord;
             uniform sampler2D u_texture;
 
-            const vec3 lightPos = normalize(vec3(0.3, 0.3, 0.3));
-            uniform vec3 viewPos;
+            const vec3 lightDir = normalize(vec3(1, -1, 1)); // 灯光方向向量
+            uniform vec3 u_viewPos;
             
             out vec4 outColor;
             
             void main() {
                 vec3 normal = normalize(v_normal);
             
-                float diffLight = dot(normal, lightPos);
-                float reflLight = dot(viewPos, normal - lightPos);
+                float diffLight = max(dot(normal, -lightDir), 0.0);
+                float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 20.0);
 
                 outColor.a = 1.0;
-                outColor.rgb = texture(u_texture, v_texcoord).rgb * (max(0.0, diffLight) + max(0.0, reflLight) + 0.3);
+                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.15 + diffLight * 0.8 + reflLight * 0.2);
             }
         `);
     obje.faces = {

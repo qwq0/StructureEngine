@@ -59,13 +59,19 @@ export class ScenesObject
      * @type {import("./shader/glslProgram").glslProgram}
      */
     program = null;
-    
+
     /**
      * 子节点
      * @type {Array<ScenesObject>}
      * @todo 兼容map Map<string, ScenesObject>
      */
     c = null;
+
+    /**
+     * 物体id
+     * @type {string}
+     */
+    id = "";
 
     /**
      * 此物体的vao对象
@@ -91,7 +97,7 @@ export class ScenesObject
      * }}
      */
     faces = null;
-    
+
     /**
      * [渲染时] 此物体的缓冲区
      * 用于释放内存使用

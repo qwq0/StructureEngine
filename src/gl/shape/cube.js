@@ -134,6 +134,8 @@ var cubeProgram = null;
 
 /**
  * @returns {ScenesObject}
+ * @param {WebGL2RenderingContext} gl
+ * @param {import("../util/texture.js").Texture} tex
  */
 export function create_cube(gl, tex)
 {
@@ -180,7 +182,7 @@ export function create_cube(gl, tex)
                 vec3 normal = normalize(v_normal);
             
                 float diffLight = max(dot(normal, -lightDir), 0.0);
-                float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 20.0);
+                float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
                 outColor.a = 1.0;
                 outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.15 + diffLight * 0.8 + reflLight * 0.2);

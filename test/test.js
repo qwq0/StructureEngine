@@ -22,6 +22,7 @@ var camera = new Camera(scenes);
 var keyMap = new Map();
 var lastTimeStamp = 0;
 var speed = 0.01;
+
 /**
  * 绘制函数 每帧调用
  * @param {number} timeStamp 
@@ -30,6 +31,7 @@ function draw(timeStamp)
 {
     var timeChange = timeStamp - lastTimeStamp;
     lastTimeStamp = timeStamp;
+
     if (keyMap.get("Shift"))
         speed = 0.02;
     else
@@ -59,6 +61,7 @@ function draw(timeStamp)
     if (keyMap.get("n"))
         camera.y -= timeChange * speed;
     camera.draw();
+
     requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
@@ -81,12 +84,12 @@ function mousemove(e)
     var ry = camera.ry - (e.movementX * 0.005);
     if (rx < degToRad * -90)
         rx = degToRad * -90;
-    if (rx > degToRad * 90)
+    else if (rx > degToRad * 90)
         rx = degToRad * 90;
-    if (ry < degToRad * -180)
-        ry = degToRad * 180;
-    if (ry > degToRad * 180)
-        ry = degToRad * -180;
+    if (ry < degToRad * -360)
+        ry += degToRad * 720;
+    else if (ry > degToRad * 360)
+        ry += degToRad * -720;
     camera.rx = rx;
     camera.ry = ry;
 }
@@ -125,29 +128,5 @@ touchBind(canvas, e => mousemove({
     movementX: e.vx
 }));
 
-var man = new Manager();
+var manager = new Manager();
 
-man.woker.addEventListener("message", (e) =>
-{
-    var data = e.data;
-    if (data.objects)
-    {
-        var info = data.objects[0];
-        // console.log(info);
-        cube0.x = info[0];
-        cube0.y = info[1];
-        cube0.z = info[2];
-        cube0.rx = info[3];
-        cube0.ry = info[4];
-        cube0.rz = info[5];
-        cube0.rw = info[6];
-    }
-    else if (data.isReady)
-        man.woker.postMessage(1);
-    else
-        console.log(e);
-});
-
-// debug
-window["screenObj"] = scenes;
-window["camera"] = camera;

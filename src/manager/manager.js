@@ -1,4 +1,5 @@
 import { ScenesObject } from "../gl/ScenesObject.js";
+import { proxyCallback } from "../util/callbackHandler.js";
 import { ManagerObject } from "./ManagerObject.js";
 
 /**
@@ -22,13 +23,19 @@ export class Manager
      * 场景管理worker(线程)
      * @type {Worker}
      */
-    woker = null;
+    worker = null;
+
+    /**
+     * 准备完成
+     * @type {boolean}
+     */
+    isReady = false;
 
     constructor()
     {
-        this.woker = new Worker("../src/manager/worker/worker.js", { type: "module" });
+        this.worker = new Worker("../src/manager/worker/worker.js", { type: "module" });
 
-        this.woker.addEventListener("message", (e) => // 从worker发来的数据
+        this.worker.addEventListener("message", (e) => // 从worker发来的数据
         {
             var data = e.data;
             if (data.objects)
@@ -54,9 +61,57 @@ export class Manager
                 }
             }
             else if (data.isReady)
-                this.woker.postMessage(1);
+            {
+                this.isReady = true;
+                this.worker.postMessage({ isReady: true });
+            }
             else
                 console.log(e);
+        });
+    }
+
+    /**
+     * 等待直到初始化完成(准备好)
+     */
+    async waitInit()
+    {
+        if (this.isReady)
+            return;
+        await proxyCallback(e =>
+        {
+            Object.defineProperty(this, "isReady", {
+                set: (o) =>
+                {
+                    if (o == true)
+                        e();
+                },
+                get: () => false
+            });
+        }, () =>
+        {
+            delete this.isReady;
+            this.isReady = true;
+        });
+    }
+
+    /**
+     * @param {ScenesObject} e
+     * @param {number} mass
+     */
+    addCube(e, mass)
+    {
+        this.oMap.set(e.id, e);
+        this.worker.postMessage({
+            objects: [{
+                id: e.id,
+                x: e.x,
+                y: e.y,
+                z: e.z,
+                mass: mass,
+                sx: e.sx,
+                sy: e.sy,
+                sz: e.sz,
+            }]
         });
     }
 }

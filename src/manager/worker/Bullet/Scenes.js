@@ -5,8 +5,12 @@
  * 使用Ammo.js以在js中使用Bullet物理引擎
  */
 import { Ammo } from "../../../../lib/ammojs/ammo.wasm.js";
-import { ScenesObject } from "./ScenesObject";
+import { ScenesObject } from "./ScenesObject.js";
 
+/**
+ * Bullet接口
+ * Bullet的Api文档: https://pybullet.org/Bullet/BulletFull/
+*/
 var bt = null;
 /**
  * 初始化Ammo
@@ -102,7 +106,7 @@ export class Scenes
         var objNum = 0;
         for (var i = 0; i < objs.length; i++)
         {
-            var info = objs[i].getInfoA();
+            var info = objs[i].getInfoA(this.transform);
             if (info)
                 data.objects[objNum++] = info;
         }

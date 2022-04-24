@@ -7,16 +7,16 @@ import { initAmmo, Scenes } from "./Bullet/Scenes.js";
 {
     await initAmmo();
 
-    /*
-        使用Bullet接口
-        Bullet的Api文档: https://pybullet.org/Bullet/BulletFull/
-    */
+    /**
+     * 场景上下文
+     * @type {Scenes}
+     */
+    var scenes = null;
 
     var interval = null; // 定时循环号
-
-    onmessage = function (event) // 接受来自主线程的信息
+    function initLoop()
     {
-        var scenes = new Scenes();
+        scenes = new Scenes();
         scenes.initScenes(); // 初始化
 
         var last = Date.now();
@@ -30,6 +30,25 @@ import { initAmmo, Scenes } from "./Bullet/Scenes.js";
         }
         if (interval) clearInterval(interval);
         interval = setInterval(mainLoop, 1000 / 60);
+    }
+
+    onmessage = function (e) // 接受来自主线程的信息
+    {
+        var data = e.data;
+        if (data.objects)
+        {
+            /**
+             * @type {Array}
+             */
+            var objA = data.objects;
+            for (var i = 0; i < objA.length; i++)
+            {
+                var o = objA[i];
+                scenes.addCube(o.id, o.x, o.y, o.z, o.mass, o.sx, o.sy, o.sz);
+            }
+        }
+        else if (data.isReady)
+            initLoop();
     }
     postMessage({ isReady: true }); // 发送已准备好信息
 })();

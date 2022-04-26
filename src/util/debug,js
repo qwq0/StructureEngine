@@ -1,9 +1,0 @@
-/**
- * 调试工具
- * 在屏幕上显示调试窗口
- */
-
-var debugWindow = null;
-
-function init()
-{}

@@ -1,5 +1,5 @@
-import { m4 } from "../matrix/m4.js";
-import { v4 } from "../matrix/v4.js";
+import { m4 } from "../math/m4.js";
+import { v4 } from "../math/v4.js";
 import { glslProgram } from "./shader/glslProgram.js";
 import { degToRad } from "./util/math.js";
 

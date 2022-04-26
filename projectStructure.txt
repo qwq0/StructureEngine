@@ -1,0 +1,57 @@
+Structure Engine
+
+TODO
+    紧急的
+
+    活动的(当前)
+        补全项目结构描述
+        优化项目结构
+    重要的
+
+    循环(定期)
+        优化项目结构
+    未来
+        将游戏逻辑移动到worker进程
+
+
+此项目的结构
+
+源码 - src/
+    处理用户操作 - controller
+        处理键盘操作 - keyboard.js
+        处理鼠标操作 - mouse.js
+        处理触摸操作 - touch.js
+    执行渲染 - gl
+        初始化 - init/
+            初始化webgl上下文 - initContext.js
+        着色器 - shader/
+            glsl着色器编译 - glslProgram.js
+        形状 - shape/
+        工具 - util/
+            数学 - math.js
+            纹理 - texture.js
+        相机 - camera.js
+        灯光 - light.js
+        场景 - scenes.js
+        场景内的物体 - ScenesObject.js
+        全局状态 - state.js
+    管理场景(与worker通信) - manager
+        worker进程(详见下方) - worker/
+        场景管理(与worker通信) - manager.js
+    数学 - math
+        4*4矩阵 - m4.js
+        4向量 - v4.js
+    工具 - util
+        管理回调 - callbackHandler.js
+        遍历数组 - forEach.js
+    索引 - index.js
+    iife版本索引 - index.iife.js
+    处理游戏逻辑 - 用户实现
+
+
+worker进程 - src/manager/worker/
+    处理物理模拟 - Bullet
+
+
+库 - lib/
+    使用了ammo.js库以使用bullet作为物理库

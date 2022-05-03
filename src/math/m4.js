@@ -6,29 +6,30 @@ export class m4
     /**
      * 矩阵原始数据
      * 数组长度为16
-     * @type {Float32Array}
+     * @type {Array<number>}
      */
     a = null;
 
     /**
-     * @param {Array<number> | Float32Array} [arr]
+     * @param {Array<number>} [arr]
      */
     constructor(arr)
     {
         if (arr)
         {
-            this.a = new Float32Array(arr);
+            this.a = arr.slice();
         }
         else
         {
-            this.a = new Float32Array([ // 新矩阵
+            this.a = [ // 新矩阵
                 1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1
-            ]);
+            ];
         }
     }
+    
     /**
      * 复制矩阵
      * @returns {m4}

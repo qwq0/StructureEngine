@@ -11,7 +11,7 @@ TODO
     循环(定期)
         优化项目结构
     未来
-        将游戏逻辑移动到worker进程
+        将游戏逻辑移动到worker线程
 
 
 此项目的结构
@@ -27,16 +27,17 @@ TODO
         着色器 - shader/
             glsl着色器编译 - glslProgram.js
         形状 - shape/
+            正方体 - cube.js
         工具 - util/
             数学 - math.js
             纹理 - texture.js
-        相机 - camera.js
+        相机 - Camera.js
         灯光 - light.js
-        场景 - scenes.js
-        场景内的物体 - ScenesObject.js
+        场景 - Scene.js
+        场景内的物体 - SceneObject.js
         全局状态 - state.js
     管理场景(与worker通信) - manager
-        worker进程(详见下方) - worker/
+        worker线程(详见下方) - worker/
         场景管理(与worker通信) - manager.js
     数学 - math
         4*4矩阵 - m4.js
@@ -46,11 +47,25 @@ TODO
         遍历数组 - forEach.js
     索引 - index.js
     iife版本索引 - index.iife.js
-    处理游戏逻辑 - 用户实现
-
-
-worker进程 - src/manager/worker/
+worker线程 - src/manager/worker/
     处理物理模拟 - Bullet
+
+
+渲染线程与worker线程通信
+渲染线程 -> worker
+    isReady
+        作为worker发送的isReady的回应
+    objects
+        添加物体到worker中
+worker -> 渲染进程
+    isReady
+        当worker初始化完成后发送
+    objects
+        传递物体的位置角度等数据
+
+
+此项目的使用
+    处理游戏逻辑 - 用户实现(在渲染线程中)
 
 
 库 - lib/

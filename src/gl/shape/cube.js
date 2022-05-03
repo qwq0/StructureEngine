@@ -1,4 +1,5 @@
-import { ScenesObject } from "../ScenesObject.js";
+import { ObjFaces } from "../scene/objFaces.js";
+import { SceneObject } from "../scene/SceneObject.js";
 import { glslProgram } from "../shader/glslProgram.js";
 
 var cubeVer = new Float32Array([
@@ -133,13 +134,13 @@ var cubeTexOff = new Float32Array([
 var cubeProgram = null;
 
 /**
- * @returns {ScenesObject}
+ * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
- * @param {import("../util/texture.js").Texture} tex
+ * @param {import("../texture.js").Texture} tex
  */
 export function create_cube(gl, tex)
 {
-    var obje = new ScenesObject();
+    var obje = new SceneObject();
     if (!cubeProgram)
         cubeProgram = new glslProgram(gl,
             `#version 300 es
@@ -185,85 +186,13 @@ export function create_cube(gl, tex)
                 float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
                 outColor.a = 1.0;
-                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.15 + diffLight * 0.8 + reflLight * 0.2);
+                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.85 + diffLight * 0.1 + reflLight * 0.0);
+                // discard;
             }
         `);
-    obje.faces = {
-        ver: cubeVer,
-        verLen: Math.floor(cubeVer.length / 3),
-        tex: tex,
-        texOff: cubeTexOff,
-        normal: cubeNormal
-    };
+    var faces = obje.faces = new ObjFaces(cubeVer, tex, cubeTexOff, cubeNormal, gl.TRIANGLES);
 
-    obje.program = cubeProgram;
-
-    /*
-     * 初始化(顶点数组,纹理数组)
-     */
-    if (!obje.vao) // 这个判断不是必须的
-    {
-        let vao = gl.createVertexArray(); // 创建顶点数组
-        gl.bindVertexArray(vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-
-
-        let positionBuffer = gl.createBuffer(); // 创建缓冲区
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-        gl.bufferData(gl.ARRAY_BUFFER, obje.faces.ver, gl.STATIC_DRAW); // 送入数据
-
-        // 初始化顶点数组
-        let positionAttributeLocation = gl.getAttribLocation(obje.program.progra, "a_position"); // [着色器变量] 顶点坐标
-        gl.enableVertexAttribArray(positionAttributeLocation); // 启用顶点属性数组(顶点坐标数组)
-        gl.vertexAttribPointer( // 顶点属性指针
-            positionAttributeLocation, // 到顶点坐标
-            3, // 每个坐标为3个元素
-            gl.FLOAT, // 浮点数(似乎应该是32位)
-            false, // 归一化(规范化,正常化)
-            0, // 坐标间间隔(无间隔)
-            0 // 缓冲区偏移(从开头开始)
-        );
-
-        obje.vao = vao;
-
-        if (obje.faces.tex) // 有纹理
-        {
-            // 初始化纹理坐标
-            let texcoordAttributeLocation = gl.getAttribLocation(obje.program.progra, "a_texcoord"); // [着色器变量] 纹理坐标
-
-            let texcoordBuffer = gl.createBuffer(); // 创建缓冲区
-            gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-            gl.bufferData(gl.ARRAY_BUFFER, obje.faces.texOff, gl.STATIC_DRAW); // 送入数据
-
-            gl.enableVertexAttribArray(texcoordAttributeLocation); // 启用顶点属性数组(纹理坐标数组)
-
-            gl.vertexAttribPointer( // 顶点属性指针
-                texcoordAttributeLocation, // 到纹理坐标
-                2, // 每个坐标为2个元素
-                gl.FLOAT, // 浮点数(似乎应该是32位)
-                false, // 归一化(规范化,正常化)
-                0, // 坐标间间隔(无间隔)
-                0 // 缓冲区偏移(从开头开始)
-            );
-        }
-
-        // 初始化法线向量
-        let normalAttributeLocation = gl.getAttribLocation(obje.program.progra, "a_normal"); // [着色器变量] 法线向量
-
-        let normalBuffer = gl.createBuffer(); // 创建缓冲区
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-        gl.bufferData(gl.ARRAY_BUFFER, obje.faces.normal, gl.STATIC_DRAW); // 送入数据
-
-        gl.enableVertexAttribArray(normalAttributeLocation); // 启用顶点属性数组(法线向量数组)
-
-        gl.vertexAttribPointer( // 顶点属性指针
-            normalAttributeLocation, // 到法线向量
-            3, // 每个坐标为3个元素
-            gl.FLOAT, // 浮点数(似乎应该是32位)
-            false, // 归一化(规范化,正常化)
-            0, // 坐标间间隔(无间隔)
-            0 // 缓冲区偏移(从开头开始)
-        );
-    }
+    faces.update(gl,obje.program = cubeProgram);
 
     return obje;
 }

@@ -94,7 +94,7 @@ export class BVHnode
 
     /**
      * 此物体的渲染对象
-     * @type {import("../gl/ScenesObject").ScenesObject}
+     * @type {import("../gl/SceneObject").SceneObject}
      */
     renderObj = null;
 

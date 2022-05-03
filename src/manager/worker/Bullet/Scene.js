@@ -5,7 +5,7 @@
  * 使用Ammo.js以在js中使用Bullet物理引擎
  */
 import { Ammo } from "../../../../lib/ammojs/ammo.wasm.js";
-import { ScenesObject } from "./ScenesObject.js";
+import { SceneObject } from "./sceneObject.js";
 
 /**
  * Bullet接口
@@ -26,7 +26,7 @@ export async function initAmmo()
  * 对Bullet接口的封装
  * 有重力刚体碰撞世界
  */
-export class Scenes
+export class Scene
 {
     /**
      * 世界
@@ -35,7 +35,7 @@ export class Scenes
 
     /**
      * 物体列表
-     * @type {Array<import("./ScenesObject").ScenesObject>}
+     * @type {Array<import("./SceneObject").SceneObject>}
      */
     objs = [];
 
@@ -46,7 +46,7 @@ export class Scenes
      */
     transform = new bt.btTransform();
 
-    initScenes()
+    initscene()
     {
         var collisionConfiguration = new bt.btDefaultCollisionConfiguration(); // 内存检查与初始化
         var dispatcher = new bt.btCollisionDispatcher(collisionConfiguration); // 处理碰撞
@@ -58,7 +58,7 @@ export class Scenes
 
     /**
      * 添加一个刚体方块
-     * @param {any} id 方块id
+     * @param {any} sn 方块id
      * @param {any} x x坐标
      * @param {any} y y坐标
      * @param {any} z z坐标
@@ -67,7 +67,7 @@ export class Scenes
      * @param {any} [sy] y缩放
      * @param {any} [sz] z缩放
      */
-    addCube(id, x, y, z, mass = 0, sx = 1, sy = 1, sz = 1)
+    addCube(sn, x, y, z, mass = 0, sx = 1, sy = 1, sz = 1)
     {
         var boxShape = new bt.btBoxShape(new bt.btVector3(sx / 2, sy / 2, sz / 2)); // 立方体大小(边长的一半)
 
@@ -86,7 +86,7 @@ export class Scenes
         var body = new bt.btRigidBody(rbInfo); // 生成刚体
 
         this.dynamicsWorld.addRigidBody(body); // 添加刚体到世界
-        this.objs.push(new ScenesObject(body, id)); // 放入物体列表
+        this.objs.push(new SceneObject(body, sn)); // 放入物体列表
     }
 
     /**

@@ -1,4 +1,4 @@
-import { ScenesObject } from "../gl/ScenesObject.js";
+import { SceneObject } from "../gl/scene/SceneObject.js";
 import { proxyCallback } from "../util/callbackHandler.js";
 import { ManagerObject } from "./ManagerObject.js";
 
@@ -14,10 +14,10 @@ export class Manager
     obje = null;
 
     /**
-     * 物体对应表
-     * @type {Map<string | number, ScenesObject>}
+     * 物体sn对应表
+     * @type {Map<number, SceneObject>}
      */
-    oMap = new Map();
+    sMap = new Map();
 
     /**
      * 场景管理worker(线程)
@@ -47,7 +47,7 @@ export class Manager
                 for (var i = 0; i < objA.length; i++)
                 {
                     var info = objA[i];
-                    var obj = this.oMap.get(info[0]);
+                    var obj = this.sMap.get(info[0]);
                     if (obj)
                     {
                         obj.x = info[1];
@@ -95,22 +95,22 @@ export class Manager
     }
 
     /**
-     * @param {ScenesObject} e
+     * @param {SceneObject} e
      * @param {number} mass
      */
     addCube(e, mass)
     {
-        this.oMap.set(e.id, e);
+        this.sMap.set(e.sn, e);
         this.worker.postMessage({
             objects: [{
-                id: e.id,
+                sn: e.sn,
                 x: e.x,
                 y: e.y,
                 z: e.z,
                 mass: mass,
                 sx: e.sx,
                 sy: e.sy,
-                sz: e.sz,
+                sz: e.sz
             }]
         });
     }

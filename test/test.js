@@ -5,8 +5,9 @@
  */
 import { keyboardBind } from "../src/controller/keyboard.js";
 import { touchBind } from "../src/controller/touch.js";
+import { ObjC } from "../src/gl/object/ObjC.js";
 import { degToRad } from "../src/gl/util/math.js";
-import { Camera, create_cube, initContext, Scenes, Texture } from "../src/index.js";
+import { create_cube, initContext, Texture } from "../src/index.js";
 import { Manager } from "../src/manager/manager.js";
 
 
@@ -19,9 +20,9 @@ import { Manager } from "../src/manager/manager.js";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
 
-    var gl = initContext(canvas);
-    var scenes = new Scenes(gl);
-    var camera = new Camera(scenes);
+    var ct = initContext(canvas);
+    var scene = ct.createScene();
+    var camera = scene.createCamera();
     var keyMap = new Map();
     var manager = new Manager();
     await manager.waitInit();
@@ -62,9 +63,14 @@ import { Manager } from "../src/manager/manager.js";
             camera.z -= timeChange * Math.sin(camera.ry) * speed;
         }
         if (keyMap.get(" "))
+        {
             camera.y += timeChange * speed;
+        }
         if (keyMap.get("n"))
+        {
             camera.y -= timeChange * speed;
+        }
+
         camera.draw();
 
         requestAnimationFrame(draw);
@@ -72,20 +78,22 @@ import { Manager } from "../src/manager/manager.js";
     requestAnimationFrame(draw);
 
 
-    let cubeF = create_cube(gl, new Texture(gl, "./cube.png"));
+    let cubeF = create_cube(ct.gl, new Texture(scene.gl, "./cube.png"));
     cubeF.sx = 16;
     cubeF.y = -10;
     cubeF.sz = 16;
-    scenes.obje.c.push(cubeF);
-    cubeF.id = "cubeF";
+    scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
-    let cube0 = create_cube(gl, new Texture(gl, "./WoodFloor045_1K_Color.jpg"));
+    let cube0 = create_cube(ct.gl, new Texture(scene.gl, "./WoodFloor045_1K_Color.jpg"));
     cube0.x = 0;
     cube0.y = 9;
     cube0.z = 0;
-    scenes.obje.c.push(cube0);
-    cube0.id = "cube0";
+    scene.addChild(cube0);
     manager.addCube(cube0, 1);
+    camera.x = scene.obje.x = camera.z = scene.obje.z = 80000;
+
+    let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
+    scene.addChild(objObj.createSceneObject(ct.gl, cube0.program));
 
     function mousemove(e)
     {

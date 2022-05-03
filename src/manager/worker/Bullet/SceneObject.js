@@ -4,7 +4,7 @@
 /**
  * 场景中的物体
  */
-export class ScenesObject
+export class SceneObject
 {
     /**
      * 物体在物理引擎中的对象
@@ -72,19 +72,21 @@ export class ScenesObject
     sz = 1;
 
     /**
-     * 物体id
-     * @type {string}
+     * 物体的唯一编号
+     * 正常时为非负整数
+     * 与渲染线程中的对应
+     * @type {number}
      */
-    id = "";
+    sn = -1;
 
     /**
      * @param {any} o
-     * @param {string} id
+     * @param {number} sn
      */
-    constructor(o, id)
+    constructor(o, sn)
     {
         this.o = o;
-        this.id = id;
+        this.sn = sn;
     }
 
     /**
@@ -124,7 +126,7 @@ export class ScenesObject
     getInfoE(transform)
     {
         var info = [];
-        info[0] = this.id;
+        info[0] = this.sn;
         var body = this.o;
         body.getMotionState().getWorldTransform(transform);
         var origin = transform.getOrigin(); // 位置坐标

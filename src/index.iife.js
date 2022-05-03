@@ -1,14 +1,14 @@
 import
     {
         initContext,
-        Scenes,
+        Scene,
         Camera,
         create_cube,
         Texture
     } from "./index.js";
 window["structureEngine"] = {
     initContext,
-    Scenes,
+    Scene,
     Camera,
     create_cube,
     Texture

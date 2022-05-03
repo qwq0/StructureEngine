@@ -1,5 +1,5 @@
 import { forEach } from "../../util/forEach.js";
-import { ObjFaces } from "../scene/objFaces.js";
+import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/sceneObject.js";
 import { Texture } from "../texture.js";
 import { MtlC } from "./MtlC.js";

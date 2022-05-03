@@ -1,4 +1,4 @@
-import { ObjFaces } from "../scene/objFaces.js";
+import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { glslProgram } from "../shader/glslProgram.js";
 

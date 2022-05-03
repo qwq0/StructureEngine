@@ -101,7 +101,7 @@ export class SceneObject
 
     /**
      * [gl]面数据
-     * @type {import("./objFaces").ObjFaces}
+     * @type {import("./ObjFaces").ObjFaces}
      */
     faces = null;
 

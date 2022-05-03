@@ -1,5 +1,5 @@
 import { Camera } from "../Camera.js"
-import { SceneObject } from "./sceneObject.js";
+import { SceneObject } from "./SceneObject.js";
 
 /**
  * 场景类

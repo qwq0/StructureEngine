@@ -1,6 +1,6 @@
 import { forEach } from "../../util/forEach.js";
 import { ObjFaces } from "../scene/ObjFaces.js";
-import { SceneObject } from "../scene/sceneObject.js";
+import { SceneObject } from "../scene/SceneObject.js";
 import { Texture } from "../texture.js";
 import { MtlC } from "./MtlC.js";
 import { MtlCMaterial } from "./MtlCMaterial.js";

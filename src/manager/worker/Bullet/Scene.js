@@ -5,7 +5,7 @@
  * 使用Ammo.js以在js中使用Bullet物理引擎
  */
 import { Ammo } from "../../../../lib/ammojs/ammo.wasm.js";
-import { SceneObject } from "./sceneObject.js";
+import { SceneObject } from "./SceneObject.js";
 
 /**
  * Bullet接口

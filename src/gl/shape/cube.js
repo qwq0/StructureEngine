@@ -174,7 +174,7 @@ export function create_cube(gl, tex)
             in vec2 v_texcoord;
             uniform sampler2D u_texture;
 
-            const vec3 lightDir = normalize(vec3(1, -1, 1)); // 灯光方向向量
+            const vec3 lightDir = normalize(vec3(0.3, -0.2, 1)); // 灯光方向向量
             uniform vec3 u_viewPos;
             
             out vec4 outColor;
@@ -186,7 +186,7 @@ export function create_cube(gl, tex)
                 float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
                 outColor.a = 1.0;
-                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.35 + diffLight * 0.4 + reflLight * 0.3);
+                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.45 + diffLight * 0.4 + reflLight * 0.3);
                 // discard;
             }
         `);

@@ -144,7 +144,7 @@ export class ObjC
                 { // 缺省法线
                     var ind = positionsInd[i];
                     defaultNormalMap.set(ind,
-                        defaultNormal.sub(
+                        defaultNormal.add(
                             defaultNormalMap.has(ind) ? defaultNormalMap.get(ind) : new v3()
                         )
                     );

@@ -19,6 +19,16 @@ import { Manager } from "../src/manager/manager.js";
     canvas.style.top = "0px";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
+    var debugDiv = document.body.appendChild(document.createElement("div"));
+    debugDiv.style.position = "fixed";
+    debugDiv.style.left = "0px";
+    debugDiv.style.top = "0px";
+    var fpsCount = 0;
+    setInterval(() =>
+    {
+        debugDiv.innerText = "fps: " + fpsCount;
+        fpsCount = 0;
+    }, 1000);
 
     var ct = initContext(canvas);
     var scene = ct.createScene();
@@ -37,6 +47,7 @@ import { Manager } from "../src/manager/manager.js";
     {
         var timeChange = timeStamp - lastTimeStamp;
         lastTimeStamp = timeStamp;
+        fpsCount++;
 
         if (keyMap.get("Shift"))
             speed = 0.02;
@@ -92,8 +103,9 @@ import { Manager } from "../src/manager/manager.js";
     manager.addCube(cube0, 1);
     camera.x = scene.obje.x = camera.z = scene.obje.z = 80000;
 
-    let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
-    scene.addChild(objObj.createSceneObject(ct.gl, cube0.program));
+    // var objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
+    // let obj = objObj.createSceneObject(ct.gl, cube0.program);
+    // scene.addChild(obj);
 
     function mousemove(e)
     {

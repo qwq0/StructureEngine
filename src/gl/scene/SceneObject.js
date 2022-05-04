@@ -1,3 +1,4 @@
+import { m4 } from "../../math/m4.js";
 import { forEach } from "../../util/forEach.js";
 
 /**
@@ -60,6 +61,18 @@ export class SceneObject
      * @type {number}
      */
     sz = 1;
+
+    /**
+     * 世界矩阵
+     * @type {m4}
+     */
+    wMat = new m4();
+
+    /**
+     * 局部矩阵
+     * @type {m4}
+     */
+    lMat = new m4();
 
     /**
      * 子节点
@@ -152,4 +165,10 @@ export class SceneObject
             this.c = [];
         this.c.push(o);
     }
+
+    /**
+     * 更新矩阵
+     */
+    updateMat()
+    {}
 }

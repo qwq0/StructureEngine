@@ -1,3 +1,5 @@
+import { v4 } from "./v4.js";
+
 /**
  * 4*4矩阵类
  */
@@ -29,7 +31,7 @@ export class m4
             ];
         }
     }
-    
+
     /**
      * 复制矩阵
      * @returns {m4}
@@ -45,7 +47,7 @@ export class m4
      * 注意 此乘法与一般矩阵乘法的ab相反
      * 此函数为b*a 也就是矩阵变换乘
      * c[i][j] = sum(a[k][j] + b[i][k])
-     * @param {m4} matrix 
+     * @param {m4} matrix
      * @returns {m4}
      */
     multiply(matrix)
@@ -431,5 +433,21 @@ export class m4
         this.a[2 * 4 + 2] *= sz;
         this.a[2 * 4 + 3] *= sz;
         return this;
+    }
+
+    /**
+     * 乘v4向量
+     * (矩阵 乘 向量)
+     * @param {import("./v4").v4} v
+     */
+    mulV4(v)
+    {
+        var a = this.a;
+        return new v4(
+            (v.x * a[0]) + (v.y * a[1]) + (v.z * a[2]) + (v.w * a[3]),
+            (v.x * a[4]) + (v.y * a[5]) + (v.z * a[6]) + (v.w * a[7]),
+            (v.x * a[8]) + (v.y * a[9]) + (v.z * a[10]) + (v.w * a[11]),
+            (v.x * a[12]) + (v.y * a[13]) + (v.z * a[14]) + (v.w * a[15])
+        );
     }
 }

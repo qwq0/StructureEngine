@@ -101,11 +101,10 @@ import { Manager } from "../src/manager/manager.js";
     cube0.z = 0;
     scene.addChild(cube0);
     manager.addCube(cube0, 1);
-    camera.x = scene.obje.x = camera.z = scene.obje.z = 80000;
 
-    // var objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
-    // let obj = objObj.createSceneObject(ct.gl, cube0.program);
-    // scene.addChild(obj);
+    var objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
+    let obj = objObj.createSceneObject(ct.gl, cube0.program);
+    scene.addChild(obj);
 
     function mousemove(e)
     {

@@ -1,4 +1,5 @@
 import { m4 } from "../../math/m4.js";
+import { v4 } from "../../math/v4.js";
 import { forEach } from "../../util/forEach.js";
 
 /**
@@ -74,17 +75,12 @@ export class SceneObject
      */
     lMat = new m4();
 
+
     /**
      * 子节点
      * @type {Array<SceneObject>}
      */
     c = null;
-
-    /**
-     * 父节点
-     * @type {SceneObject}
-     */
-    parent = null;
 
     /**
      * 物体所在的场景
@@ -119,11 +115,11 @@ export class SceneObject
     faces = null;
 
     /**
-     * [gl]此物体的缓冲区
-     * 用于释放内存使用
-     * @type {WebGLBuffer}
+     * 包围球半径
+     * 包围球中心为局部原点
+     * @type {number}
      */
-    buffer = null;
+    bsR = -1;
 
 
     constructor()
@@ -167,8 +163,30 @@ export class SceneObject
     }
 
     /**
-     * 更新矩阵
+     * 递归更新矩阵
+     * @param {m4} mat
      */
-    updateMat()
-    {}
+    updateMat(mat)
+    {
+        this.lMat = new m4().
+            translation(this.x, this.y, this.z). // 平移
+            rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
+            scale(this.sx, this.sy, this.sz); // 缩放
+        this.wMat = mat.multiply(this.lMat);
+        // 递归子节点
+        if (this.c)
+            this.c.forEach(o => o.updateMat(this.wMat));
+    }
+
+    /**
+     * 更新包围球
+     */
+    updateBoundingSphere()
+    {
+        var pos = this.faces.pos;
+        var maxR = 0;
+        for (var i = 0; i < pos.length; i += 3)
+            maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(this.lMat).getV3Len());
+        this.bsR = maxR;
+    }
 }

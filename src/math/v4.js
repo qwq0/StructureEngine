@@ -40,17 +40,17 @@ export class v4
 
     /**
      * 乘m4矩阵
-     * (矩阵 乘 向量)
+     * (向量 乘 矩阵)
      * @param {import("./m4").m4} m
      */
-    multiplyM4(m)
+    mulM4(m)
     {
         var a = m.a;
         return new v4(
-            (this.x * a[0]) + (this.y * a[1]) + (this.z * a[2]) + (this.w * a[3]),
-            (this.x * a[4]) + (this.y * a[5]) + (this.z * a[6]) + (this.w * a[7]),
-            (this.x * a[8]) + (this.y * a[9]) + (this.z * a[10]) + (this.w * a[11]),
-            (this.x * a[12]) + (this.y * a[13]) + (this.z * a[14]) + (this.w * a[15])
+            (this.x * a[0]) + (this.y * a[4]) + (this.z * a[8]) + (this.w * a[12]),
+            (this.x * a[1]) + (this.y * a[5]) + (this.z * a[9]) + (this.w * a[13]),
+            (this.x * a[2]) + (this.y * a[6]) + (this.z * a[10]) + (this.w * a[14]),
+            (this.x * a[3]) + (this.y * a[7]) + (this.z * a[11]) + (this.w * a[15])
         );
     }
 
@@ -95,21 +95,40 @@ export class v4
             0
         );
     }
-    
+
     /**
-     * 归一化
-     * 将改变原向量
+     * 归一化(使向量长度为1 不改变方向)
+     * 不改变原向量
+     * @returns {v4}
      */
     normalize()
     {
-        var sum = Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
+        var sum = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
         if (sum != 0)
-        {
-            this.x /= sum;
-            this.y /= sum;
-            this.z /= sum;
-            this.w /= sum;
-        }
-        return this;
+            return new v4(
+                this.x / sum,
+                this.y / sum,
+                this.z / sum,
+                this.w / sum
+            );
+        else
+            return new v4();
     }
+
+    /**
+     * 取三维向量的模(长度)
+     * 只使用xyz
+     */
+    getV3Len()
+    {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+}
+/**
+ * 通过数组构造一个v4类
+ * @param {Array<number>} a
+ */
+export function V4(a)
+{
+    return new v4(a[0], a[1], a[2], a[3]);
 }

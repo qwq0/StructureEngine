@@ -1,9 +1,9 @@
+import { v3, V3 } from "../../math/v3.js";
 import { forEach } from "../../util/forEach.js";
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { Texture } from "../texture.js";
 import { MtlC } from "./MtlC.js";
-import { MtlCMaterial } from "./MtlCMaterial.js";
 import { ObjCFaces } from "./ObjCFaces.js";
 
 /**
@@ -87,74 +87,91 @@ export class ObjC
         var faces = new ObjCFaces();
         ret.faces.push(faces);
 
+        /** @type {Map<number, v3>} */
+        var defaultNormalMap = new Map();
+        /** @type {Array<[number, number]>} */
+        var defaultNormalList = [];
         /**
          * 添加面
          * @param {[string, string, string]} vert 三个顶点索引 每个顶点索引为一个包含多索引的字符串
          */
         function addFace(vert)
         {
-            var positions = [];
-            var texcoords = [];
-            var normals = [];
+            var positionsInd = [-1, -1, -1];
+            /** @type {Array<v3>} */
+            var positions = [null, null, null];
+            var texcoords = [null, null, null];
+            var normals = [null, null, null];
             for (var i = 0; i < 3; i++)
             {
                 var parts = vert[i].split("/");
                 if (parts[0]) // 顶点索引
                 {
                     var objInd = parseInt(parts[0]);
-                    positions.push(ret.positions[objInd + (objInd >= 0 ? 0 : ret.positions.length)]);
+                    positions[i] = V3(ret.positions[
+                        positionsInd[i] = (objInd + (objInd >= 0 ? 0 : ret.positions.length))
+                    ]);
                 }
                 else
-                    positions.push(null);
+                    positions[i] = new v3();
                 if (parts[1]) // 纹理索引
                 {
                     var objInd = parseInt(parts[1]);
-                    texcoords.push(ret.texcoords[objInd + (objInd >= 0 ? 0 : ret.texcoords.length)]);
+                    texcoords[i] = ret.texcoords[objInd + (objInd >= 0 ? 0 : ret.texcoords.length)];
                 }
-                else
-                    texcoords.push(null);
                 if (parts[2]) // 法线索引
                 {
                     var objInd = parseInt(parts[2]);
-                    normals.push(ret.normals[objInd + (objInd >= 0 ? 0 : ret.normals.length)]);
+                    normals[i] = ret.normals[objInd + (objInd >= 0 ? 0 : ret.normals.length)];
                 }
-                else
-                    normals.push(null);
             }
-            var v1 = [ // 三角形的一条边向量
-                positions[1][0] - positions[0][0],
-                positions[1][1] - positions[0][1],
-                positions[1][2] - positions[0][2]
-            ];
-            var v2 = [ // 三角形的一条边向量
-                positions[2][0] - positions[1][0],
-                positions[2][1] - positions[1][1],
-                positions[2][2] - positions[1][2]
-            ];
-            var defaultNormal = [ // 默认法线向量(未归一化)
-                v1[1] * v2[2] - v1[2] * v2[1],
-                v1[2] * v2[0] - v1[0] * v2[2],
-                v1[0] * v2[1] - v1[1] * v2[0]
-            ];
+            var vec1 = positions[1].sub(positions[0]); // 三角形的一条边向量
+            var vec2 = positions[2].sub(positions[1]); // 三角形的一条边向量
+            var defaultNormal = vec1.cross(vec2).normalize().mulNum(Math.PI - vec1.angleTo(vec2)); // 默认法线向量乘夹角作为倍率
             for (var i = 0; i < 3; i++)
             {
                 if (positions[i])
-                    faces.pos.push(...positions[i]);
+                    faces.pos.push(positions[i].x, positions[i].y, positions[i].z);
                 else
                     faces.pos.push(0, 0, 0);
                 if (texcoords[i])
                     faces.texPos.push(...texcoords[i]);
                 else
-                    faces.texPos.push(0, 0, 0);
+                    faces.texPos.push(0, 0);
                 if (normals[i])
                     faces.norm.push(...normals[i]);
                 else
-                    faces.norm.push(...defaultNormal);
+                { // 缺省法线
+                    var ind = positionsInd[i];
+                    defaultNormalMap.set(ind,
+                        defaultNormal.sub(
+                            defaultNormalMap.has(ind) ? defaultNormalMap.get(ind) : new v3()
+                        )
+                    );
+                    defaultNormalList.push([faces.norm.length, ind]);
+                    faces.norm.push(0, 0, 0);
+                }
             }
+        }
+        /**
+         * 设置缺省的法线
+         */
+        function setDefaultNormal()
+        {
+            forEach(defaultNormalList, o =>
+            {
+                var ind = o[0];
+                var defaultNormal = defaultNormalMap.get(o[1]).normalize(); // 默认法线向量
+                faces.norm[ind] = defaultNormal.x;
+                faces.norm[ind + 1] = defaultNormal.y;
+                faces.norm[ind + 2] = defaultNormal.z;
+            });
+            defaultNormalList.length = 0;
+            defaultNormalMap.clear();
         }
 
         for (var oInd = 0; oInd < arr.length; oInd++)
-        {
+        { // 解析单行指令
             var oStr = arr[oInd].trim();
             if (oStr == "" || oStr[0] == "#")
                 continue;
@@ -185,6 +202,7 @@ export class ObjC
                     ret.mtl = MtlC.fromString(await (await fetch(folderPath + parts[0])).text(), folderPath);
                     break;
                 case "usemtl": // 使用材质(在mtl中定义)
+                    setDefaultNormal();
                     faces = new ObjCFaces();
                     ret.faces.push(faces);
                     var material = ret.mtl.materialMap.get(parts[0]);
@@ -195,7 +213,8 @@ export class ObjC
             }
         }
 
+        setDefaultNormal();
+
         return ret;
     }
 }
-

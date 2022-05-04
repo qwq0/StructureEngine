@@ -67,6 +67,7 @@ export class Camera
 
     draw()
     {
+        this.scene.obje.updateMat(new m4());
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.render(
             this.gl,
@@ -74,7 +75,6 @@ export class Camera
             m4.perspective(this.fov, this.gl.canvas.clientWidth / this.gl.canvas.clientHeight, 0.1, 2500).
                 rotateXYZ(-this.rx, -this.ry, -this.rz).
                 translation(-this.x, -this.y, -this.z),
-            new m4(),
             new m4()
         );
     }
@@ -87,26 +87,17 @@ export class Camera
      * 我写了这个引擎 但也许我自己也不完全了解webglAPI
      * @param {WebGL2RenderingContext} gl webgl上下文
      * @param {import("./scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
-     * @param {m4} last_matrix 上一个矩阵(投影 位置 角度 缩放)
-     * @param {m4} last_worldViewProjection 世界视图投影矩阵
-     * @param {m4} last_worldMatrix 世界矩阵
+     * @param {m4} pers_matrix 投影矩阵(相机矩阵)
+     * @param {m4} last_worldViewProjection 只包含旋转和缩放没有平移的世界视图投影矩阵
      */
-    render(gl, obje, last_matrix, last_worldViewProjection, last_worldMatrix)
+    render(gl, obje, pers_matrix, last_worldViewProjection)
     {
         // 变换矩阵
-        var matrix = last_matrix.copy(). // 复制矩阵
-            translation(obje.x, obje.y, obje.z). // 平移
-            rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
-            scale(obje.sx, obje.sy, obje.sz); // 缩放
-
+        var matrix = pers_matrix.multiply(obje.wMat);
         var worldViewProjection = last_worldViewProjection.copy(). // 复制矩阵
             rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
             scale(obje.sx, obje.sy, obje.sz); // 缩放
-
-        var worldMatrix = last_worldMatrix.copy(). // 复制矩阵
-            translation(obje.x, obje.y, obje.z). // 平移
-            rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
-            scale(obje.sx, obje.sy, obje.sz); // 缩放
+        var worldMatrix = obje.wMat;
         // -----
 
         // 绘制图像
@@ -129,6 +120,6 @@ export class Camera
 
         // 递归子节点
         if (obje.c)
-            obje.c.forEach(o => this.render(gl, o, matrix, worldViewProjection, worldMatrix));
+            obje.c.forEach(o => this.render(gl, o, pers_matrix, worldViewProjection));
     }
 }

@@ -186,7 +186,7 @@ export function create_cube(gl, tex)
                 float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
                 outColor.a = 1.0;
-                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.25 + diffLight * 0.4 + reflLight * 0.4);
+                outColor.rgb = texture(u_texture, v_texcoord).rgb * (0.35 + diffLight * 0.4 + reflLight * 0.3);
                 // discard;
             }
         `);

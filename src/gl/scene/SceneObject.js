@@ -179,7 +179,20 @@ export class SceneObject
     }
 
     /**
+     * 获取世界视图投影矩阵
+     * 只包含旋转和缩放没有平移
+     * @returns {m4}
+     */
+    getWorldViewProjectionMat()
+    {
+        var ret = this.wMat.copy();
+        this.wMat.a[12] = this.wMat.a[13] = this.wMat.a[14] = 0;
+        return ret;
+    }
+
+    /**
      * 更新包围球
+     * 需要先更新矩阵
      */
     updateBoundingSphere()
     {

@@ -1,3 +1,9 @@
+/**
+ * Structure Engine
+ * @link https://github.com/qwq0/StructureEngine
+ * @copyright qwq_yahu & ndzda
+ * @license MIT
+ */
 export { initContext } from "./gl/init/initContext.js";
 export { Scene } from "./gl/scene/Scene.js";
 export { Camera } from "./gl/Camera.js"

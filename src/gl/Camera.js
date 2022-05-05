@@ -88,15 +88,12 @@ export class Camera
      * @param {WebGL2RenderingContext} gl webgl上下文
      * @param {import("./scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
      * @param {m4} pers_matrix 投影矩阵(相机矩阵)
-     * @param {m4} last_worldViewProjection 只包含旋转和缩放没有平移的世界视图投影矩阵
      */
-    render(gl, obje, pers_matrix, last_worldViewProjection)
+    render(gl, obje, pers_matrix)
     {
         // 变换矩阵
         var matrix = pers_matrix.multiply(obje.wMat);
-        var worldViewProjection = last_worldViewProjection.copy(). // 复制矩阵
-            rotateQuat(obje.rx, obje.ry, obje.rz, obje.rw). // 旋转
-            scale(obje.sx, obje.sy, obje.sz); // 缩放
+        var worldViewProjection = obje.getWorldViewProjectionMat();
         var worldMatrix = obje.wMat;
         // -----
 
@@ -120,6 +117,6 @@ export class Camera
 
         // 递归子节点
         if (obje.c)
-            obje.c.forEach(o => this.render(gl, o, pers_matrix, worldViewProjection));
+            obje.c.forEach(o => this.render(gl, o, pers_matrix));
     }
 }

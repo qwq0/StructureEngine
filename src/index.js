@@ -1,7 +1,7 @@
 /**
  * Structure Engine
  * @link https://github.com/qwq0/StructureEngine
- * @copyright qwq_yahu & ndzda
+ * @copyright StructureEngine authors (qwq0(qwq_yahu) & ndzda)
  * @license MIT
  */
 export { initContext } from "./gl/init/initContext.js";

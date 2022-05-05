@@ -150,15 +150,19 @@ export function create_cube(gl, tex)
             in vec3 a_normal;
 
             in vec2 a_texcoord;
-            uniform mat4 u_matrix;
+            uniform mat4 u_cameraMatrix;
             uniform mat4 u_worldMatrix;
-            uniform mat4 u_worldViewProjection;
             
             out vec3 v_normal;
             out vec2 v_texcoord;
             out vec3 v_thisPos;
             
             void main() {
+                mat4 u_matrix = u_cameraMatrix * u_worldMatrix;
+                mat4 u_worldViewProjection = u_worldMatrix;
+                u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;
+                u_worldViewProjection = transpose(inverse(u_worldViewProjection));
+
                 gl_Position = u_matrix * a_position;
                 v_normal = mat3(u_worldViewProjection) * a_normal;
                 v_texcoord = a_texcoord;
@@ -185,7 +189,7 @@ export function create_cube(gl, tex)
                 float diffLight = max(dot(normal, -lightDir), 0.0);
                 float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
-                float lightResult = 0.45 + diffLight * 0.4 + reflLight * 0.08;
+                float lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08;
                 outColor.a = 1.0;
                 outColor.rgb = texture(u_texture, v_texcoord).rgb * lightResult;
                 // discard;

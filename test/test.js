@@ -102,9 +102,18 @@ import { Manager } from "../src/manager/manager.js";
     scene.addChild(cube0);
     manager.addCube(cube0, 1);
 
-    var objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
-    let obj = objObj.createSceneObject(ct.gl, cube0.program);
-    scene.addChild(obj);
+    {
+        let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
+        let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        scene.addChild(obj);
+    }
+    {
+        let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
+        let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        obj.x = 15;
+        scene.addChild(obj);
+    }
+    //scene.obje.x = scene.obje.z = camera.x = camera.z = 100000;
 
     function mousemove(e)
     {

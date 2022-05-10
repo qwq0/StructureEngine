@@ -58,8 +58,6 @@ export class ObjFaces
             this.pos = new Float32Array(pos);
         if (mode == WebGL2RenderingContext.TRIANGLES) // 三角形
             this.posLen = Math.floor(pos.length / 3);
-        else if (mode == WebGL2RenderingContext.POINTS) // 单点
-            this.posLen = pos.length;
         else
             throw "drawMode error";
         this.tex = tex;

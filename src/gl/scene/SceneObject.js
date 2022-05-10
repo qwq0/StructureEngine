@@ -12,55 +12,25 @@ var snCount = 0;
  */
 export class SceneObject
 {
-    /**
-     * 坐标x(相对)
-     * @type {number}
-     */
+    /** 坐标x(相对) @type {number} */
     x = 0;
-    /**
-     * 坐标y(相对)
-     * @type {number}
-     */
+    /** 坐标y(相对) @type {number} */
     y = 0;
-    /**
-     * 坐标z(相对)
-     * @type {number}
-     */
+    /** 坐标z(相对) @type {number} */
     z = 0;
-    /**
-     * 四元数x(相对旋转)
-     * @type {number}
-     */
+    /** 四元数x(相对旋转) @type {number} */
     rx = 0;
-    /**
-     * 四元数y(相对旋转)
-     * @type {number}
-     */
+    /** 四元数y(相对旋转) @type {number} */
     ry = 0;
-    /**
-     * 四元数z(相对旋转)
-     * @type {number}
-     */
+    /** 四元数z(相对旋转) @type {number} */
     rz = 0;
-    /**
-     * 四元数w(相对旋转)
-     * @type {number}
-     */
+    /** 四元数w(相对旋转) @type {number} */
     rw = 1;
-    /**
-     * x轴缩放(相对)
-     * @type {number}
-     */
+    /** x轴缩放(相对) @type {number} */
     sx = 1;
-    /**
-     * y轴缩放(相对)
-     * @type {number}
-     */
+    /** y轴缩放(相对) @type {number} */
     sy = 1;
-    /**
-     * z轴缩放(相对)
-     * @type {number}
-     */
+    /** z轴缩放(相对) @type {number} */
     sz = 1;
 
     /**
@@ -159,6 +129,7 @@ export class SceneObject
     {
         if (!this.c)
             this.c = [];
+        o.setScene(this.scene);
         this.c.push(o);
     }
 
@@ -179,6 +150,17 @@ export class SceneObject
     }
 
     /**
+     * 获取世界坐标
+     * 需要先更新矩阵
+     * @returns {v4} xyz为坐标 w恒定为1
+     */
+    getWPos()
+    {
+        var wMat = this.wMat;
+        return new v4(wMat.a[12], wMat.a[13], wMat.a[14]);
+    }
+
+    /**
      * 获取世界视图投影矩阵
      * 只包含旋转和缩放没有平移
      * @returns {m4}
@@ -186,20 +168,24 @@ export class SceneObject
     getWorldViewProjectionMat()
     {
         var ret = this.wMat.copy();
-        this.wMat.a[12] = this.wMat.a[13] = this.wMat.a[14] = 0;
+        ret.a[12] = ret.a[13] = ret.a[14] = 0;
         return ret;
     }
 
     /**
-     * 更新包围球
+     * 更新当前物体的面的包围球
      * 需要先更新矩阵
      */
     updateBoundingSphere()
     {
-        var pos = this.faces.pos;
-        var maxR = 0;
-        for (var i = 0; i < pos.length; i += 3)
-            maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(this.lMat).getV3Len());
-        this.bsR = maxR;
+        if (this.bsR < 0)
+        {
+            var pos = this.faces.pos;
+            var wvpMat = this.getWorldViewProjectionMat();
+            var maxR = 0;
+            for (var i = 0; i < pos.length; i += 3)
+                maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
+            this.bsR = maxR;
+        }
     }
 }

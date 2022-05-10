@@ -69,7 +69,7 @@ export class Scene
      */
     addCube(sn, x, y, z, mass = 0, sx = 1, sy = 1, sz = 1)
     {
-        var boxShape = new bt.btBoxShape(new bt.btVector3(sx / 2, sy / 2, sz / 2)); // 立方体大小(边长的一半)
+        var boxShape = new bt.btBoxShape(new bt.btVector3(sx * 0.5, sy * 0.5, sz * 0.5)); // 立方体大小(边长的一半)
 
         var startTransform = new bt.btTransform(); // 转换 仅具有平移和旋转且没有缩放,剪切的刚性变换
         startTransform.setIdentity(); // 将此转换设置为标识

@@ -19,14 +19,19 @@ import { Manager } from "../src/manager/manager.js";
     canvas.style.top = "0px";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
+
     var debugDiv = document.body.appendChild(document.createElement("div"));
     debugDiv.style.position = "fixed";
     debugDiv.style.left = "0px";
     debugDiv.style.top = "0px";
     var fpsCount = 0;
+    var cullCount = 0;
     setInterval(() =>
     {
-        debugDiv.innerText = "fps: " + fpsCount;
+        debugDiv.innerText = ([
+            "fps: " + fpsCount,
+            "cullCount: " + cullCount,
+        ]).join("\n");
         fpsCount = 0;
     }, 1000);
 
@@ -82,7 +87,10 @@ import { Manager } from "../src/manager/manager.js";
             camera.y -= timeChange * speed;
         }
 
+        window.cullCount = 0;
         camera.draw();
+        cullCount = window.cullCount;
+
 
         requestAnimationFrame(draw);
     }
@@ -90,26 +98,40 @@ import { Manager } from "../src/manager/manager.js";
 
 
     let cubeF = create_cube(ct.gl, new Texture(scene.gl, "./cube.png"));
+    cubeF.id = "cubeF";
     cubeF.sx = 16;
     cubeF.y = -10;
     cubeF.sz = 16;
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
     let cube0 = create_cube(ct.gl, new Texture(scene.gl, "./WoodFloor045_1K_Color.jpg"));
+    cube0.id = "cube0";
     cube0.x = 0;
     cube0.y = 9;
     cube0.z = 0;
     scene.addChild(cube0);
     manager.addCube(cube0, 1);
-
+    for (let x = 0; x < 100; x += 3)
+        for (let z = 0; z < 100; z += 3)
+        {
+            let cube = create_cube(ct.gl, scene.idMap.get("cube0").faces.tex);
+            cube.id = "cube" + x + "," + z;
+            cube.x = x;
+            cube.y = 6;
+            cube.z = z;
+            scene.addChild(cube);
+            // manager.addCube(cube, 1);
+        }
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
         let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        obj.id = "yunjin";
         scene.addChild(obj);
     }
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
         let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        obj.id = "ying";
         obj.x = 15;
         scene.addChild(obj);
     }

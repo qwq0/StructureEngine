@@ -38,12 +38,12 @@ export class v3
      */
     normalize()
     {
-        var sum = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-        if (sum != 0)
+        var multiple = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (multiple != Infinity)
             return new v3(
-                this.x / sum,
-                this.y / sum,
-                this.z / sum
+                this.x * multiple,
+                this.y * multiple,
+                this.z * multiple
             );
         else
             return new v3();
@@ -114,7 +114,7 @@ export class v3
      */
     len()
     {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return Math.hypot(this.x, this.y, this.z);
     }
 
     /**
@@ -139,7 +139,7 @@ export class v3
         if (productOfLen != 0)
             return Math.acos(this.dot(v) / productOfLen);
         else
-            return Math.PI / 2;
+            return Math.PI * 0.5;
     }
 }
 /**

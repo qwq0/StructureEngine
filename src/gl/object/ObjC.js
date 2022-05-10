@@ -85,7 +85,6 @@ export class ObjC
         var arr = srcStr.split("\n");
 
         var faces = new ObjCFaces();
-        ret.faces.push(faces);
 
         /** @type {Map<number, v3>} */
         var defaultNormalMap = new Map();
@@ -126,7 +125,7 @@ export class ObjC
                 }
             }
             var vec1 = positions[1].sub(positions[0]); // 三角形的一条边向量
-            var vec2 = positions[2].sub(positions[1]); // 三角形的一条边向量
+            var vec2 = positions[2].sub(positions[1]); // 三角形的另一条边向量
             var defaultNormal = vec1.cross(vec2).normalize().mulNum(Math.PI - vec1.angleTo(vec2)); // 默认法线向量乘夹角作为倍率
             for (var i = 0; i < 3; i++)
             {
@@ -202,9 +201,12 @@ export class ObjC
                     ret.mtl = MtlC.fromString(await (await fetch(folderPath + parts[0])).text(), folderPath);
                     break;
                 case "usemtl": // 使用材质(在mtl中定义)
+                    // 处理之前的面
                     setDefaultNormal();
+                    if(faces.pos.length > 0)
+                        ret.faces.push(faces);
+                    // 新的面
                     faces = new ObjCFaces();
-                    ret.faces.push(faces);
                     var material = ret.mtl.materialMap.get(parts[0]);
                     faces.tex = material.diffuseMap;
                     break;
@@ -214,6 +216,7 @@ export class ObjC
         }
 
         setDefaultNormal();
+        ret.faces.push(faces);
 
         return ret;
     }

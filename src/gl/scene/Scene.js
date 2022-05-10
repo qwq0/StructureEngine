@@ -15,7 +15,7 @@ export class Scene
     /**
      * 场景中物体id与物品对象的对应map
      * @package
-     * @type {Map}
+     * @type {Map<string, SceneObject>}
      */
     idMap = new Map();
     /**

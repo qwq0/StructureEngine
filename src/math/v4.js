@@ -57,7 +57,7 @@ export class v4
     /**
      * 欧拉角到四元数
      * 旋转顺序ZYX
-     * 单位弧度
+     * 单位为弧度
      * @param {number} x
      * @param {number} y
      * @param {number} z
@@ -65,17 +65,17 @@ export class v4
     static Euler2Quaternion(x, y, z)
     {
         return new v4(
-            Math.sin(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) -
-            Math.cos(x / 2) * Math.sin(y / 2) * Math.sin(z / 2),
+            Math.sin(x * 0.5) * Math.cos(y * 0.5) * Math.cos(z * 0.5) -
+            Math.cos(x * 0.5) * Math.sin(y * 0.5) * Math.sin(z * 0.5),
 
-            Math.cos(x / 2) * Math.sin(y / 2) * Math.cos(z / 2) +
-            Math.sin(x / 2) * Math.cos(y / 2) * Math.sin(z / 2),
+            Math.cos(x * 0.5) * Math.sin(y * 0.5) * Math.cos(z * 0.5) +
+            Math.sin(x * 0.5) * Math.cos(y * 0.5) * Math.sin(z * 0.5),
 
-            Math.cos(x / 2) * Math.cos(y / 2) * Math.sin(z / 2) -
-            Math.sin(x / 2) * Math.sin(y / 2) * Math.cos(z / 2),
+            Math.cos(x * 0.5) * Math.cos(y * 0.5) * Math.sin(z * 0.5) -
+            Math.sin(x * 0.5) * Math.sin(y * 0.5) * Math.cos(z * 0.5),
 
-            Math.cos(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) +
-            Math.sin(x / 2) * Math.sin(y / 2) * Math.sin(z / 2)
+            Math.cos(x * 0.5) * Math.cos(y * 0.5) * Math.cos(z * 0.5) +
+            Math.sin(x * 0.5) * Math.sin(y * 0.5) * Math.sin(z * 0.5)
         );
     }
 
@@ -103,13 +103,13 @@ export class v4
      */
     normalize()
     {
-        var sum = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-        if (sum != 0)
+        var multiple = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        if (multiple != Infinity)
             return new v4(
-                this.x / sum,
-                this.y / sum,
-                this.z / sum,
-                this.w / sum
+                this.x * multiple,
+                this.y * multiple,
+                this.z * multiple,
+                this.w * multiple
             );
         else
             return new v4();
@@ -121,7 +121,7 @@ export class v4
      */
     getV3Len()
     {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return Math.hypot(this.x, this.y, this.z);
     }
 }
 /**

@@ -162,23 +162,23 @@ export class m4
 
     /**
      * 透视投影矩阵
-     * @param {number} fieldOfViewInRadians 
-     * @param {number} aspect 
-     * @param {number} near 
-     * @param {number} far 
+     * @param {number} fov 对角线视角场(单位:弧度)
+     * @param {number} aspect 视口垂直长度与水平长度的比例
+     * @param {number} near 视锥最近处
+     * @param {number} far 视锥最远处
      * @returns {m4}
      */
-    static perspective(fieldOfViewInRadians, aspect, near, far)
+    static perspective(fov, aspect, near, far)
     {
-        var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+        var f = Math.tan((Math.PI - fov) * 0.5);
         var rangeInv = 1.0 / (near - far);
 
         return new m4([
-            f / aspect, 0, 0, 0,
-            0, f, 0, 0,
-            0, 0, (near + far) * rangeInv, -1,
-            0, 0, near * far * rangeInv * 2, 0
-        ]);
+            1 / (f * Math.sqrt(1 + 1 / (aspect * aspect))), 0, 0, 0,
+            0, 1 / (f * Math.sqrt(1 + (aspect * aspect))), 0, 0,
+            0, 0, 1 + 2 * far * rangeInv, -1, // 1 + ((2far) / (near - far))
+            0, 0, near * far * rangeInv * 2, 0 // near * far * 2 / (near - far)
+        ]); // Z = 2 * (0.5 + far + near * far / z) / (near - far)
     }
 
     /**

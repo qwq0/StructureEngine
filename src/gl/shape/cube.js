@@ -180,6 +180,8 @@ export function create_cube(gl, tex)
 
             const vec3 lightDir = normalize(vec3(0.3, -0.3, 1)); // 灯光方向向量
             uniform vec3 u_viewPos;
+
+            uniform vec3 u_markColor;
             
             out vec4 outColor;
             
@@ -192,6 +194,7 @@ export function create_cube(gl, tex)
                 float lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08;
                 outColor.a = 1.0;
                 outColor.rgb = texture(u_texture, v_texcoord).rgb * lightResult;
+                outColor.rgb += u_markColor;
                 // discard;
             }
         `);

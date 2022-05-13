@@ -1,4 +1,5 @@
 import { m4 } from "../math/m4.js";
+import { debugObj } from "../tools/debugObj.js";
 import { degToRad } from "./util/math.js";
 
 
@@ -78,9 +79,9 @@ export class Camera
     {
         this.scene.obje.updateMat(new m4()); // 更新场景中物体的矩阵
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
-        if(!window.lock)
+        if (!window.lock)
             this.cMat = new m4().rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
-            translation(-this.x, -this.y, -this.z) // 反向平移;
+                translation(-this.x, -this.y, -this.z) // 反向平移;
         this.render(
             this.gl,
             this.scene.obje,
@@ -113,17 +114,7 @@ export class Camera
         */
         if (obje.faces) // 有"面数据"
         {
-            obje.updateBoundingSphere();
-            var bsPos = obje.getWPos().mulM4(this.cMat);
-            bsPos.z *= -1;
-            /**
-                ndzda推导的球与圆锥不相交的保守剔除原始判断公式
-                (sin(arctan(len(x, y) / z) - Fov / 2) * len(x, y, z) >= r) or (-z >= r)
-            */
-            var cullFlag = (Math.sin(
-                Math.atan(Math.hypot(bsPos.x, bsPos.y) / bsPos.z) - this.fov * 0.5 // 原点到球心与圆锥在对应方向母线的夹角
-            ) * bsPos.getV3Len() >= obje.bsR) || // 乘球心和原点距离得到球心与圆锥在对应方向母线的距离
-                (-bsPos.z >= obje.bsR); // 球心在背后判断
+
             // if (!cullFlag) // 未被剔除
             {
                 var faces = obje.faces;
@@ -132,10 +123,10 @@ export class Camera
                 obje.program.uniformMatrix4fv("u_cameraMatrix", cameraPMat.a); // 设置相机矩阵
                 obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
                 obje.program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
-                if (cullFlag)
+                if (obje.coneRemove(this.cMat, this.fov))
                 {
                     obje.program.uniform3f("u_markColor", 0.5, 0.5, 0); // 标记颜色
-                    window.cullCount++;
+                    debugObj.cullCount++;
                 }
                 else
                     obje.program.uniform3f("u_markColor", 0, 0, 0); // 标记颜色

@@ -170,12 +170,12 @@ export class m4
      */
     static perspective(fov, aspect, near, far)
     {
-        var f = Math.tan((Math.PI - fov) * 0.5);
+        var f = 1 / Math.tan(fov * 0.5);
         var rangeInv = 1.0 / (near - far);
 
         return new m4([
-            1 / (f * Math.sqrt(1 + 1 / (aspect * aspect))), 0, 0, 0,
-            0, 1 / (f * Math.sqrt(1 + (aspect * aspect))), 0, 0,
+            Math.sqrt(1 + (aspect * aspect)) * f, 0, 0, 0,
+            0, Math.sqrt(1 + 1 / (aspect * aspect)) * f, 0, 0,
             0, 0, 1 + 2 * far * rangeInv, -1, // 1 + ((2far) / (near - far))
             0, 0, near * far * rangeInv * 2, 0 // near * far * 2 / (near - far)
         ]); // Z = 2 * (0.5 + far + near * far / z) / (near - far)

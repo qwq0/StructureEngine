@@ -12,25 +12,25 @@ var snCount = 0;
  */
 export class SceneObject
 {
-    /** 坐标x(相对) @type {number} */
+    /** 坐标x(相对) @package @type {number} */
     x = 0;
-    /** 坐标y(相对) @type {number} */
+    /** 坐标y(相对) @package @type {number} */
     y = 0;
-    /** 坐标z(相对) @type {number} */
+    /** 坐标z(相对) @package @type {number} */
     z = 0;
-    /** 四元数x(相对旋转) @type {number} */
+    /** 四元数x(相对旋转) @package @type {number} */
     rx = 0;
-    /** 四元数y(相对旋转) @type {number} */
+    /** 四元数y(相对旋转) @package @type {number} */
     ry = 0;
-    /** 四元数z(相对旋转) @type {number} */
+    /** 四元数z(相对旋转) @package @type {number} */
     rz = 0;
-    /** 四元数w(相对旋转) @type {number} */
+    /** 四元数w(相对旋转) @package @type {number} */
     rw = 1;
-    /** x轴缩放(相对) @type {number} */
+    /** x轴缩放(相对) @package @type {number} */
     sx = 1;
-    /** y轴缩放(相对) @type {number} */
+    /** y轴缩放(相对) @package @type {number} */
     sy = 1;
-    /** z轴缩放(相对) @type {number} */
+    /** z轴缩放(相对) @package @type {number} */
     sz = 1;
 
     /**
@@ -51,6 +51,12 @@ export class SceneObject
      * @type {Array<SceneObject>}
      */
     c = null;
+
+    /**
+     * 父节点
+     * @type {SceneObject}
+     */
+    parent = null;
 
     /**
      * 物体所在的场景
@@ -95,6 +101,7 @@ export class SceneObject
     constructor()
     {
         this.sn = snCount++;
+        this.updateMat();
     }
 
 
@@ -130,23 +137,29 @@ export class SceneObject
         if (!this.c)
             this.c = [];
         o.setScene(this.scene);
+        o.parent = this;
         this.c.push(o);
     }
 
     /**
      * 递归更新矩阵
-     * @param {m4} mat
      */
-    updateMat(mat)
+    updateMat()
     {
         this.lMat = new m4().
             translation(this.x, this.y, this.z). // 平移
             rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
             scale(this.sx, this.sy, this.sz); // 缩放
-        this.wMat = mat.multiply(this.lMat);
+        var pMat = null;
+        if (this.parent)
+        {
+            this.wMat = (this.parent.wMat).multiply(this.lMat);
+        }
+        else
+            pMat = this.lMat;
         // 递归子节点
         if (this.c)
-            this.c.forEach(o => o.updateMat(this.wMat));
+            this.c.forEach(o => o.updateMat());
     }
 
     /**

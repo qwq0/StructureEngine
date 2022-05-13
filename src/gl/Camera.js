@@ -45,7 +45,7 @@ export class Camera
      * 对角线fov
      * @type {number}
      */
-    fov = degToRad * 90;
+    fov = degToRad * 130;
 
     /**
      * 绑定的场景
@@ -64,6 +64,11 @@ export class Camera
      * @type {m4}
      */
     cMat = null;
+    /**
+     * 当前着色器
+     * @type {import("./shader/glslProgram").glslProgram}
+     */
+    nowProgram = null;
 
 
     /**
@@ -77,7 +82,9 @@ export class Camera
 
     draw()
     {
-        this.scene.obje.updateMat(new m4()); // 更新场景中物体的矩阵
+        debugObj.clear();
+        this.nowProgram = null;
+        this.scene.obje.updateMat(); // 更新场景中物体的矩阵
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
         if (!window.lock)
             this.cMat = new m4().rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
@@ -115,29 +122,25 @@ export class Camera
         if (obje.faces) // 有"面数据"
         {
 
-            // if (!cullFlag) // 未被剔除
+            if (!obje.coneRemove(this.cMat, this.fov)) // 未被剔除
             {
                 var faces = obje.faces;
-                gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
-
-                obje.program.uniformMatrix4fv("u_cameraMatrix", cameraPMat.a); // 设置相机矩阵
-                obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
-                obje.program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
-                if (obje.coneRemove(this.cMat, this.fov))
+                if(this.nowProgram != obje.program)
                 {
-                    obje.program.uniform3f("u_markColor", 0.5, 0.5, 0); // 标记颜色
-                    debugObj.cullCount++;
+                    gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
+                    obje.program.uniformMatrix4fv("u_cameraMatrix", cameraPMat.a); // 设置相机矩阵
+                    obje.program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
+                    this.nowProgram = obje.program;
                 }
-                else
-                    obje.program.uniform3f("u_markColor", 0, 0, 0); // 标记颜色
+                obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
+                // obje.program.uniform3f("u_markColor", 0, 0, 0); // 标记颜色
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理
-
                 gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
                 gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
             }
-            // else
-            //     window.cullCount++;
+            else
+                debugObj.cullCount++;
         }
         /*---------*/
 

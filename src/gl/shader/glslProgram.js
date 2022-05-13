@@ -18,7 +18,7 @@ export class glslProgram
      * uniform变量表
      * @type {Object<string,object>}
      */
-    unif = {};
+    unif = Object.create(null);
 
     /**
      * @param {WebGL2RenderingContext} gl webgl上下文

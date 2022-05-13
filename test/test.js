@@ -9,6 +9,7 @@ import { ObjC } from "../src/gl/object/ObjC.js";
 import { degToRad } from "../src/gl/util/math.js";
 import { create_cube, initContext, Texture } from "../src/index.js";
 import { Manager } from "../src/manager/manager.js";
+import { debugObj } from "../src/tools/debugObj.js";
 
 
 (async function ()
@@ -30,7 +31,7 @@ import { Manager } from "../src/manager/manager.js";
     {
         debugDiv.innerText = ([
             "fps: " + fpsCount,
-            "cullCount: " + cullCount,
+            "cullCount: " + debugObj.cullCount,
         ]).join("\n");
         fpsCount = 0;
     }, 1000);
@@ -87,10 +88,7 @@ import { Manager } from "../src/manager/manager.js";
             camera.y -= timeChange * speed;
         }
 
-        window.cullCount = 0;
         camera.draw();
-        cullCount = window.cullCount;
-
 
         requestAnimationFrame(draw);
     }
@@ -162,9 +160,9 @@ import { Manager } from "../src/manager/manager.js";
         if (e.key == "c")
         {
             if (e.hold)
-                camera.fov = degToRad * 30;
+                camera.fov = degToRad * 80;
             else
-                camera.fov = degToRad * 90;
+                camera.fov = degToRad * 125;
         }
     })
 

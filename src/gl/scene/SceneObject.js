@@ -66,7 +66,7 @@ export class SceneObject
 
     /**
      * 绘制此物体使用的着色器组(渲染程序)
-     * @type {import("../shader/glslProgram").glslProgram}
+     * @type {import("../shader/GlslProgram").GlslProgram}
      */
     program = null;
 

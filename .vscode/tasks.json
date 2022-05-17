@@ -6,7 +6,7 @@
         {
             "label": "build lib",
             "type": "shell",
-            "command": "rollup -i src/index.js -o dist/structureEngine.js -f es",
+            "command": "rollup -i src/index.js -o dist/structureEngine.js -f es -m",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,7 +16,7 @@
         {
             "label": "build lib (iife)",
             "type": "shell",
-            "command": "rollup -i src/index.iife.js -o dist/structureEngine.iife.js -f iife",
+            "command": "rollup -i src/index.js -o dist/structureEngine.iife.js -f iife -n structureEngine -m",
             "problemMatcher": []
         },
     ]

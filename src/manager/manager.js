@@ -1,17 +1,11 @@
 import { SceneObject } from "../gl/scene/SceneObject.js";
 import { proxyCallback } from "../util/callbackHandler.js";
-import { ManagerObject } from "./ManagerObject.js";
 
 /**
  * 场景管理类
  */
 export class Manager
 {
-    /**
-     * 场景物体树
-     * @type {ManagerObject}
-     */
-    obje = null;
 
     /**
      * 物体sn对应表

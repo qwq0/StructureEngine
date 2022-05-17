@@ -1,6 +1,6 @@
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
-import { glslProgram } from "../shader/glslProgram.js";
+import { GlslProgram } from "../shader/GlslProgram.js";
 
 var cubeVer = new Float32Array([
     -0.5, 0.5, -0.5,
@@ -136,13 +136,13 @@ var cubeProgram = null;
 /**
  * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
- * @param {import("../texture.js").Texture} tex
+ * @param {import("../texture/Texture.js").Texture} tex
  */
 export function create_cube(gl, tex)
 {
     var obje = new SceneObject();
     if (!cubeProgram)
-        cubeProgram = new glslProgram(gl,
+        cubeProgram = new GlslProgram(gl,
             `#version 300 es
             precision highp float;
 
@@ -158,15 +158,14 @@ export function create_cube(gl, tex)
             out vec3 v_thisPos;
             
             void main() {
-                mat4 u_matrix = u_cameraMatrix * u_worldMatrix;
+                gl_Position = u_cameraMatrix * u_worldMatrix * a_position;
+                v_texcoord = a_texcoord;
+                v_thisPos = (u_worldMatrix * a_position).xyz;
+
                 mat4 u_worldViewProjection = u_worldMatrix;
                 u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;
                 u_worldViewProjection = transpose(inverse(u_worldViewProjection));
-
-                gl_Position = u_matrix * a_position;
                 v_normal = mat3(u_worldViewProjection) * a_normal;
-                v_texcoord = a_texcoord;
-                v_thisPos = (u_worldMatrix * a_position).xyz;
             }
             `,
             `#version 300 es

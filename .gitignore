@@ -1,3 +1,5 @@
 .vscode/settings.json
 test/ssl/
 dist/structureEngine.iife.js
+dist/structureEngine.js.map
+dist/structureEngine.iife.js.map

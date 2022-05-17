@@ -1,0 +1,112 @@
+import { GlslProgram } from "./GlslProgram.js";
+
+/**
+ * glsl着色器生成器
+ * 生成一对着色器(一个GlslProgram)
+ *  - 顶点着色器流程
+ *      - 定义输入变量
+ *          - in vec4 a_position; // (必须)原始坐标
+ *          - in vec3 a_normal; // 原始法线
+ *          - in vec2 a_texcoord; // 纹理坐标
+ *          - uniform mat4 u_cameraMatrix; // (必须)相机(包括投影投影)矩阵
+ *          - uniform mat4 u_worldMatrix; // (必须)世界矩阵
+ *      - 传递顶点的视图坐标(必须)
+ *      - 传递自定义数据
+ *  - 片段着色器流程
+ *      - 定义输入变量(包含顶点着色器的输入变量)
+ *          - in vec3 v_normal; // 法线
+ *          - in vec3 v_thisPos; // 顶点的世界坐标
+ *          - in vec2 v_texcoord; // 纹理坐标
+ *          - uniform sampler2D u_texture; // 纹理
+ *          - uniform vec3 u_viewPos; // 视点(相机)的世界坐标
+ *          - uniform vec3 u_markColor; // 标记颜色(调试)
+ *      - 计算光照
+ *      - 设置最终颜色(必须)
+ */
+export class GlslGenerator
+{
+    /**
+     * @type {WebGL2RenderingContext}
+     */
+    gl = null;
+
+    /**
+     * 灯光列表
+     */
+    lights = [];
+
+    /**
+     * 顶点着色器的uniform列表
+     */
+    vUniforms = [];
+    /**
+     * 片段着色器的uniform列表
+     */
+    fUniforms = [];
+
+    /**
+     * 生成着色器
+     * @returns {GlslProgram}
+     */
+    gen()
+    {
+        var vertexShaderParts = [
+            "#version 300 es",
+            "precision highp float;",
+
+            "in vec4 a_position;", // 原始坐标
+            "in vec3 a_normal;", // 原始法线
+
+            "in vec2 a_texcoord;", // 纹理坐标
+
+            "uniform mat4 u_cameraMatrix;", // 相机(包括投影投影)矩阵
+            "uniform mat4 u_worldMatrix;", // 世界矩阵
+
+            "out vec3 v_normal;", // 法线
+            "out vec2 v_texcoord;", // 纹理坐标
+            "out vec3 v_thisPos;", // 顶点的世界坐标
+
+            "void main() {",
+            "    gl_Position = u_cameraMatrix * u_worldMatrix * a_position;", // 转换到视图中坐标
+            "    v_texcoord = a_texcoord;", // 纹理坐标(插值)
+            "    v_thisPos = (u_worldMatrix * a_position).xyz;", // 顶点世界坐标(插值)
+
+            "    mat4 u_worldViewProjection = u_worldMatrix;", // 求出不含平移的世界矩阵(旋转和缩放)
+            "    u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;",
+            "    u_worldViewProjection = transpose(inverse(u_worldViewProjection));",
+            "    v_normal = mat3(u_worldViewProjection) * a_normal;", // 法线(插值)
+            "}"
+        ];
+        var fragmentShaderParts = [
+            "#version 300 es",
+            "precision highp float;",
+
+            "in vec3 v_normal;", // 法线
+            "in vec3 v_thisPos;", // 顶点的世界坐标
+
+            "in vec2 v_texcoord;", // 纹理坐标
+            "uniform sampler2D u_texture;", // 纹理
+
+            "const vec3 lightDir = normalize(vec3(0.3, -0.3, 1));", // 灯光方向向量
+            "uniform vec3 u_viewPos;", // 视点(相机)的世界坐标
+
+            "uniform vec3 u_markColor;", // 标记颜色(调试)
+
+            "out vec4 outColor;", // 此片段最终的颜色
+
+            "void main() {",
+            "    vec3 normal = normalize(v_normal);", // 法线(归一化)
+
+            "    float diffLight = max(dot(normal, -lightDir), 0.0);", // 平行光漫反射
+            "    float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);", // 平行光镜面反射
+
+            "    float lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08;", // 光的总影响
+            "    outColor.a = 1.0;",
+            "    outColor.rgb = texture(u_texture, v_texcoord).rgb * lightResult;", // 计算最终颜色
+            "    outColor.rgb += u_markColor;", // 标记颜色(调试)
+            // "    discard;", 丢弃片段
+            "}"
+        ];
+        return new GlslProgram(this.gl, vertexShaderParts.join("\n"), fragmentShaderParts.join("\n"));
+    }
+}

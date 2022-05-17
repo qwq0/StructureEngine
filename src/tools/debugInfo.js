@@ -1,4 +1,4 @@
-export var debugObj = {
+export var debugInfo = {
     /**
      * 视锥剔除的物体数
      * @type {number}

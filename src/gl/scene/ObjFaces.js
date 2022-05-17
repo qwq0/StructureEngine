@@ -1,4 +1,4 @@
-import { glslProgram } from "../shader/glslProgram.js";
+import { GlslProgram } from "../shader/GlslProgram.js";
 
 /**
  * [gl]物体的面数据
@@ -24,7 +24,7 @@ export class ObjFaces
     posLen = 0;
     /**
      * 纹理
-     * @type {import("../texture").Texture}
+     * @type {import("../texture/Texture").Texture}
      */
     tex = null;
     /**
@@ -45,7 +45,7 @@ export class ObjFaces
 
     /**
      * @param {Float32Array | Array<number>} pos
-     * @param {import("../texture").Texture} tex
+     * @param {import("../texture/Texture").Texture} tex
      * @param {Float32Array | Array<number>} texPos
      * @param {Float32Array | Array<number>} normal
      * @param {number} [mode]
@@ -75,7 +75,7 @@ export class ObjFaces
     /**
      * 更新vao的值
      * @param {WebGL2RenderingContext} gl
-     * @param {glslProgram} program
+     * @param {GlslProgram} program
      */
     update(gl, program)
     {

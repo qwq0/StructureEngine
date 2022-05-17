@@ -1,5 +1,5 @@
 import { m4 } from "../math/m4.js";
-import { debugObj } from "../tools/debugObj.js";
+import { debugInfo } from "../tools/debugInfo.js";
 import { degToRad } from "./util/math.js";
 
 
@@ -66,7 +66,7 @@ export class Camera
     cMat = null;
     /**
      * 当前着色器
-     * @type {import("./shader/glslProgram").glslProgram}
+     * @type {import("./shader/GlslProgram").GlslProgram}
      */
     nowProgram = null;
 
@@ -82,11 +82,11 @@ export class Camera
 
     draw()
     {
-        debugObj.clear();
+        debugInfo.clear();
         this.nowProgram = null;
         this.scene.obje.updateMat(); // 更新场景中物体的矩阵
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
-        if (!window.lock)
+        if (!window["lock"])
             this.cMat = new m4().rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
                 translation(-this.x, -this.y, -this.z) // 反向平移;
         this.render(
@@ -125,7 +125,7 @@ export class Camera
             if (!obje.coneRemove(this.cMat, this.fov)) // 未被剔除
             {
                 var faces = obje.faces;
-                if(this.nowProgram != obje.program)
+                if (this.nowProgram != obje.program)
                 {
                     gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
                     obje.program.uniformMatrix4fv("u_cameraMatrix", cameraPMat.a); // 设置相机矩阵
@@ -133,14 +133,14 @@ export class Camera
                     this.nowProgram = obje.program;
                 }
                 obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
-                // obje.program.uniform3f("u_markColor", 0, 0, 0); // 标记颜色
+                // obje.program.uniform3f("u_markColor", 0, 0.2, 0); // 标记颜色
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理
                 gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
                 gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
             }
             else
-                debugObj.cullCount++;
+                debugInfo.cullCount++;
         }
         /*---------*/
 

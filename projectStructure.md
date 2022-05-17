@@ -6,16 +6,15 @@
     - 紧急的
 
     - 活动的(当前)
-        - 补全项目结构描述
-        - 优化项目结构
+        - 制作光的阴影
 
     - 重要的
 
     - 循环(定期)
         - 优化项目结构
 
-    未来
-        将游戏逻辑移动到worker线程
+    - 未来
+        - 将游戏逻辑移动到worker线程
 
 
 # 此项目的结构
@@ -41,13 +40,15 @@
             - glsl着色器类 - glslProgram.js
         - 形状 - shape/
             - 正方体 - cube.js
+        - 纹理 - texture/
+            - 渲染到纹理 - Render2Texture.js
+            - 纹理类 - Texture.js
         - 工具 - util/
             - 数学 - math.js
         - 相机类 - Camera.js
         - 灯光类 - Light.js
         - 此引擎的上下文类 - SEContext.js
         - 全局状态 - state.js
-        - 纹理类 - texture.js
     - 管理场景(与worker通信) - manager
         - worker线程(详见下方) - worker/
         - 场景管理(与worker通信) - manager.js
@@ -58,9 +59,12 @@
         - 管理回调 - callbackHandler.js
         - 遍历数组 - forEach.js
     - 索引 - index.js
-    - iife版本索引 - index.iife.js
-worker线程 - src/manager/worker/
-    处理物理模拟 - Bullet
+
+- worker线程 - src/manager/worker/
+    - 处理物理模拟 - Bullet/
+        - 场景封装 - Scene.js
+        - 场景中的物体封装 - SceneObject.js
+    - worker线程主程序 - worker.js
 
 
 # 渲染线程与worker线程通信协议

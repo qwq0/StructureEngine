@@ -1,4 +1,17 @@
 /**
+ * Structure Engine
+ * @link https://github.com/qwq0/StructureEngine
+ * @copyright StructureEngine authors (qwq0(qwq_yahu) & ndzda)
+ * @license MIT
+ */
+const structureEngineInfo = Object.freeze({
+    /** 引擎字符串版本号 */
+    version: "1.0",
+    /** 引擎版本编号 */
+    versionNumber: 1
+});
+
+/**
  * 4向量类
  */
 class v4
@@ -57,7 +70,7 @@ class v4
     /**
      * 欧拉角到四元数
      * 旋转顺序ZYX
-     * 单位弧度
+     * 单位为弧度
      * @param {number} x
      * @param {number} y
      * @param {number} z
@@ -65,17 +78,17 @@ class v4
     static Euler2Quaternion(x, y, z)
     {
         return new v4(
-            Math.sin(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) -
-            Math.cos(x / 2) * Math.sin(y / 2) * Math.sin(z / 2),
+            Math.sin(x * 0.5) * Math.cos(y * 0.5) * Math.cos(z * 0.5) -
+            Math.cos(x * 0.5) * Math.sin(y * 0.5) * Math.sin(z * 0.5),
 
-            Math.cos(x / 2) * Math.sin(y / 2) * Math.cos(z / 2) +
-            Math.sin(x / 2) * Math.cos(y / 2) * Math.sin(z / 2),
+            Math.cos(x * 0.5) * Math.sin(y * 0.5) * Math.cos(z * 0.5) +
+            Math.sin(x * 0.5) * Math.cos(y * 0.5) * Math.sin(z * 0.5),
 
-            Math.cos(x / 2) * Math.cos(y / 2) * Math.sin(z / 2) -
-            Math.sin(x / 2) * Math.sin(y / 2) * Math.cos(z / 2),
+            Math.cos(x * 0.5) * Math.cos(y * 0.5) * Math.sin(z * 0.5) -
+            Math.sin(x * 0.5) * Math.sin(y * 0.5) * Math.cos(z * 0.5),
 
-            Math.cos(x / 2) * Math.cos(y / 2) * Math.cos(z / 2) +
-            Math.sin(x / 2) * Math.sin(y / 2) * Math.sin(z / 2)
+            Math.cos(x * 0.5) * Math.cos(y * 0.5) * Math.cos(z * 0.5) +
+            Math.sin(x * 0.5) * Math.sin(y * 0.5) * Math.sin(z * 0.5)
         );
     }
 
@@ -103,13 +116,13 @@ class v4
      */
     normalize()
     {
-        var sum = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-        if (sum != 0)
+        var multiple = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        if (multiple != Infinity)
             return new v4(
-                this.x / sum,
-                this.y / sum,
-                this.z / sum,
-                this.w / sum
+                this.x * multiple,
+                this.y * multiple,
+                this.z * multiple,
+                this.w * multiple
             );
         else
             return new v4();
@@ -121,7 +134,7 @@ class v4
      */
     getV3Len()
     {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return Math.hypot(this.x, this.y, this.z);
     }
 }
 
@@ -287,23 +300,23 @@ class m4
 
     /**
      * 透视投影矩阵
-     * @param {number} fieldOfViewInRadians 
-     * @param {number} aspect 
-     * @param {number} near 
-     * @param {number} far 
+     * @param {number} fov 对角线视角场(单位:弧度)
+     * @param {number} aspect 视口垂直长度与水平长度的比例
+     * @param {number} near 视锥最近处
+     * @param {number} far 视锥最远处
      * @returns {m4}
      */
-    static perspective(fieldOfViewInRadians, aspect, near, far)
+    static perspective(fov, aspect, near, far)
     {
-        var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+        var f = 1 / Math.tan(fov * 0.5);
         var rangeInv = 1.0 / (near - far);
 
         return new m4([
-            f / aspect, 0, 0, 0,
-            0, f, 0, 0,
-            0, 0, (near + far) * rangeInv, -1,
-            0, 0, near * far * rangeInv * 2, 0
-        ]);
+            Math.sqrt(1 + (aspect * aspect)) * f, 0, 0, 0,
+            0, Math.sqrt(1 + 1 / (aspect * aspect)) * f, 0, 0,
+            0, 0, 1 + 2 * far * rangeInv, -1, // 1 + ((2far) / (near - far))
+            0, 0, near * far * rangeInv * 2, 0 // near * far * 2 / (near - far)
+        ]); // Z = 2 * (0.5 + far + near * far / z) / (near - far)
     }
 
     /**
@@ -577,6 +590,22 @@ class m4
     }
 }
 
+var debugInfo = {
+    /**
+     * 视锥剔除的物体数
+     * @type {number}
+     */
+    cullCount: 0,
+
+    /**
+     * 每次渲染前清除
+     */
+    clear: function ()
+    {
+        this.cullCount = 0;
+    }
+};
+
 /**
  * 角度转弧度因数
  * @type {number}
@@ -620,10 +649,12 @@ class Camera
      */
     rz = 0;
     /**
-     * 相机视角场角度
+     * 相机视角场
+     * 单位为弧度
+     * 对角线fov
      * @type {number}
      */
-    fov = degToRad * 90;
+    fov = degToRad * 130;
 
     /**
      * 绑定的场景
@@ -635,6 +666,18 @@ class Camera
      * @type {WebGL2RenderingContext}
      */
     gl = null;
+
+    /**
+     * 相机矩阵
+     * 仅变换坐标到相对相机坐标 不含带投影矩阵
+     * @type {m4}
+     */
+    cMat = null;
+    /**
+     * 当前着色器
+     * @type {import("./shader/glslProgram").glslProgram}
+     */
+    nowProgram = null;
 
 
     /**
@@ -648,57 +691,73 @@ class Camera
 
     draw()
     {
-        this.scene.obje.updateMat(new m4());
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        debugInfo.clear();
+        this.nowProgram = null;
+        this.scene.obje.updateMat(); // 更新场景中物体的矩阵
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
+        if (!window["lock"])
+            this.cMat = new m4().rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
+                translation(-this.x, -this.y, -this.z); // 反向平移;
         this.render(
             this.gl,
             this.scene.obje,
-            m4.perspective(this.fov, this.gl.canvas.clientWidth / this.gl.canvas.clientHeight, 0.1, 2500).
-                rotateXYZ(-this.rx, -this.ry, -this.rz).
-                translation(-this.x, -this.y, -this.z),
-            new m4()
+            m4.perspective(this.fov, this.gl.canvas.clientHeight / this.gl.canvas.clientWidth, 0.1, 2500). // 透视投影矩阵
+                rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
+                translation(-this.x, -this.y, -this.z) // 反向平移
         );
     }
 
     /**
      * 递归渲染场景
      * 写给以后的自己和其他想要修改这部分的人:
-     * 请不要随意改动你无法理解的部分
-     * webgl以及opengl的接口有些杂乱
-     * 我写了这个引擎 但也许我自己也不完全了解webglAPI
+     *  请不要随意改动你无法理解的部分
+     *  webgl以及opengl的接口有些杂乱
+     *  即使我写了这个引擎 但也许我自己也不完全了解webglAPI
      * @param {WebGL2RenderingContext} gl webgl上下文
      * @param {import("./scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
-     * @param {m4} pers_matrix 投影矩阵(相机矩阵)
+     * @param {m4} cameraPMat 相机矩阵(带投影矩阵)
      */
-    render(gl, obje, pers_matrix)
+    render(gl, obje, cameraPMat)
     {
-        // 变换矩阵
-        var matrix = pers_matrix.multiply(obje.wMat);
-        var worldViewProjection = obje.getWorldViewProjectionMat();
+        /*
+            变换矩阵(遗留部分)
+        */
         var worldMatrix = obje.wMat;
-        // -----
+        /*---------*/
 
-        // 绘制图像
-        if (obje.faces) // 有"面数据" 则绘制
+        /*
+            绘制图像
+        */
+        if (obje.faces) // 有"面数据"
         {
-            var faces = obje.faces;
-            gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
 
-            obje.program.uniformMatrix4fv("u_matrix", matrix.a); // 设置矩阵
-            obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
-            obje.program.uniformMatrix4fv_tr("u_worldViewProjection", worldViewProjection.inverse().a); // 设置世界视图投影矩阵
-            obje.program.uniform3f("u_viewPos", this.x, this.y, this.z);
-            if (faces.tex) // 如果有纹理
-                faces.tex.bindTexture(0); // 绑定纹理
-
-            gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-            gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
+            if (!obje.coneRemove(this.cMat, this.fov)) // 未被剔除
+            {
+                var faces = obje.faces;
+                if (this.nowProgram != obje.program)
+                {
+                    gl.useProgram(obje.program.progra); // 修改着色器组(渲染程序)
+                    obje.program.uniformMatrix4fv("u_cameraMatrix", cameraPMat.a); // 设置相机矩阵
+                    obje.program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
+                    this.nowProgram = obje.program;
+                }
+                obje.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
+                // obje.program.uniform3f("u_markColor", 0, 0.2, 0); // 标记颜色
+                if (faces.tex) // 如果有纹理
+                    faces.tex.bindTexture(0); // 绑定纹理
+                gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
+                gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
+            }
+            else
+                debugInfo.cullCount++;
         }
-        // -----
+        /*---------*/
 
-        // 递归子节点
+        /*
+            递归子节点
+        */
         if (obje.c)
-            obje.c.forEach(o => this.render(gl, o, pers_matrix));
+            obje.c.forEach(o => this.render(gl, o, cameraPMat));
     }
 }
 
@@ -736,55 +795,25 @@ var snCount = 0;
  */
 class SceneObject
 {
-    /**
-     * 坐标x(相对)
-     * @type {number}
-     */
+    /** 坐标x(相对) @package @type {number} */
     x = 0;
-    /**
-     * 坐标y(相对)
-     * @type {number}
-     */
+    /** 坐标y(相对) @package @type {number} */
     y = 0;
-    /**
-     * 坐标z(相对)
-     * @type {number}
-     */
+    /** 坐标z(相对) @package @type {number} */
     z = 0;
-    /**
-     * 四元数x(相对旋转)
-     * @type {number}
-     */
+    /** 四元数x(相对旋转) @package @type {number} */
     rx = 0;
-    /**
-     * 四元数y(相对旋转)
-     * @type {number}
-     */
+    /** 四元数y(相对旋转) @package @type {number} */
     ry = 0;
-    /**
-     * 四元数z(相对旋转)
-     * @type {number}
-     */
+    /** 四元数z(相对旋转) @package @type {number} */
     rz = 0;
-    /**
-     * 四元数w(相对旋转)
-     * @type {number}
-     */
+    /** 四元数w(相对旋转) @package @type {number} */
     rw = 1;
-    /**
-     * x轴缩放(相对)
-     * @type {number}
-     */
+    /** x轴缩放(相对) @package @type {number} */
     sx = 1;
-    /**
-     * y轴缩放(相对)
-     * @type {number}
-     */
+    /** y轴缩放(相对) @package @type {number} */
     sy = 1;
-    /**
-     * z轴缩放(相对)
-     * @type {number}
-     */
+    /** z轴缩放(相对) @package @type {number} */
     sz = 1;
 
     /**
@@ -805,6 +834,12 @@ class SceneObject
      * @type {Array<SceneObject>}
      */
     c = null;
+
+    /**
+     * 父节点
+     * @type {SceneObject}
+     */
+    parent = null;
 
     /**
      * 物体所在的场景
@@ -849,6 +884,7 @@ class SceneObject
     constructor()
     {
         this.sn = snCount++;
+        this.updateMat();
     }
 
 
@@ -883,23 +919,40 @@ class SceneObject
     {
         if (!this.c)
             this.c = [];
+        o.setScene(this.scene);
+        o.parent = this;
         this.c.push(o);
     }
 
     /**
      * 递归更新矩阵
-     * @param {m4} mat
      */
-    updateMat(mat)
+    updateMat()
     {
         this.lMat = new m4().
             translation(this.x, this.y, this.z). // 平移
             rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
             scale(this.sx, this.sy, this.sz); // 缩放
-        this.wMat = mat.multiply(this.lMat);
+        if (this.parent)
+        {
+            this.wMat = (this.parent.wMat).multiply(this.lMat);
+        }
+        else
+            this.lMat;
         // 递归子节点
         if (this.c)
-            this.c.forEach(o => o.updateMat(this.wMat));
+            this.c.forEach(o => o.updateMat());
+    }
+
+    /**
+     * 获取世界坐标
+     * 需要先更新矩阵
+     * @returns {v4} xyz为坐标 w恒定为1
+     */
+    getWPos()
+    {
+        var wMat = this.wMat;
+        return new v4(wMat.a[12], wMat.a[13], wMat.a[14]);
     }
 
     /**
@@ -910,21 +963,53 @@ class SceneObject
     getWorldViewProjectionMat()
     {
         var ret = this.wMat.copy();
-        this.wMat.a[12] = this.wMat.a[13] = this.wMat.a[14] = 0;
+        ret.a[12] = ret.a[13] = ret.a[14] = 0;
         return ret;
     }
 
     /**
-     * 更新包围球
+     * 更新当前物体的面的包围球
      * 需要先更新矩阵
      */
     updateBoundingSphere()
     {
-        var pos = this.faces.pos;
-        var maxR = 0;
-        for (var i = 0; i < pos.length; i += 3)
-            maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(this.lMat).getV3Len());
-        this.bsR = maxR;
+        if (this.bsR < 0)
+        {
+            var pos = this.faces.pos;
+            var wvpMat = this.getWorldViewProjectionMat();
+            var maxR = 0;
+            for (var i = 0; i < pos.length; i += 3)
+                maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
+            this.bsR = maxR;
+        }
+    }
+
+    /**
+     * 视锥剔除判断
+     * @param {m4} cMat
+     * @param {number} fov
+     * @returns {boolean} 返回true则剔除
+     */
+    coneRemove(cMat, fov)
+    {
+        this.updateBoundingSphere();
+        var bsPos = this.getWPos().mulM4(cMat);
+        /*
+            ndzda推导的球与圆锥不相交的保守剔除原始判断公式
+            圆锥沿着z轴向负方向扩展
+            if (arccos(-z / len(x, y, z)) - Fov / 2 < Math.PI / 2)
+                (sin(arccos(-z / len(x, y, z)) - Fov / 2) * len(x, y, z) >= r) or (z >= r)
+            else
+                len(x, y, z) >= r;
+        */
+        if (bsPos.z >= this.bsR)
+            return true;
+        var bsLen = bsPos.getV3Len(); // 球心和原点距离
+        var angle = Math.acos(-bsPos.z / bsLen) - fov * 0.5; // 原点到球心与圆锥在对应方向母线的夹角
+        if (angle < Math.PI / 2)
+            return (Math.sin(angle) * bsLen >= this.bsR);
+        else
+            return bsLen >= this.bsR;
     }
 }
 
@@ -942,7 +1027,7 @@ class Scene
     /**
      * 场景中物体id与物品对象的对应map
      * @package
-     * @type {Map}
+     * @type {Map<string, SceneObject>}
      */
     idMap = new Map();
     /**
@@ -1046,9 +1131,9 @@ class glslProgram
 
     /**
      * uniform变量表
-     * @type {Object<string,object>}
+     * @type {Object<string, object>}
      */
-    unif = {};
+    unif = Object.create(null);
 
     /**
      * @param {WebGL2RenderingContext} gl webgl上下文
@@ -1128,7 +1213,7 @@ class glslProgram
  * 创建一个着色器
  * @param {WebGL2RenderingContext} gl webgl上下文
  * @param {string} sourceCode 着色器源码
- * @param {*} type 着色器类型 gl.VERTEX_SHADER 或 gl.FRAGMENT_SHADER
+ * @param {number} type 着色器类型 gl.VERTEX_SHADER 或 gl.FRAGMENT_SHADER
  * @returns {WebGLShader}
  */
 function createShader(gl, sourceCode, type)
@@ -1169,7 +1254,7 @@ class ObjFaces
     posLen = 0;
     /**
      * 纹理
-     * @type {import("../texture").Texture}
+     * @type {import("../Texture").Texture}
      */
     tex = null;
     /**
@@ -1190,7 +1275,7 @@ class ObjFaces
 
     /**
      * @param {Float32Array | Array<number>} pos
-     * @param {import("../texture").Texture} tex
+     * @param {import("../Texture").Texture} tex
      * @param {Float32Array | Array<number>} texPos
      * @param {Float32Array | Array<number>} normal
      * @param {number} [mode]
@@ -1203,8 +1288,6 @@ class ObjFaces
             this.pos = new Float32Array(pos);
         if (mode == WebGL2RenderingContext.TRIANGLES) // 三角形
             this.posLen = Math.floor(pos.length / 3);
-        else if (mode == WebGL2RenderingContext.POINTS) // 单点
-            this.posLen = pos.length;
         else
             throw "drawMode error";
         this.tex = tex;
@@ -1423,7 +1506,7 @@ var cubeProgram = null;
 /**
  * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
- * @param {import("../texture.js").Texture} tex
+ * @param {import("../texture/Texture.js").Texture} tex
  */
 function create_cube(gl, tex)
 {
@@ -1437,15 +1520,19 @@ function create_cube(gl, tex)
             in vec3 a_normal;
 
             in vec2 a_texcoord;
-            uniform mat4 u_matrix;
+            uniform mat4 u_cameraMatrix;
             uniform mat4 u_worldMatrix;
-            uniform mat4 u_worldViewProjection;
             
             out vec3 v_normal;
             out vec2 v_texcoord;
             out vec3 v_thisPos;
             
             void main() {
+                mat4 u_matrix = u_cameraMatrix * u_worldMatrix;
+                mat4 u_worldViewProjection = u_worldMatrix;
+                u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;
+                u_worldViewProjection = transpose(inverse(u_worldViewProjection));
+
                 gl_Position = u_matrix * a_position;
                 v_normal = mat3(u_worldViewProjection) * a_normal;
                 v_texcoord = a_texcoord;
@@ -1463,6 +1550,8 @@ function create_cube(gl, tex)
 
             const vec3 lightDir = normalize(vec3(0.3, -0.3, 1)); // 灯光方向向量
             uniform vec3 u_viewPos;
+
+            uniform vec3 u_markColor;
             
             out vec4 outColor;
             
@@ -1472,9 +1561,10 @@ function create_cube(gl, tex)
                 float diffLight = max(dot(normal, -lightDir), 0.0);
                 float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);
 
-                float lightResult = 0.45 + diffLight * 0.4 + reflLight * 0.08;
+                float lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08;
                 outColor.a = 1.0;
                 outColor.rgb = texture(u_texture, v_texcoord).rgb * lightResult;
+                outColor.rgb += u_markColor;
                 // discard;
             }
         `);
@@ -1537,4 +1627,873 @@ class Texture
     }
 }
 
-export { Camera, Scene, Texture, create_cube, initContext };
+/**
+ * 3向量类
+ */
+class v3
+{
+    /**
+     * 向量中的第个1值
+     * @type {number}
+     */
+    x;
+    /**
+     * 向量中的第个2值
+     * @type {number}
+     */
+    y;
+    /**
+     * 向量中的第个3值
+     * @type {number}
+     */
+    z;
+
+    /**
+     * @param {number} [x]
+     * @param {number} [y]
+     * @param {number} [z]
+     */
+    constructor(x = 0, y = 0, z = 0)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    /**
+     * 归一化(使向量长度为1 不改变方向)
+     * 不改变原向量
+     * @returns {v3}
+     */
+    normalize()
+    {
+        var multiple = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (multiple != Infinity)
+            return new v3(
+                this.x * multiple,
+                this.y * multiple,
+                this.z * multiple
+            );
+        else
+            return new v3();
+    }
+
+    /**
+     * 向量点乘
+     * 不改变原向量
+     * @param {v3} v
+     * @returns {number}
+     */
+    dot(v)
+    {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+
+    /**
+     * 向量相加
+     * 不改变原向量
+     * @param {v3} v
+     * @returns {v3}
+     */
+    add(v)
+    {
+        return new v3(this.x + v.x, this.y + v.y, this.z + v.z);
+    }
+
+    /**
+     * 向量相加
+     * 不改变原向量
+     * @param {v3} v
+     * @returns {v3}
+     */
+    sub(v)
+    {
+        return new v3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    /**
+     * 向量叉乘
+     * 不改变原向量
+     * @param {v3} v
+     * @returns {v3}
+     */
+    cross(v)
+    {
+        return new v3(
+            this.y * v.z - this.z * v.y,
+            this.z * v.x - this.x * v.z,
+            this.x * v.y - this.y * v.x
+        );
+    }
+
+    /**
+     * 向量乘标量
+     * @param {number} a
+     * @returns {v3}
+     */
+    mulNum(a)
+    {
+        return new v3(this.x * a, this.y * a, this.z * a);
+    }
+
+    /**
+     * 取三维向量的模(长度)
+     * 只使用xyz
+     * @returns {number}
+     */
+    len()
+    {
+        return Math.hypot(this.x, this.y, this.z);
+    }
+
+    /**
+     * 取三维向量的模(长度)的平方
+     * 只使用xyz
+     * @returns {number}
+     */
+    lenSq()
+    {
+        return this.x * this.x + this.y * this.y + this.z * this.z;
+    }
+
+    /**
+     * 取两个向量的夹角
+     * 单位为弧度
+     * @param {v3} v
+     * @returns {number}
+     */
+    angleTo(v)
+    {
+        var productOfLen = Math.sqrt(this.lenSq() + v.lenSq());
+        if (productOfLen != 0)
+            return Math.acos(this.dot(v) / productOfLen);
+        else
+            return Math.PI * 0.5;
+    }
+}
+/**
+ * 通过数组构造一个v3类
+ * @param {Array<number>} a
+ */
+function V3(a)
+{
+    return new v3(a[0], a[1], a[2]);
+}
+
+/**
+ * MtlC类中的单个材质的封装
+ */
+class MtlCMaterial
+{
+    /**
+     * 镜面反射度
+     * @type {number}
+     */
+    shininess;
+
+    /**
+     * 环境色
+     * @type {Array<number>}
+     */
+    ambient;
+
+    /**
+     * 漫反射色
+     * @type {Array<number>}
+     */
+    diffuse;
+
+    /**
+     * 高光色
+     * @type {Array<number>}
+     */
+    specular;
+
+    /**
+     * 发光色
+     * @type {Array<number>}
+     */
+    emissive;
+
+    /**
+     * 光密度
+     * @type {number}
+     */
+    opticalDensity;
+
+    /**
+     * 透明度(不透明度)
+     * @type {number}
+     */
+    opacity;
+
+    /**
+     * 照明类型
+     * @type {number}
+     */
+    illum;
+
+    /**
+     * 漫反射颜色贴图
+     * @type {string}
+     */
+    diffuseMap;
+
+    /**
+     * 镜面反射度标量贴图
+     * @type {string}
+     */
+    specularMap;
+
+    /**
+     * 法线贴图
+     * @type {string}
+     */
+    normalMap;
+
+}
+
+/**
+ * 对mtl文件的封装
+ */
+class MtlC
+{
+    /**
+     * 材质map
+     * @type {Map<string, MtlCMaterial>}
+     */
+    materialMap = new Map();
+
+    /**
+     * 从mtl字符串解析
+     * @param {string} srcStr
+     * @param {string} [folderPath]
+     * @returns {MtlC}
+     */
+    static fromString(srcStr, folderPath = "")
+    {
+        var ret = new MtlC();
+        var arr = srcStr.split("\n");
+
+        /**
+         * 解析贴图指令的参数
+         * @todo 处理可选项参数
+         * @param {Array<string>} args
+         * @returns {string}
+         */
+        function parseMapArgs(args)
+        {
+            return args.join(" ");
+        }
+
+        /**
+         * 当前材质
+         * @type {MtlCMaterial}
+         */
+        var material = null;
+        for (var oInd = 0; oInd < arr.length; oInd++)
+        {
+            var oStr = arr[oInd].trim();
+            if (oStr == "" || oStr[0] == "#")
+                continue;
+            var parts = oStr.split(/\s+/);
+            var type = parts.shift();
+
+            switch (type)
+            {
+                case "newmtl": // 定义新材质
+                    material = new MtlCMaterial();
+                    ret.materialMap.set(parts[0], material);
+                    break;
+                case "Ns": // 镜面反射度
+                    material.shininess = parseFloat(parts[0]);
+                    break;
+                case "Ka": // 环境色
+                    material.ambient = parts.map(parseFloat);
+                    break;
+                case "Kd": // 漫反射色
+                    material.diffuse = parts.map(parseFloat);
+                    break;
+                case "Ks": // 高光色
+                    material.specular = parts.map(parseFloat);
+                    break;
+                case "Ke": // 发光色
+                    material.emissive = parts.map(parseFloat);
+                    break;
+                case "Ni": // 光密度
+                    material.opticalDensity = parseFloat(parts[0]);
+                    break;
+                case "d": // 透明度(不透明度)
+                    material.opacity = parseFloat(parts[0]);
+                    break;
+                case "illum": // 照明类型
+                    material.illum = parseInt(parts[0]);
+                    break;
+                case "map_Kd": // 漫反射颜色贴图
+                    material.diffuseMap = folderPath + parseMapArgs(parts);
+                    break;
+                case "map_Ns": // 镜面反射度标量贴图
+                    material.specularMap = folderPath + parseMapArgs(parts);
+                    break;
+                case "map_Bump": // 凹凸贴图(法线贴图)
+                    material.normalMap = folderPath + parseMapArgs(parts);
+                    break;
+                default:
+                    console.warn("unhandled type in mtl:", type);
+            }
+        }
+        return ret;
+    }
+}
+
+/**
+ * ObjC类中(相同材质的)一些面封装
+ */
+class ObjCFaces
+{
+    /**
+     * 顶点坐标
+     * 每个顶点3个(1个向量)
+     * 每个面9个(每个面3个顶点)
+     * @type {Array<number>}
+     */
+    pos = [];
+
+    /**
+     * 纹理坐标
+     * @type {Array<number>}
+     */
+    texPos = [];
+
+    /**
+     * 法线方向
+     * @type {Array<number>}
+     */
+    norm = [];
+
+    /**
+     * 漫反射颜色贴图
+     * @type {string}
+     */
+    tex = "";
+}
+
+/**
+ * 多顶点的物体模型封装
+ * (对wavefrontObj的封装)
+ */
+class ObjC
+{
+    /**
+     * 顶点坐标数组
+     * @type {Array<Array<number>>}
+     */
+    positions = [];
+
+    /**
+     * 纹理坐标数组
+     * @type {Array<Array<number>>}
+     */
+    texcoords = [];
+
+    /**
+     * 法线方向数组
+     * @type {Array<Array<number>>}
+     */
+    normals = [];
+
+    /**
+     * 面
+     * @type {Array<ObjCFaces>}
+     */
+    faces = [];
+
+    /**
+     * 关联的mtl
+     * @type {MtlC}
+     */
+    mtl = null;
+
+
+    constructor()
+    {
+        // 由于WavefrontObj中索引从1开始所以将第0个位置占用
+        this.positions.push([0, 0, 0]);
+        this.normals.push([0, 0, 0]);
+        this.texcoords.push([0, 0]);
+    }
+
+    /**
+     * 以此模型创建物体
+     * @returns {SceneObject}
+     * @param {WebGL2RenderingContext} gl
+     * @param {import("../shader/glslProgram.js").glslProgram} program
+     */
+    createSceneObject(gl, program)
+    {
+        var ret = new SceneObject();
+        var texMap = new Map();
+        forEach(this.faces, o =>
+        {
+            var obj = new SceneObject();
+            if (!texMap.has(o.tex))
+                texMap.set(o.tex, new Texture(gl, o.tex));
+            obj.faces = new ObjFaces(o.pos, texMap.get(o.tex), o.texPos, o.norm);
+            obj.faces.update(gl, obj.program = program);
+            ret.addChild(obj);
+        });
+        return ret;
+    }
+
+    /**
+     * 从WavefrontObj字符串解析
+     * @param {string} srcStr
+     * @param {string} [folderPath]
+     * @returns {Promise<ObjC>}
+     */
+    static async fromWavefrontObj(srcStr, folderPath = "")
+    {
+        var ret = new ObjC();
+        var arr = srcStr.split("\n");
+
+        var faces = new ObjCFaces();
+
+        /** @type {Map<number, v3>} */
+        var defaultNormalMap = new Map();
+        /** @type {Array<[number, number]>} */
+        var defaultNormalList = [];
+        /**
+         * 添加面
+         * @param {[string, string, string]} vert 三个顶点索引 每个顶点索引为一个包含多索引的字符串
+         */
+        function addFace(vert)
+        {
+            var positionsInd = [-1, -1, -1];
+            /** @type {Array<v3>} */
+            var positions = [null, null, null];
+            var texcoords = [null, null, null];
+            var normals = [null, null, null];
+            for (var i = 0; i < 3; i++)
+            {
+                var parts = vert[i].split("/");
+                if (parts[0]) // 顶点索引
+                {
+                    var objInd = parseInt(parts[0]);
+                    positions[i] = V3(ret.positions[
+                        positionsInd[i] = (objInd + (objInd >= 0 ? 0 : ret.positions.length))
+                    ]);
+                }
+                else
+                    positions[i] = new v3();
+                if (parts[1]) // 纹理索引
+                {
+                    var objInd = parseInt(parts[1]);
+                    texcoords[i] = ret.texcoords[objInd + (objInd >= 0 ? 0 : ret.texcoords.length)];
+                }
+                if (parts[2]) // 法线索引
+                {
+                    var objInd = parseInt(parts[2]);
+                    normals[i] = ret.normals[objInd + (objInd >= 0 ? 0 : ret.normals.length)];
+                }
+            }
+            var vec1 = positions[1].sub(positions[0]); // 三角形的一条边向量
+            var vec2 = positions[2].sub(positions[1]); // 三角形的另一条边向量
+            var defaultNormal = vec1.cross(vec2).normalize().mulNum(Math.PI - vec1.angleTo(vec2)); // 默认法线向量乘夹角作为倍率
+            for (var i = 0; i < 3; i++)
+            {
+                if (positions[i])
+                    faces.pos.push(positions[i].x, positions[i].y, positions[i].z);
+                else
+                    faces.pos.push(0, 0, 0);
+                if (texcoords[i])
+                    faces.texPos.push(...texcoords[i]);
+                else
+                    faces.texPos.push(0, 0);
+                if (normals[i])
+                    faces.norm.push(...normals[i]);
+                else
+                { // 缺省法线
+                    var ind = positionsInd[i];
+                    defaultNormalMap.set(ind,
+                        defaultNormal.add(
+                            defaultNormalMap.has(ind) ? defaultNormalMap.get(ind) : new v3()
+                        )
+                    );
+                    defaultNormalList.push([faces.norm.length, ind]);
+                    faces.norm.push(0, 0, 0);
+                }
+            }
+        }
+        /**
+         * 设置缺省的法线
+         */
+        function setDefaultNormal()
+        {
+            forEach(defaultNormalList, o =>
+            {
+                var ind = o[0];
+                var defaultNormal = defaultNormalMap.get(o[1]).normalize(); // 默认法线向量
+                faces.norm[ind] = defaultNormal.x;
+                faces.norm[ind + 1] = defaultNormal.y;
+                faces.norm[ind + 2] = defaultNormal.z;
+            });
+            defaultNormalList.length = 0;
+            defaultNormalMap.clear();
+        }
+
+        for (var oInd = 0; oInd < arr.length; oInd++)
+        { // 解析单行指令
+            var oStr = arr[oInd].trim();
+            if (oStr == "" || oStr[0] == "#")
+                continue;
+            var parts = oStr.split(/\s+/);
+            var type = parts.shift();
+
+            switch (type)
+            {
+                case "v": // 顶点坐标
+                    ret.positions.push(parts.slice(0, 3).map(parseFloat));
+                    if (parts.length > 3) // 非标准情况 顶点声明中附带顶点颜色
+                        console.warn("type v with color");
+                    break;
+                case "vt": // 纹理坐标
+                    ret.texcoords.push(parts.map(parseFloat));
+                    break;
+                case "vn": // 法线坐标
+                    ret.normals.push(parts.map(parseFloat));
+                    break;
+                case "f": // 面
+                    var trianNum = parts.length - 2;
+                    for (var i = 0; i < trianNum; i++)
+                    {
+                        addFace([parts[0], parts[i + 1], parts[i + 2]]);
+                    }
+                    break;
+                case "mtllib": // 关联mtl文件
+                    ret.mtl = MtlC.fromString(await (await fetch(folderPath + parts[0])).text(), folderPath);
+                    break;
+                case "usemtl": // 使用材质(在mtl中定义)
+                    // 处理之前的面
+                    setDefaultNormal();
+                    if(faces.pos.length > 0)
+                        ret.faces.push(faces);
+                    // 新的面
+                    faces = new ObjCFaces();
+                    var material = ret.mtl.materialMap.get(parts[0]);
+                    faces.tex = material.diffuseMap;
+                    break;
+                default:
+                    console.warn("unhandled type in obj:", type);
+            }
+        }
+
+        setDefaultNormal();
+        ret.faces.push(faces);
+
+        return ret;
+    }
+}
+
+/**
+ * 键盘对应表
+ */
+var table = {
+    "~": "`",
+    "!": "1",
+    "@": "2",
+    "#": "3",
+    "$": "4",
+    "%": "5",
+    "^": "6",
+    "&": "7",
+    "*": "8",
+    "(": "9",
+    ")": "0",
+    "_": "-",
+    "+": "=",
+    "{": "[",
+    "}": "]",
+    "|": "\\",
+    "\"": "\'",
+    ":": ";",
+    "<": ",",
+    ">": ".",
+    "?": "/"
+};
+var capitalA = "A".charCodeAt(0);
+var lowercaseA = "a".charCodeAt(0);
+for (var i = 0; i < 26; i++)
+    table[String.fromCharCode(capitalA + i)] = String.fromCharCode(lowercaseA + i);
+
+/**
+ * 按键数据
+ * 当发生键盘事件时传递
+ * 包含按键和按下状态等数据
+ */
+class keyData
+{
+    key = ""; // 键名
+    hold = false; // 当前此指针是否处于按下状态
+    pressing = false; // 当前指针是否正在按下(按下事件)
+    constructor(key, hold, pressing)
+    {
+        this.key = key;
+        this.hold = hold;
+        this.pressing = pressing;
+    }
+}
+
+/**
+ * 键盘 事件处理
+ * @param {HTMLElement} element
+ * @param {function(keyData):void} callBack
+ */
+function keyboardBind(element, callBack)
+{
+    element.addEventListener("keydown", e => callBack(new keyData(
+        (table[e.key] ? table[e.key] : e.key),
+        true,
+        true
+    )));
+    element.addEventListener("keyup", e => callBack(new keyData(
+        (table[e.key] ? table[e.key] : e.key),
+        false,
+        false
+    )));
+}
+
+/**
+ * 键盘操作的封装
+ */
+class KeyboardMap
+{
+    /**
+     * 按键状态表
+     * 存在则为按下
+     * @type {Set<string>}
+     */
+    keySet = new Set();
+    /**
+     * 按下回调map
+     * @type {Map<string, function(import("./keyData").keyData) : void>}
+     */
+    downCB = new Map();
+    /**
+     * 弹起回调map
+     * @type {Map<string, function(import("./keyData").keyData) : void>}
+     */
+    upCB = new Map();
+
+    /**
+     * 接管元素的键盘操作
+     * @param {HTMLElement} e 默认为 document.body
+     */
+    constructor(e = document.body)
+    {
+        keyboardBind(e, e =>
+        {
+            if (e.hold)
+                this.keySet.add(e.key);
+            else
+                this.keySet.delete(e.key);
+        });
+    }
+
+    /**
+     * 获取按键状态
+     * @param {string} key 
+     * @returns {boolean} true为按下
+     */
+    get(key)
+    {
+        return this.keySet.has(key);
+    }
+
+    /**
+     * 绑定按下事件
+     * 注意: 一个按键多次绑定Down会解除前一次绑定的回调
+     * @param {string} key 
+     * @param {function(import("./keyData").keyData) : void} callback 回调将在按键按下时触发
+     */
+    bindDown(key, callback)
+    {
+        this.downCB.set(key, callback);
+    }
+
+    /**
+     * 绑定弹起事件
+     * 注意: 一个按键多次绑定Up会解除前一次绑定的回调
+     * @param {string} key 
+     * @param {function(import("./keyData").keyData) : void} callback 回调将在按键弹起时触发
+     */
+    bindUp(key, callback)
+    {
+        this.upCB.set(key, callback);
+    }
+
+    /**
+     * 绑定按键事件
+     * 注意: 一个按键多次绑定会解除前一次绑定的回调
+     * @param {string} key 
+     * @param {function(import("./keyData").keyData) : void} callback 回调将在按键按下或弹起时触发
+     */
+    bind(key, callback)
+    {
+        this.bindDown(key, callback);
+        this.bindUp(key, callback);
+    }
+
+    /**
+     * 绑定多个按键
+     * 注意: 一个按键多次绑定会解除前一次绑定的回调
+     * @param {Array<string>} key 
+     * @param {function(import("./keyData").keyData) : void} callback 回调将在按键按下或弹起时触发
+     */
+    bindArray(key, callback)
+    {
+        key.forEach(o => { this.bind(o, callback); });
+    }
+}
+
+/**
+ * 指针数据
+ * 当发生鼠标或触摸事件时传递
+ * 包含指针坐标和按下状态等数据
+ */
+class pointerData
+{
+    x = 0; y = 0; // 当前指针位置
+    vx = 0; vy = 0; // 指针位置和上次位置的变化
+    sx = 0; sy = 0; // 此指针的起始位置
+    hold = false; // 当前此指针是否处于按下状态
+    pressing = false; // 当前指针是否正在按下(按下事件)
+    constructor(x, y, vx, vy, sx, sy, hold, pressing)
+    {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.sx = sx;
+        this.sy = sy;
+        this.hold = hold;
+        this.pressing = pressing;
+    }
+}
+
+/**
+ * 触摸(拖拽) 事件处理
+ * @param {HTMLElement} element 
+ * @param {function(pointerData):void} callBack
+ */
+function touchBind(element, callBack)
+{
+    element.addEventListener("touchstart", e => touchStart(e), {
+        capture: false,
+        passive: false
+    });
+    element.addEventListener("touchmove", e => touchMove(e), {
+        capture: false,
+        passive: true
+    });
+    element.addEventListener("touchend", e => touchEnd(e), {
+        capture: false,
+        passive: true
+    });
+
+    var ogTouches = [];
+    /**
+     * 通过标识符取触摸点数据索引
+     * @param {any} id
+     * @returns {number}
+     */
+    function getTouchesInd(id)
+    {
+        var ret = -1;
+        ogTouches.forEach((o, i) =>
+        {
+            if (id == o.id)
+                ret = i;
+        });
+        return ret;
+    }
+    /**
+     * 触摸处理函数(按下)
+     * @param {TouchEvent} e 
+     */
+    function touchStart(e)
+    {
+        if (e.cancelable)
+            e.preventDefault();
+        forEach(e.touches, o =>
+        {
+            var t = {
+                id: o.identifier,
+                sx: o.clientX,
+                sy: o.clientY,
+                x: o.clientX,
+                y: o.clientY
+            };
+            ogTouches.push(t);
+            callBack(new pointerData(
+                t.x, t.y,
+                0, 0,
+                t.sx, t.sy,
+                true, true
+            ));
+        });
+    }
+    /**
+     * 触摸处理函数(移动)
+     * @param {TouchEvent} e 
+     */
+    function touchMove(e)
+    {
+        forEach(e.touches, o =>
+        {
+            var ind = getTouchesInd(o.identifier);
+            if (ind > -1)
+            {
+                var t = ogTouches[ind];
+                var vx = o.clientX - t.x;
+                var vy = o.clientY - t.y;
+                t.x = o.clientX;
+                t.y = o.clientY;
+                callBack(new pointerData(
+                    t.x, t.y,
+                    vx, vy,
+                    t.sx, t.sy,
+                    true, false
+                ));
+            }
+        });
+    }
+    /**
+     * 触摸处理函数(松开)
+     * @param {TouchEvent} e 
+     */
+    function touchEnd(e)
+    {
+        forEach(e.touches, o =>
+        {
+            var ind = getTouchesInd(o.identifier);
+            if (ind > -1)
+            {
+                var t = ogTouches[ind];
+                ogTouches.splice(ind, 1);
+                var vx = o.clientX - t.x;
+                var vy = o.clientY - t.y;
+                t.x = o.clientX;
+                t.y = o.clientY;
+                callBack(new pointerData(
+                    t.x, t.y,
+                    vx, vy,
+                    t.sx, t.sy,
+                    false, false
+                ));
+            }
+        });
+    }
+}
+
+export { Camera, KeyboardMap, ObjC, Scene, Texture, create_cube, debugInfo, initContext, keyboardBind, structureEngineInfo, touchBind };
+//# sourceMappingURL=structureEngine.js.map

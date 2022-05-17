@@ -2,7 +2,7 @@ import { v3, V3 } from "../../math/v3.js";
 import { forEach } from "../../util/forEach.js";
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
-import { Texture } from "../texture.js";
+import { Texture } from "../texture/Texture.js";
 import { MtlC } from "./MtlC.js";
 import { ObjCFaces } from "./ObjCFaces.js";
 
@@ -55,7 +55,7 @@ export class ObjC
      * 以此模型创建物体
      * @returns {SceneObject}
      * @param {WebGL2RenderingContext} gl
-     * @param {import("../shader/glslProgram.js").glslProgram} program
+     * @param {import("../shader/GlslProgram.js").GlslProgram} program
      */
     createSceneObject(gl, program)
     {

@@ -1,3 +1,4 @@
+import { GlslGenParam } from "./GlslGenParam.js";
 import { GlslProgram } from "./GlslProgram.js";
 
 /**
@@ -32,24 +33,29 @@ export class GlslGenerator
 
     /**
      * 灯光列表
+     * @type {any}
      */
     light = [];
 
     /**
      * 顶点着色器的uniform表
+     * @type {Map<string, GlslGenParam>}
      */
     vUniform = new Map();
     /**
      * 片段着色器的uniform表
+     * @type {Map<string, GlslGenParam>}
      */
     fUniform = new Map();
     /**
      * 顶点着色器的in表
+     * @type {Map<string, GlslGenParam>}
      */
     vIn = new Map();
     /**
      * 片段着色器的in表
      * 顶点着色器的out表
+     * @type {Map<string, GlslGenParam>}
      */
     fIn = new Map();
 
@@ -59,17 +65,16 @@ export class GlslGenerator
      */
     gen()
     {
-        var vertexShader = genVertexShader();
-        var fragmentShader = genFragmentShader();
+        var vertexShader = genVertexShader(this.vUniform, this.vIn, this.fIn);
+        var fragmentShader = genFragmentShader(this.fUniform, this.fIn);
         return new GlslProgram(this.gl, vertexShader, fragmentShader);
     }
 }
 /**
  * 生成顶点着色器
- * @param {*} uniform 
- * @param {*} vIn 
- * @param {*} vOut 
- * @returns 
+ * @param {Map<string, GlslGenParam>} uniform
+ * @param {Map<string, GlslGenParam>} vIn
+ * @param {Map<string, GlslGenParam>} vOut
  */
 function genVertexShader(uniform, vIn, vOut)
 {
@@ -77,10 +82,33 @@ function genVertexShader(uniform, vIn, vOut)
         "#version 300 es",
         "precision highp float;",
 
-        (() => // 顶点着色器输入参数
+        (() => // 顶点着色器uniform
         {
             var ret = [];
+            uniform.forEach((value) =>
+            {
+                ret.push("uniform " + value.type + " " + value.id + ";");
+            });
+            return ret;
+        })(),
 
+        (() => // 顶点着色器in
+        {
+            var ret = [];
+            vIn.forEach((value) =>
+            {
+                ret.push("in " + value.type + " " + value.id + ";");
+            });
+            return ret;
+        })(),
+
+        (() => // 顶点着色器out
+        {
+            var ret = [];
+            vOut.forEach((value) =>
+            {
+                ret.push("out " + value.type + " " + value.id + ";");
+            });
             return ret;
         })(),
 
@@ -109,11 +137,41 @@ function genVertexShader(uniform, vIn, vOut)
     ]).flat(Infinity).join("\n");
 }
 
-function genFragmentShader(uniform, vIn, vOut)
+/**
+ * 生成片段着色器
+ * @param {Map<string, GlslGenParam>} uniform
+ * @param {Map<string, GlslGenParam>} fIn
+ */
+function genFragmentShader(uniform, fIn)
 {
     return ([
         "#version 300 es",
         "precision highp float;",
+
+        (() => // 片段着色器uniform
+        {
+            var ret = [];
+            uniform.forEach((value) =>
+            {
+                ret.push("uniform " + value.type + " " + value.id + ";");
+            });
+            return ret;
+        })(),
+
+        (() => // 片段着色器in
+        {
+            var ret = [];
+            fIn.forEach((value) =>
+            {
+                ret.push("in " + value.type + " " + value.id + ";");
+            });
+            return ret;
+        })(),
+
+        (() => // 片段着色器out
+        {
+            return ["out vec4 outColor;"];
+        })(),
 
         "in vec3 v_normal;", // 法线
         "in vec3 v_thisPos;", // 顶点的世界坐标

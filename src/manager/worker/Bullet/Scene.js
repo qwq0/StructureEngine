@@ -1,16 +1,15 @@
-/**
- * 此文件在worker中
- */
-/**
- * 使用Ammo.js以在js中使用Bullet物理引擎
- */
+/*
+    此文件在worker中
+*/
 import { Ammo } from "../../../../lib/ammojs/ammo.wasm.js";
 import { SceneObject } from "./SceneObject.js";
+
+// 使用Ammo.js以在js中使用Bullet物理引擎
 
 /**
  * Bullet接口
  * Bullet的Api文档: https://pybullet.org/Bullet/BulletFull/
-*/
+ */
 var bt = null;
 /**
  * 初始化Ammo

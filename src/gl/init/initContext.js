@@ -7,7 +7,7 @@ import { SEContext } from "../SEContext.js";
  * @param {number} scale
  * @returns {SEContext}
  */
-export function initContext(canvas, scale = 1.1)
+export function initContext(canvas, scale = 1)
 {
     var gl = canvas.getContext("webgl2");
     canvas.width = Math.floor(canvas.clientWidth * scale);
@@ -15,6 +15,6 @@ export function initContext(canvas, scale = 1.1)
     gl.viewport(0, 0, canvas.width, canvas.height);
     // gl.enable(gl.CULL_FACE); // 面剔除
     gl.enable(gl.DEPTH_TEST); // 深度测试(z-buffer)
-    gl.clearColor(0.3, 0.3, 0.3, 1);
+    gl.clearColor(0.2, 0.2, 0.2, 1);
     return new SEContext(gl);
 }

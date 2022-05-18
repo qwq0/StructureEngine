@@ -1,6 +1,6 @@
-/**
- * 此文件在worker中
- */
+/*
+    此文件在worker中
+*/
 import { initAmmo, Scene } from "./Bullet/Scene.js";
 
 (async function ()
@@ -9,7 +9,7 @@ import { initAmmo, Scene } from "./Bullet/Scene.js";
 
     /**
      * 场景上下文
-     * @type {scene}
+     * @type {Scene}
      */
     var scene = null;
 

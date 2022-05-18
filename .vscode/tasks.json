@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build lib",
+            "label": "build lib (structureEngine.js)",
             "type": "shell",
             "command": "rollup -i src/index.js -o dist/structureEngine.js -f es -m",
             "problemMatcher": [],
@@ -14,10 +14,20 @@
             }
         },
         {
-            "label": "build lib (iife)",
+            "label": "build worker (worker.js)",
+            "type": "shell",
+            "command": "rollup -i src/manager/worker/worker.js -o dist/worker.js -f es -m",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build iife (structureEngine.iife.js)",
             "type": "shell",
             "command": "rollup -i src/index.js -o dist/structureEngine.iife.js -f iife -n structureEngine -m",
             "problemMatcher": []
-        },
+        }
     ]
 }

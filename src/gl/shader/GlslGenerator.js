@@ -59,6 +59,10 @@ export class GlslGenerator
      */
     fIn = new Map();
 
+    constructor()
+    {
+    }
+
     /**
      * 生成着色器
      * @returns {GlslProgram}
@@ -170,7 +174,7 @@ function genFragmentShader(uniform, fIn)
 
         (() => // 片段着色器out
         {
-            return ["out vec4 outColor;"];
+            return ["out vec4 outColor;"]; // 此片段最终的颜色
         })(),
 
         "in vec3 v_normal;", // 法线
@@ -183,8 +187,6 @@ function genFragmentShader(uniform, fIn)
         "uniform vec3 u_viewPos;", // 视点(相机)的世界坐标
 
         "uniform vec3 u_markColor;", // 标记颜色(调试)
-
-        "out vec4 outColor;", // 此片段最终的颜色
 
         "void main() {",
         "    vec3 normal = normalize(v_normal);", // 法线(归一化)

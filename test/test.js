@@ -90,14 +90,14 @@ import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugI
     requestAnimationFrame(draw);
 
 
-    let cubeF = create_cube(ct.gl, new Texture(scene.gl, "./cube.png"));
+    let cubeF = create_cube(ct.gl, Texture.fromImage(scene.gl, "./cube.png"));
     cubeF.id = "cubeF";
     cubeF.sx = 16;
     cubeF.y = -10;
     cubeF.sz = 16;
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
-    let cube0 = create_cube(ct.gl, new Texture(scene.gl, "./WoodFloor045_1K_Color.jpg"));
+    let cube0 = create_cube(ct.gl, Texture.fromImage(scene.gl, "./WoodFloor045_1K_Color.jpg"));
     cube0.id = "cube0";
     cube0.x = 0;
     cube0.y = 9;

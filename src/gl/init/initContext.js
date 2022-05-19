@@ -16,5 +16,5 @@ export function initContext(canvas, scale = 1)
     // gl.enable(gl.CULL_FACE); // 面剔除
     gl.enable(gl.DEPTH_TEST); // 深度测试(z-buffer)
     gl.clearColor(0.2, 0.2, 0.2, 1);
-    return new SEContext(gl);
+    return new SEContext(gl, canvas);
 }

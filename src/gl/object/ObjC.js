@@ -60,12 +60,12 @@ export class ObjC
     createSceneObject(gl, program)
     {
         var ret = new SceneObject();
-        var texMap = new Map();
+        var texMap = new Map(); // 防止生成获取相同url的纹理
         forEach(this.faces, o =>
         {
             var obj = new SceneObject();
             if (!texMap.has(o.tex))
-                texMap.set(o.tex, new Texture(gl, o.tex));
+                texMap.set(o.tex, Texture.fromImage(gl, o.tex));
             obj.faces = new ObjFaces(o.pos, texMap.get(o.tex), o.texPos, o.norm);
             obj.faces.update(gl, obj.program = program);
             ret.addChild(obj);
@@ -203,7 +203,7 @@ export class ObjC
                 case "usemtl": // 使用材质(在mtl中定义)
                     // 处理之前的面
                     setDefaultNormal();
-                    if(faces.pos.length > 0)
+                    if (faces.pos.length > 0)
                         ret.faces.push(faces);
                     // 新的面
                     faces = new ObjCFaces();

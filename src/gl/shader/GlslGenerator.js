@@ -61,6 +61,40 @@ export class GlslGenerator
 
     constructor()
     {
+        ([
+            new GlslGenParam("mat4", "u_cameraMatrix"), // 相机(包括投影投影)矩阵
+            new GlslGenParam("mat4", "u_worldMatrix") // 世界矩阵
+        ]).forEach(o =>
+        {
+            this.vUniform.set(o.id, o);
+        });
+
+        ([
+            new GlslGenParam("vec4", "a_position"), // 原始坐标
+            new GlslGenParam("vec3", "a_normal"), // 原始法线
+            new GlslGenParam("vec2", "a_texcoord") // 纹理坐标
+        ]).forEach(o =>
+        {
+            this.vIn.set(o.id, o);
+        });
+
+        ([
+            new GlslGenParam("vec3", "v_thisPos"), // 顶点的世界坐标
+            new GlslGenParam("vec3", "v_normal"), // 法线
+            new GlslGenParam("vec2", "v_texcoord") // 纹理坐标
+        ]).forEach(o =>
+        {
+            this.fIn.set(o.id, o);
+        });
+
+        ([
+            new GlslGenParam("vec3", "u_viewPos"), // 视点(相机)的世界坐标
+            new GlslGenParam("sampler2D", "u_texture"), // 纹理
+            new GlslGenParam("vec3", "u_markColor") // 标记颜色(调试)    
+        ]).forEach(o =>
+        {
+            this.fUniform.set(o.id, o);
+        });
     }
 
     /**
@@ -116,18 +150,6 @@ function genVertexShader(uniform, vIn, vOut)
             return ret;
         })(),
 
-        "in vec4 a_position;", // 原始坐标
-        "in vec3 a_normal;", // 原始法线
-
-        "in vec2 a_texcoord;", // 纹理坐标
-
-        "uniform mat4 u_cameraMatrix;", // 相机(包括投影投影)矩阵
-        "uniform mat4 u_worldMatrix;", // 世界矩阵
-
-        "out vec3 v_normal;", // 法线
-        "out vec2 v_texcoord;", // 纹理坐标
-        "out vec3 v_thisPos;", // 顶点的世界坐标
-
         "void main() {",
         "    gl_Position = u_cameraMatrix * u_worldMatrix * a_position;", // 转换到视图中坐标
         "    v_texcoord = a_texcoord;", // 纹理坐标(插值)
@@ -177,16 +199,7 @@ function genFragmentShader(uniform, fIn)
             return ["out vec4 outColor;"]; // 此片段最终的颜色
         })(),
 
-        "in vec3 v_normal;", // 法线
-        "in vec3 v_thisPos;", // 顶点的世界坐标
-
-        "in vec2 v_texcoord;", // 纹理坐标
-        "uniform sampler2D u_texture;", // 纹理
-
         "const vec3 lightDir = normalize(vec3(0.3, -0.3, 1));", // 灯光方向向量
-        "uniform vec3 u_viewPos;", // 视点(相机)的世界坐标
-
-        "uniform vec3 u_markColor;", // 标记颜色(调试)
 
         "void main() {",
         "    vec3 normal = normalize(v_normal);", // 法线(归一化)

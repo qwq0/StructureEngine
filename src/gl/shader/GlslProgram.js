@@ -47,6 +47,14 @@ export class GlslProgram
     }
 
     /**
+     * 使用一个渲染程序(切换到此渲染程序)
+     */
+    use()
+    {
+        this.gl.useProgram(this.progra);
+    }
+
+    /**
      * 删除一个渲染程序(释放内存)
      */
     deleteProgram()

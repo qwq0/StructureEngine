@@ -66,6 +66,9 @@ export class Texture
             );
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT); // 设置镜像重复
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT); // 设置镜像重复
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); // mipmap设置(绘制的面大于贴图时)只选取1个像素
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); // mipmap设置(绘制的面大于贴图时)混合原贴图的4个像素
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); // mipmap设置(绘制的面小于贴图时)混合两个贴图每个选取4个像素
             gl.generateMipmap(gl.TEXTURE_2D); // 生成mipmap纹理
         });
         return ret;

@@ -59,8 +59,13 @@ export class GlslGenerator
      */
     fIn = new Map();
 
-    constructor()
+    /**
+     * @param {WebGL2RenderingContext} [gl]
+     */
+    constructor(gl)
     {
+        this.gl = gl;
+        
         ([
             new GlslGenParam("mat4", "u_cameraMatrix"), // 相机(包括投影投影)矩阵
             new GlslGenParam("mat4", "u_worldMatrix") // 世界矩阵

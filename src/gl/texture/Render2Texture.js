@@ -90,7 +90,7 @@ export class Render2Texture
                 textureHeight, // 高
                 0, // 边框宽度(遗留属性,必须为0)
                 gl.DEPTH_COMPONENT, // 数据格式
-                gl.UNSIGNED_INT, // 数据类型
+                gl.FLOAT, // 数据类型
                 null // 图像源
             );
 
@@ -112,6 +112,10 @@ export class Render2Texture
         }
     }
 
+    /**
+     * 绑定到此帧缓冲区
+     * 之后的渲染将在此帧缓冲区执行
+     */
     bindFramebuffer()
     {
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);

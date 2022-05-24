@@ -104,17 +104,18 @@ import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugI
     cube0.z = 0;
     scene.addChild(cube0);
     manager.addCube(cube0, 1);
-    for (let x = 0; x < 100; x += 3)
-        for (let z = 0; z < 100; z += 3)
-        {
-            let cube = create_cube(ct.gl, scene.idMap.get("cube0").faces.tex);
-            cube.id = "cube" + x + "," + z;
-            cube.x = x;
-            cube.y = 6;
-            cube.z = z;
-            scene.addChild(cube);
-            // manager.addCube(cube, 1);
-        }
+    for (let x = 0; x < 10; x += 3)
+        for (let y = 0; y < 10; y += 3)
+            for (let z = 0; z < 10; z += 3)
+            {
+                let cube = create_cube(ct.gl, scene.idMap.get("cube0").faces.tex);
+                cube.id = "cube" + x + "," + z;
+                cube.x = x;
+                cube.y = y;
+                cube.z = z + 10;
+                scene.addChild(cube);
+                // manager.addCube(cube, 1);
+            }
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
         let obj = objObj.createSceneObject(ct.gl, cube0.program);

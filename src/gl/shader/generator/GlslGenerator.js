@@ -1,5 +1,5 @@
 import { GlslGenParam } from "./GlslGenParam.js";
-import { GlslProgram } from "./GlslProgram.js";
+import { GlslProgram } from "../GlslProgram.js";
 
 /**
  * glsl着色器生成器
@@ -31,11 +31,6 @@ export class GlslGenerator
      */
     gl = null;
 
-    /**
-     * 灯光列表
-     * @type {any}
-     */
-    light = [];
 
     /**
      * 顶点着色器的uniform表
@@ -58,6 +53,15 @@ export class GlslGenerator
      * @type {Map<string, GlslGenParam>}
      */
     fIn = new Map();
+
+    /**
+     * 顶点着色器部分
+     */
+    vPart = [];
+    /**
+     * 片段着色器部分
+     */
+    fPart = [];
 
     /**
      * @param {WebGL2RenderingContext} [gl]

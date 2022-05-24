@@ -9,6 +9,7 @@
         - 制作光的阴影
 
     - 重要的
+        - 渲染流程封装类
 
     - 循环(定期)
         - 优化项目结构
@@ -37,7 +38,10 @@
             - 场景类 - Scene.js
             - 场景内的物体类 - SceneObject.js
         - 着色器 - shader/
-            - glsl着色器类 - glslProgram.js
+            - 着色器生成器 - generator/
+                - glsl着色器生成器 - GlslGenerator.js
+                - glsl着色器生成器的片段封装 - GlslGenParam.js
+            - glsl着色器封装类 - glslProgram.js
         - 形状 - shape/
             - 正方体 - cube.js
         - 纹理 - texture/
@@ -65,6 +69,44 @@
         - 场景封装 - Scene.js
         - 场景中的物体封装 - SceneObject.js
     - worker线程主程序 - worker.js
+
+
+# 渲染流程
+
+## 图像的原始渲染
+由相机类完成
+- 相机 - src/gl/Camera.js
+    - 调用 draw 方法 (绘制图像)
+        - 更新矩阵
+        - 清除画布
+        - 计算相机矩阵
+        - 设置着色器
+        - 调用 render 方法 (执行递归渲染)
+            - 绘制面
+                - 设置物体的世界矩阵
+                - 绑定纹理
+                - 绑定顶点数组
+                - 绘制数据
+            - 遍历 子节点 递归调用 render 方法
+
+## 灯光阴影贴图渲染
+由灯光类完成
+- 灯光 - src/gl/Light.js
+    - 调用 renderShadow 方法 (绘制阴影贴图)
+        - 更新矩阵
+        - 切换帧缓冲区以渲染到纹理
+        - 清除画布
+        - 设置着色器
+        - 调用 render 方法 (执行递归渲染)
+            - 绘制面
+                - 设置物体的世界矩阵
+                - 绑定顶点数组
+                - 绘制数据
+            - 遍历 子节点 递归调用 render 方法
+
+## 渲染流程(渲染与后期)
+由渲染流程封装类完成
+- 渲染流程 - 还没写
 
 
 # 渲染线程与worker线程通信协议

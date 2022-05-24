@@ -1,6 +1,6 @@
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
-import { GlslGenerator } from "../shader/GlslGenerator.js";
+import { GlslGenerator } from "../shader/generator/GlslGenerator.js";
 import { GlslProgram } from "../shader/GlslProgram.js";
 
 var cubeVer = new Float32Array([

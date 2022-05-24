@@ -1,6 +1,6 @@
 import { m4 } from "../math/m4.js";
 import { debugInfo } from "../tools/debugInfo.js";
-import { GlslGenerator } from "./shader/GlslGenerator.js";
+import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
 import { degToRad } from "./util/math.js";
 
 
@@ -80,6 +80,11 @@ export class Camera
      * @type {import("./shader/GlslProgram").GlslProgram}
      */
     program = null;
+    /**
+     * 着色器生成器对象
+     * @type {GlslGenerator}
+     */
+    pGenerator = null;
 
 
     /**
@@ -90,7 +95,8 @@ export class Camera
         this.scene = scene;
         this.gl = scene.gl;
 
-        this.program = (new GlslGenerator(this.gl)).gen();
+        this.pGenerator = new GlslGenerator(this.gl);
+        this.program = this.pGenerator.gen();
     }
 
     /**
@@ -124,12 +130,6 @@ export class Camera
     render(obje)
     {
         /*
-            变换矩阵(遗留部分)
-        */
-        var worldMatrix = obje.wMat;
-        /*---------*/
-
-        /*
             绘制图像
         */
         if (obje.faces) // 有"面数据"
@@ -139,7 +139,7 @@ export class Camera
             {
                 var faces = obje.faces;
 
-                this.program.uniformMatrix4fv("u_worldMatrix", worldMatrix.a); // 设置世界矩阵
+                this.program.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
                 // obje.program.uniform3f("u_markColor", 0, 0.2, 0); // 标记颜色
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理

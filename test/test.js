@@ -6,6 +6,7 @@
 import { degToRad } from "../src/gl/util/math.js";
 import { Manager } from "../src/manager/manager.js";
 import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugInfo } from "../src/index.js";
+import { Light } from "../src/gl/Light.js";
 
 
 (async function ()
@@ -27,6 +28,7 @@ import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugI
         debugDiv.innerText = ([
             "fps: " + fpsCount,
             "cullCount: " + debugInfo.cullCount,
+            "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
         ]).join("\n");
         fpsCount = 0;
     }, 1000);
@@ -39,6 +41,10 @@ import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugI
     await manager.waitInit();
     var lastTimeStamp = 0;
     var speed = 0.01;
+
+    var light = new Light(scene);
+    camera.shadowTex = light.shadowTex.depthTex;
+    camera.lightMat = light.cMat;
 
     /**
      * 绘制函数 每帧调用
@@ -83,6 +89,8 @@ import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugI
             camera.y -= timeChange * speed;
         }
 
+        light.renderShadow();
+        ct.clearFramebuffer();
         camera.draw();
 
         requestAnimationFrame(draw);

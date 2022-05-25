@@ -37,8 +37,10 @@ export class Render2Texture
      * @param {WebGL2RenderingContext} gl
      * @param {number} textureWidth
      * @param {number} textureHeight
+     * @param {boolean} useColorTexture 使用颜色缓冲
+     * @param {boolean} useDepthTexture 使用深度缓冲
      */
-    constructor(gl, textureWidth, textureHeight)
+    constructor(gl, textureWidth, textureHeight, useColorTexture = true, useDepthTexture = true)
     {
         this.gl = gl;
         this.textureWidth = textureWidth;
@@ -48,6 +50,7 @@ export class Render2Texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer); // 绑定帧缓冲
         this.frameBuffer = frameBuffer;
 
+        if(useColorTexture)
         { // 颜色
             let colorTexture = gl.createTexture(); // 创建颜色纹理
             gl.bindTexture(gl.TEXTURE_2D, colorTexture); // 绑定颜色纹理
@@ -79,13 +82,14 @@ export class Render2Texture
             this.colorTex = new Texture(gl, colorTexture);
         }
 
+        if(useDepthTexture)
         { // 深度缓冲
             let depthTexture = gl.createTexture(); // 创建深度纹理
             gl.bindTexture(gl.TEXTURE_2D, depthTexture); // 绑定深度纹理
             gl.texImage2D(
                 gl.TEXTURE_2D, // 二维纹理贴图
                 0, // 基本图形等级
-                gl.DEPTH_COMPONENT24, // 纹理颜色组件
+                gl.DEPTH_COMPONENT32F, // 纹理颜色组件
                 textureWidth, // 宽
                 textureHeight, // 高
                 0, // 边框宽度(遗留属性,必须为0)

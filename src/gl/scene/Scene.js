@@ -3,12 +3,14 @@ import { SceneObject } from "./SceneObject.js";
 
 /**
  * 场景类
- * 需要绑定到 webgl上下文
+ * 需要绑定到 本引擎上下文(包括webgl上下文)
  * 记录场景中的物体
  */
 export class Scene
 {
     /**
+     * 物体树
+     * 此对象为根节点
      * @type {SceneObject}
      */
     obje = null;

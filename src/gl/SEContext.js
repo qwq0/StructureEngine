@@ -16,6 +16,7 @@ export class SEContext
     gl;
     /**
      * canvas对象
+     * @package
      * @type {HTMLCanvasElement}
      */
     canvas;
@@ -40,7 +41,20 @@ export class SEContext
     }
 
     /**
+     * 清除帧缓冲绑定
+     * 渲染到可视画布(canvas)
+     * 也可用于初始化视口
+     * @package
+     */
+    clearFramebuffer()
+    {
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    /**
      * 创建渲染到纹理
+     * @package
      * @param {number} textureWidth
      * @param {number} textureHeight
      * @returns {Render2Texture}

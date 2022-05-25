@@ -62,6 +62,33 @@ export class GlslGenerator
      * 片段着色器部分
      */
     fPart = [];
+    /**
+     * fPart的一些预设
+     */
+    static t_fPart = {
+        light: [
+            "const vec3 lightDir = normalize(vec3(0.3, -0.3, 1))", // 灯光方向向量
+            "float diffLight = max(dot(normal, -lightDir), 0.0)", // 平行光漫反射
+            "float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0)", // 平行光镜面反射
+            "lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08" // 光的总影响
+        ]
+    };
+
+    /**
+     * 片段着色器输出的颜色
+     * @type {string}
+     */
+    fOutColor = GlslGenerator.t_fOutColor.white;
+    /**
+     * fOutColor的一些预设值
+     */
+    static t_fOutColor = {
+        white: "vec3(1.0, 1.0, 1.0)",
+        /** 纹理乘以光照 */
+        light: "texture(u_texture, v_texcoord).rgb * lightResult",
+        /** 渲染法线向量作为颜色 */
+        normal: "normal"
+    };
 
     /**
      * @param {WebGL2RenderingContext} [gl]
@@ -69,7 +96,7 @@ export class GlslGenerator
     constructor(gl)
     {
         this.gl = gl;
-        
+
         ([
             new GlslGenParam("mat4", "u_cameraMatrix"), // 相机(包括投影投影)矩阵
             new GlslGenParam("mat4", "u_worldMatrix") // 世界矩阵
@@ -112,115 +139,131 @@ export class GlslGenerator
      */
     gen()
     {
-        var vertexShader = genVertexShader(this.vUniform, this.vIn, this.fIn);
-        var fragmentShader = genFragmentShader(this.fUniform, this.fIn);
+        var vertexShader = this.genVertexShader();
+        var fragmentShader = this.genFragmentShader();
         return new GlslProgram(this.gl, vertexShader, fragmentShader);
     }
-}
-/**
- * 生成顶点着色器
- * @param {Map<string, GlslGenParam>} uniform
- * @param {Map<string, GlslGenParam>} vIn
- * @param {Map<string, GlslGenParam>} vOut
- */
-function genVertexShader(uniform, vIn, vOut)
-{
-    return ([
-        "#version 300 es",
-        "precision highp float;",
 
-        (() => // 顶点着色器uniform
-        {
-            var ret = [];
-            uniform.forEach((value) =>
+    /**
+     * 生成顶点着色器
+     * @private
+     */
+    genVertexShader()
+    {
+        return ([
+            "#version 300 es",
+            "precision highp float;",
+
+            (() => // 顶点着色器uniform
             {
-                ret.push("uniform " + value.type + " " + value.id + ";");
-            });
-            return ret;
-        })(),
+                var ret = [];
+                this.vUniform.forEach((value) =>
+                {
+                    ret.push("uniform " + value.type + " " + value.id + ";");
+                });
+                return ret;
+            })(),
 
-        (() => // 顶点着色器in
-        {
-            var ret = [];
-            vIn.forEach((value) =>
+            (() => // 顶点着色器in
             {
-                ret.push("in " + value.type + " " + value.id + ";");
-            });
-            return ret;
-        })(),
+                var ret = [];
+                this.vIn.forEach((value) =>
+                {
+                    ret.push("in " + value.type + " " + value.id + ";");
+                });
+                return ret;
+            })(),
 
-        (() => // 顶点着色器out
-        {
-            var ret = [];
-            vOut.forEach((value) =>
+            (() => // 顶点着色器out
             {
-                ret.push("out " + value.type + " " + value.id + ";");
-            });
-            return ret;
-        })(),
+                var ret = [];
+                this.fIn.forEach((value) =>
+                {
+                    ret.push("out " + value.type + " " + value.id + ";");
+                });
+                return ret;
+            })(),
 
-        "void main() {",
-        "    gl_Position = u_cameraMatrix * u_worldMatrix * a_position;", // 转换到视图中坐标
-        "    v_texcoord = a_texcoord;", // 纹理坐标(插值)
-        "    v_thisPos = (u_worldMatrix * a_position).xyz;", // 顶点世界坐标(插值)
+            "void main() {",
+            "    gl_Position = u_cameraMatrix * u_worldMatrix * a_position;", // 转换到视图中坐标
+            "    v_texcoord = a_texcoord;", // 纹理坐标(插值)
+            "    v_thisPos = (u_worldMatrix * a_position).xyz;", // 顶点世界坐标(插值)
 
-        "    mat4 u_worldViewProjection = u_worldMatrix;", // 求出不含平移的世界矩阵(旋转和缩放)
-        "    u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;",
-        "    u_worldViewProjection = transpose(inverse(u_worldViewProjection));",
-        "    v_normal = mat3(u_worldViewProjection) * a_normal;", // 法线(插值)
-        "}"
-    ]).flat(Infinity).join("\n");
-}
+            "    mat4 u_worldViewProjection = u_worldMatrix;", // 求出不含平移的世界矩阵(旋转和缩放)
+            "    u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;",
+            "    u_worldViewProjection = transpose(inverse(u_worldViewProjection));",
+            "    v_normal = mat3(u_worldViewProjection) * a_normal;", // 法线(插值)
 
-/**
- * 生成片段着色器
- * @param {Map<string, GlslGenParam>} uniform
- * @param {Map<string, GlslGenParam>} fIn
- */
-function genFragmentShader(uniform, fIn)
-{
-    return ([
-        "#version 300 es",
-        "precision highp float;",
-
-        (() => // 片段着色器uniform
-        {
-            var ret = [];
-            uniform.forEach((value) =>
+            (() => // 顶点着色器部分
             {
-                ret.push("uniform " + value.type + " " + value.id + ";");
-            });
-            return ret;
-        })(),
+                var ret = [];
+                this.vPart.forEach((o) =>
+                {
+                    ret.push(o + ";\n");
+                });
+                return ret;
+            })(),
 
-        (() => // 片段着色器in
-        {
-            var ret = [];
-            fIn.forEach((value) =>
+            "}"
+        ]).flat(Infinity).join("\n");
+    }
+
+    /**
+     * 生成片段着色器
+     * @private
+     */
+    genFragmentShader()
+    {
+        return ([
+            "#version 300 es",
+            "precision highp float;",
+
+            (() => // 片段着色器uniform
             {
-                ret.push("in " + value.type + " " + value.id + ";");
-            });
-            return ret;
-        })(),
+                var ret = [];
+                this.fUniform.forEach((value) =>
+                {
+                    ret.push("uniform " + value.type + " " + value.id + ";");
+                });
+                return ret;
+            })(),
 
-        (() => // 片段着色器out
-        {
-            return ["out vec4 outColor;"]; // 此片段最终的颜色
-        })(),
+            (() => // 片段着色器in
+            {
+                var ret = [];
+                this.fIn.forEach((value) =>
+                {
+                    ret.push("in " + value.type + " " + value.id + ";");
+                });
+                return ret;
+            })(),
 
-        "const vec3 lightDir = normalize(vec3(0.3, -0.3, 1));", // 灯光方向向量
+            (() => // 片段着色器out
+            {
+                return ["out vec4 outColor;"]; // 此片段最终的颜色
+            })(),
 
-        "void main() {",
-        "    vec3 normal = normalize(v_normal);", // 法线(归一化)
 
-        "    float diffLight = max(dot(normal, -lightDir), 0.0);", // 平行光漫反射
-        "    float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0);", // 平行光镜面反射
+            "void main() {",
+            "    vec3 normal = normalize(v_normal);", // 法线(归一化)
 
-        "    float lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08;", // 光的总影响
-        "    outColor.a = 1.0;",
-        "    outColor.rgb = texture(u_texture, v_texcoord).rgb * lightResult;", // 计算最终颜色
-        "    outColor.rgb += u_markColor;", // 标记颜色(调试)
-        // "    discard;", 丢弃片段
-        "}"
-    ]).flat(Infinity).join("\n");
+            "    float lightResult = 1.0;", // 光的总影响
+
+            (() => // 片段着色器部分
+            {
+                var ret = [];
+                this.fPart.forEach((o) =>
+                {
+                    ret.push(o + ";\n");
+                });
+                return ret;
+            })(),
+
+            "    outColor.a = 1.0;",
+            "    outColor.rgb = (" + this.fOutColor + ");", // 计算最终颜色
+            "    outColor.rgb += u_markColor;", // 标记颜色(调试)
+            // "    discard;", 丢弃片段
+            "}"
+        ]).flat(Infinity).join("\n");
+    }
 }

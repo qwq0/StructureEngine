@@ -1,6 +1,7 @@
 import { m4 } from "../math/m4.js";
 import { debugInfo } from "../tools/debugInfo.js";
 import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
+import { GlslGenParam } from "./shader/generator/GlslGenParam.js";
 import { degToRad } from "./util/math.js";
 
 
@@ -60,11 +61,13 @@ export class Camera
 
     /**
      * 绑定的场景
+     * @private
      * @type {import("./scene/Scene").Scene}
      */
     scene = null;
     /**
      * 绑定的webgl上下文
+     * @private
      * @type {WebGL2RenderingContext}
      */
     gl = null;
@@ -72,19 +75,29 @@ export class Camera
     /**
      * 相机矩阵
      * 仅变换坐标到相对相机坐标 不含投影矩阵
+     * @private
      * @type {m4}
      */
     cMat = null;
     /**
      * 当前着色器
+     * @private
      * @type {import("./shader/GlslProgram").GlslProgram}
      */
     program = null;
     /**
      * 着色器生成器对象
+     * @private
      * @type {GlslGenerator}
      */
     pGenerator = null;
+
+    /**
+     * 阴影贴图
+     * @type {import("./texture/Texture").Texture}
+     */
+    shadowTex = null;
+    lightMat = null;
 
 
     /**
@@ -96,6 +109,28 @@ export class Camera
         this.gl = scene.gl;
 
         this.pGenerator = new GlslGenerator(this.gl);
+
+        ([
+            new GlslGenParam("mat4", "u_lightMat") // 灯光投影矩阵
+        ]).forEach(o => this.pGenerator.vUniform.set(o.id, o));
+        ([
+            new GlslGenParam("vec4", "v_lightP") // 灯光投影矩阵转换后的坐标
+        ]).forEach(o => this.pGenerator.fIn.set(o.id, o));
+        ([
+            new GlslGenParam("sampler2D", "u_texS") // 阴影贴图
+        ]).forEach(o => this.pGenerator.fUniform.set(o.id, o));
+        this.pGenerator.vPart = [
+            "v_lightP = u_lightMat * u_worldMatrix * a_position"
+        ];
+        this.pGenerator.fPart = [
+            "const vec3 lightDir = normalize(vec3(0.3, -0.3, 1))", // 灯光方向向量
+            "float diffLight = max(dot(normal, -lightDir), 0.0)", // 平行光漫反射
+            "float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0)", // 平行光镜面反射
+            "lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08" // 光的总影响
+        ];
+        //this.pGenerator.fOutColor = GlslGenerator.t_fOutColor.light;
+        this.pGenerator.fOutColor = "(texture(u_texS, v_lightP.xy / v_lightP.w).r) >= v_lightP.z ? vec3(1.0,1.0,1.0) : vec3(0.6,0.6,0.6)";
+
         this.program = this.pGenerator.gen();
     }
 
@@ -120,11 +155,20 @@ export class Camera
                 translation(-this.x, -this.y, -this.z) // 反向平移
         ).a);
         this.program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program.progra, "u_texture"), 0);  // 纹理单元 0
+        this.gl.uniform1i(this.gl.getUniformLocation(this.program.progra, "u_texS"), 1);  // 纹理单元 1
+        if (this.shadowTex)
+            this.shadowTex.bindTexture(1); // 绑定阴影贴图
+        if (this.lightMat)
+            this.program.uniformMatrix4fv("u_lightMat", ( // 设置灯光投影
+                this.lightMat
+            ).a);
         this.render(this.scene.obje); // 递归渲染
     }
 
     /**
      * 递归渲染场景
+     * @private
      * @param {import("./scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
      */
     render(obje)

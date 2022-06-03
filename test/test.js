@@ -7,10 +7,14 @@ import { degToRad } from "../src/gl/util/math.js";
 import { Manager } from "../src/manager/manager.js";
 import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugInfo } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
+import { v4 } from "../src/math/v4.js";
+import { create_square } from "../src/gl/shape/square.js";
+import { m4 } from "../src/math/m4.js";
 
 
 (async function ()
 {
+    /* 初始化 */
     var canvas = document.body.appendChild(document.createElement("canvas"));
     canvas.style.position = "fixed";
     canvas.style.left = "0px";
@@ -18,6 +22,7 @@ import { Light } from "../src/gl/Light.js";
     canvas.style.width = "100%";
     canvas.style.height = "100%";
 
+    /* 显示调试信息 */
     var debugDiv = document.body.appendChild(document.createElement("div"));
     debugDiv.style.position = "fixed";
     debugDiv.style.left = "0px";
@@ -33,6 +38,7 @@ import { Light } from "../src/gl/Light.js";
         fpsCount = 0;
     }, 1000);
 
+    /* 创建场景和相机等 */
     var ct = initContext(canvas);
     var scene = ct.createScene();
     var camera = scene.createCamera();
@@ -44,7 +50,6 @@ import { Light } from "../src/gl/Light.js";
 
     var light = new Light(scene);
     camera.shadowTex = light.shadowTex.depthTex;
-    camera.lightMat = light.cMat;
 
     /**
      * 绘制函数 每帧调用
@@ -57,7 +62,7 @@ import { Light } from "../src/gl/Light.js";
         fpsCount++;
 
         if (keyMap.get("Shift"))
-            speed = 0.02;
+            speed = 0.03;
         else
             speed = 0.01;
         if (keyMap.get("w"))
@@ -89,6 +94,11 @@ import { Light } from "../src/gl/Light.js";
             camera.y -= timeChange * speed;
         }
 
+        if(window.lock)
+            light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
+            rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
+            translation(-camera.x, -camera.y, -camera.z); // 反向平移
+        camera.lightMat = light.cMat;
         light.renderShadow();
         ct.clearFramebuffer();
         camera.draw();
@@ -97,6 +107,13 @@ import { Light } from "../src/gl/Light.js";
     }
     requestAnimationFrame(draw);
 
+    /* 向场景添加物体 */
+
+    let square = create_square(ct.gl, light.shadowTex.depthTex);
+    square.sx = 64;
+    square.sy = 64;
+    square.z = 100;
+    scene.addChild(square);
 
     let cubeF = create_cube(ct.gl, Texture.fromImage(scene.gl, "./cube.png"));
     cubeF.id = "cubeF";
@@ -105,6 +122,7 @@ import { Light } from "../src/gl/Light.js";
     cubeF.sz = 16;
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
+
     let cube0 = create_cube(ct.gl, Texture.fromImage(scene.gl, "./WoodFloor045_1K_Color.jpg"));
     cube0.id = "cube0";
     cube0.x = 0;
@@ -112,6 +130,7 @@ import { Light } from "../src/gl/Light.js";
     cube0.z = 0;
     scene.addChild(cube0);
     manager.addCube(cube0, 1);
+
     for (let x = 0; x < 10; x += 3)
         for (let y = 0; y < 10; y += 3)
             for (let z = 0; z < 10; z += 3)
@@ -121,6 +140,11 @@ import { Light } from "../src/gl/Light.js";
                 cube.x = x;
                 cube.y = y;
                 cube.z = z + 10;
+                //let quat = v4.Euler2Quaternion(0.5, 0, 0);
+                //cube.rx = quat.x;
+                //cube.ry = quat.y;
+                //cube.rz = quat.z;
+                //cube.rw = quat.w;
                 scene.addChild(cube);
                 // manager.addCube(cube, 1);
             }
@@ -140,6 +164,7 @@ import { Light } from "../src/gl/Light.js";
     //scene.obje.x = scene.obje.z = camera.x = camera.z = 100000;
 
 
+    /* 添加输入响应处理 */
 
     keyMap.bind("c", e =>
     {

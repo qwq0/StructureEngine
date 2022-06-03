@@ -75,9 +75,8 @@ export class ObjFaces
     /**
      * 更新vao的值
      * @param {WebGL2RenderingContext} gl
-     * @param {GlslProgram} program
      */
-    update(gl, program)
+    update(gl)
     {
         let vao = gl.createVertexArray(); // 创建顶点数组
         gl.bindVertexArray(vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
@@ -88,7 +87,8 @@ export class ObjFaces
         gl.bufferData(gl.ARRAY_BUFFER, this.pos, gl.STATIC_DRAW); // 送入数据
 
         // 初始化顶点数组
-        let positionAttributeLocation = gl.getAttribLocation(program.progra, "a_position"); // [着色器变量] 顶点坐标
+        // let positionAttributeLocation = gl.getAttribLocation(program.progra, "a_position"); // [着色器变量] 顶点坐标
+        let positionAttributeLocation = 0; // [着色器变量] 顶点坐标
         gl.enableVertexAttribArray(positionAttributeLocation); // 启用顶点属性数组(顶点坐标数组)
         gl.vertexAttribPointer( // 顶点属性指针
             positionAttributeLocation, // 到顶点坐标
@@ -104,7 +104,8 @@ export class ObjFaces
         if (this.tex) // 有纹理
         {
             // 初始化纹理坐标
-            let texcoordAttributeLocation = gl.getAttribLocation(program.progra, "a_texcoord"); // [着色器变量] 纹理坐标
+            //let texcoordAttributeLocation = gl.getAttribLocation(program.progra, "a_texcoord"); // [着色器变量] 纹理坐标
+            let texcoordAttributeLocation = 1; // [着色器变量] 纹理坐标
 
             let texcoordBuffer = gl.createBuffer(); // 创建缓冲区
             gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
@@ -123,7 +124,8 @@ export class ObjFaces
         }
 
         // 初始化法线向量
-        let normalAttributeLocation = gl.getAttribLocation(program.progra, "a_normal"); // [着色器变量] 法线向量
+        // let normalAttributeLocation = gl.getAttribLocation(program.progra, "a_normal"); // [着色器变量] 法线向量
+        let normalAttributeLocation = 2; // [着色器变量] 法线向量
 
         let normalBuffer = gl.createBuffer(); // 创建缓冲区
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)

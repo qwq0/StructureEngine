@@ -1,7 +1,5 @@
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
-import { GlslGenerator } from "../shader/generator/GlslGenerator.js";
-import { GlslProgram } from "../shader/GlslProgram.js";
 
 var cubeVer = new Float32Array([
     -0.5, 0.5, -0.5,
@@ -132,7 +130,6 @@ var cubeTexOff = new Float32Array([
     1, 1,
     1, 1 / 2
 ]);
-var cubeProgram = null;
 
 /**
  * @returns {SceneObject}
@@ -142,11 +139,9 @@ var cubeProgram = null;
 export function create_cube(gl, tex)
 {
     var obje = new SceneObject();
-    if (!cubeProgram)
-        cubeProgram = (new GlslGenerator(gl)).gen();
     var faces = obje.faces = new ObjFaces(cubeVer, tex, cubeTexOff, cubeNormal, gl.TRIANGLES);
 
-    faces.update(gl, obje.program = cubeProgram);
+    faces.update(gl);
 
     return obje;
 }

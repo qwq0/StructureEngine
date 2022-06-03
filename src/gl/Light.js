@@ -49,9 +49,10 @@ export class Light
     {
         this.scene = scene;
         this.gl = scene.gl;
-        this.shadowTex = new Render2Texture(this.gl, 1000, 1000, false, true);
-        this.cMat = m4.projection(5, 5, 5);
-        this.program = (new GlslGenerator(this.gl)).gen();
+        this.shadowTex = new Render2Texture(this.gl, 2000, 2000, false, true);
+        this.cMat = m4.projection(5, 5, 1.5);
+        var pGenerator = new GlslGenerator(this.gl);
+        this.program = pGenerator.gen();
     }
 
     /**
@@ -62,14 +63,12 @@ export class Light
     {
         this.scene.obje.updateMat(); // 更新场景中物体的矩阵
 
-        this.shadowTex.bindFramebuffer(); // 渲染到纹理
+        this.shadowTex.bindFramebuffer(); // 渲染到纹理(帧缓冲区)
 
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT); // 清除此帧缓冲区的深度缓冲区
 
         this.program.use(); // 修改着色器组(渲染程序)
-        this.program.uniformMatrix4fv("u_cameraMatrix", ( // 设置灯光矩阵(类似相机矩阵)
-            this.cMat
-        ).a);
+        this.program.uniformMatrix4fv("u_cameraMatrix", this.cMat.a);// 设置灯光矩阵(类似相机矩阵)
         this.render(this.scene.obje); // 递归渲染
     }
 

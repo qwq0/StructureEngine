@@ -4,7 +4,7 @@ import { SceneObject } from "./SceneObject.js";
 /**
  * 场景类
  * 需要绑定到 本引擎上下文(包括webgl上下文)
- * 记录场景中的物体
+ * 记录场景中的 物体 灯光 粒子
  */
 export class Scene
 {

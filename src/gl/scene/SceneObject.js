@@ -9,6 +9,9 @@ import { forEach } from "../../util/forEach.js";
 var snCount = 0;
 /**
  * 场景中的物体
+ *  物体可以有需要渲染的面
+ *  或不绑定面作为中间节点
+ *  物体可以绑定到 相机 灯光 粒子
  */
 export class SceneObject
 {

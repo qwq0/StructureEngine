@@ -6,9 +6,9 @@ import { GlslProgram } from "../GlslProgram.js";
  * 生成一对着色器(一个GlslProgram)
  *  - 顶点着色器流程
  *      - 定义输入变量
- *          - in vec4 a_position; // (必须)原始坐标
- *          - in vec3 a_normal; // 原始法线
- *          - in vec2 a_texcoord; // 纹理坐标
+ *          - in vec4 a_position; // 原始坐标 (必须)Location=0
+ *          - in vec2 a_texcoord; // 纹理坐标 Location=1
+ *          - in vec3 a_normal; // 原始法线 Location=2
  *          - uniform mat4 u_cameraMatrix; // (必须)相机(包括投影投影)矩阵
  *          - uniform mat4 u_worldMatrix; // (必须)世界矩阵
  *      - 传递顶点的视图坐标(必须)
@@ -20,7 +20,7 @@ import { GlslProgram } from "../GlslProgram.js";
  *          - in vec2 v_texcoord; // 纹理坐标
  *          - uniform sampler2D u_texture; // 纹理
  *          - uniform vec3 u_viewPos; // 视点(相机)的世界坐标
- *          - uniform vec3 u_markColor; // 标记颜色(调试)
+ *          - uniform vec3 u_markColor; // (默认未启用)标记颜色(调试)
  *      - 计算光照
  *      - 设置最终颜色(必须)
  */
@@ -56,10 +56,12 @@ export class GlslGenerator
 
     /**
      * 顶点着色器部分
+     * @type {Array<string>}
      */
     vPart = [];
     /**
      * 片段着色器部分
+     * @type {Array<string>}
      */
     fPart = [];
     /**
@@ -106,9 +108,9 @@ export class GlslGenerator
         });
 
         ([
-            new GlslGenParam("vec4", "a_position"), // 原始坐标
-            new GlslGenParam("vec3", "a_normal"), // 原始法线
-            new GlslGenParam("vec2", "a_texcoord") // 纹理坐标
+            new GlslGenParam("vec4", "a_position", 0), // 原始坐标
+            new GlslGenParam("vec2", "a_texcoord", 1), // 纹理坐标
+            new GlslGenParam("vec3", "a_normal", 2) // 原始法线
         ]).forEach(o =>
         {
             this.vIn.set(o.id, o);
@@ -125,8 +127,8 @@ export class GlslGenerator
 
         ([
             new GlslGenParam("vec3", "u_viewPos"), // 视点(相机)的世界坐标
-            new GlslGenParam("sampler2D", "u_texture"), // 纹理
-            new GlslGenParam("vec3", "u_markColor") // 标记颜色(调试)    
+            new GlslGenParam("sampler2D", "u_texture") // 纹理
+            // new GlslGenParam("vec3", "u_markColor") // 标记颜色(调试)    
         ]).forEach(o =>
         {
             this.fUniform.set(o.id, o);
@@ -141,6 +143,7 @@ export class GlslGenerator
     {
         var vertexShader = this.genVertexShader();
         var fragmentShader = this.genFragmentShader();
+        // console.trace(vertexShader, fragmentShader);
         return new GlslProgram(this.gl, vertexShader, fragmentShader);
     }
 
@@ -159,7 +162,7 @@ export class GlslGenerator
                 var ret = [];
                 this.vUniform.forEach((value) =>
                 {
-                    ret.push("uniform " + value.type + " " + value.id + ";");
+                    ret.push(value.getDefine("uniform") + ";");
                 });
                 return ret;
             })(),
@@ -169,7 +172,7 @@ export class GlslGenerator
                 var ret = [];
                 this.vIn.forEach((value) =>
                 {
-                    ret.push("in " + value.type + " " + value.id + ";");
+                    ret.push(value.getDefine("in") + ";");
                 });
                 return ret;
             })(),
@@ -179,7 +182,7 @@ export class GlslGenerator
                 var ret = [];
                 this.fIn.forEach((value) =>
                 {
-                    ret.push("out " + value.type + " " + value.id + ";");
+                    ret.push(value.getDefine("out") + ";");
                 });
                 return ret;
             })(),
@@ -192,6 +195,7 @@ export class GlslGenerator
             "    mat4 u_worldViewProjection = u_worldMatrix;", // 求出不含平移的世界矩阵(旋转和缩放)
             "    u_worldViewProjection[3][0] = u_worldViewProjection[3][1] = u_worldViewProjection[3][2] = 0.0;",
             "    u_worldViewProjection = transpose(inverse(u_worldViewProjection));",
+
             "    v_normal = mat3(u_worldViewProjection) * a_normal;", // 法线(插值)
 
             (() => // 顶点着色器部分
@@ -223,7 +227,7 @@ export class GlslGenerator
                 var ret = [];
                 this.fUniform.forEach((value) =>
                 {
-                    ret.push("uniform " + value.type + " " + value.id + ";");
+                    ret.push(value.getDefine("uniform") + ";");
                 });
                 return ret;
             })(),
@@ -233,7 +237,7 @@ export class GlslGenerator
                 var ret = [];
                 this.fIn.forEach((value) =>
                 {
-                    ret.push("in " + value.type + " " + value.id + ";");
+                    ret.push(value.getDefine("in") + ";");
                 });
                 return ret;
             })(),
@@ -261,7 +265,7 @@ export class GlslGenerator
 
             "    outColor.a = 1.0;",
             "    outColor.rgb = (" + this.fOutColor + ");", // 计算最终颜色
-            "    outColor.rgb += u_markColor;", // 标记颜色(调试)
+            // "    outColor.rgb += u_markColor;", // 标记颜色(调试)
             // "    discard;", 丢弃片段
             "}"
         ]).flat(Infinity).join("\n");

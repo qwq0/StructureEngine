@@ -6,9 +6,10 @@
     - 紧急的
 
     - 活动的(当前)
-        - 制作光的阴影
+        - 完善glsl着色器生成器
 
     - 重要的
+        - 绘制gui
         - 渲染流程封装类
 
     - 循环(定期)
@@ -44,25 +45,31 @@
             - glsl着色器封装类 - glslProgram.js
         - 形状 - shape/
             - 正方体 - cube.js
+            - 正方形 - square.js
         - 纹理 - texture/
             - 渲染到纹理 - Render2Texture.js
             - 纹理类 - Texture.js
+        - 操作界面 - ui/
+            - 用户界面类(管理gui树) - GUI.js
+            - gui树中的元素 - GUIObject.js
         - 工具 - util/
             - 数学 - math.js
         - 相机类 - Camera.js
         - 灯光类 - Light.js
         - 此引擎的上下文类 - SEContext.js
-        - 全局状态 - state.js
-    - 管理场景(与worker通信) - manager
+    - 管理场景(与worker通信) - manager/
         - worker线程(详见下方) - worker/
         - 场景管理(与worker通信) - manager.js
-    - 数学 - math
+    - 数学 - math/
         - 4*4矩阵 - m4.js
         - 4向量 - v4.js
-    - 工具 - util
+    - 工具(用于调试等) - tools/
+        - 调试信息 - debugInfo.js
+    - 实用工具函数和类 - util/
         - 管理回调 - callbackHandler.js
         - 遍历数组 - forEach.js
     - 索引 - index.js
+    - 此引擎的有关信息(版本号等) - infoObj.js
 
 - worker线程 - src/manager/worker/
     - 处理物理模拟 - Bullet/
@@ -120,6 +127,73 @@
         - 当worker初始化完成后发送
     - objects
         - 传递物体的位置角度等数据
+
+# 坐标规范
+x z 水平坐标轴   
+y 垂直坐标轴   
+下图中的方向为角度为0时的坐标轴方向
+```
+    | y
+    |
+    |
+    |
+    .-------- x
+   /
+  /
+ / z
+```
+默认情况下   
+所有 相机 物体 灯光 的朝向为z轴负方向   
+
+# glsl着色器规范
+- 相机着色器
+    - 顶点着色器
+        - in变量
+            - vec4 a_position
+                - 原始坐标 (必须) Location=0
+            - vec2 a_texcoord
+                - 纹理坐标 Location=1
+            - vec3 a_normal
+                - 原始法线 Location=2
+        - uniform变量
+            - mat4 u_cameraMatrix
+                - 相机(包括投影投影)矩阵 (必须)
+            - mat4 u_worldMatrix
+                - 世界矩阵 (必须)
+        - out变量
+            - 同片段着色器的in变量
+    - 片段着色器
+        - in变量
+            - vec3 v_normal
+                - 法线
+            - vec3 v_thisPos
+                - 顶点的世界坐标
+            - vec2 v_texcoord
+                - 纹理坐标
+        - uniform变量
+            - sampler2D u_texture
+                - 颜色纹理
+            - vec3 u_viewPos
+                - 视点(相机)的世界坐标
+            - vec3 u_markColor
+                - (默认未启用)标记颜色(调试)
+
+# glsl着色器生成器规范
+- glsl着色器生成
+    - 顶点着色器
+        - 计算 屏幕空间顶点坐标
+        - 计算 纹理坐标
+        - 计算 世界空间顶点坐标
+        - 计算 不包含位移的世界矩阵
+        - 计算 法线向量(世界空间)
+    - 片段着色器
+        - 计算 归一化的法线向量(世界空间)
+        - 定义 光的总影响(float)
+        - 循环遍历 每个灯光
+            - 计算 光照与阴影 得到 当前灯光的贡献
+            - 将 当前灯光的贡献 加到 光的总影响
+        - 设置 输出颜色不透明通道为1.0
+        - 计算 纹理颜色 乘以 光的总影响 得到 输出颜色
 
 
 # 此项目的使用

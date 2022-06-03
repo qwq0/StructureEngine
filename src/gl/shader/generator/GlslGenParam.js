@@ -24,12 +24,41 @@ export class GlslGenParam
     id = "";
 
     /**
-     * @param {GlslGenParamType} type
-     * @param {string} id
+     * 此变量的位置(用于赋值时寻址)
      */
-    constructor(type, id)
+    location = -1;
+
+    /**
+     * @param {GlslGenParamType} type 类型
+     * @param {string} id 标识符
+     * @param {number} [location] 此值的位置 -1为不指定
+     */
+    constructor(type, id, location = -1)
     {
         this.type = type;
         this.id = id;
+        this.location = location;
+    }
+
+    /**
+     * 获取layout字符串
+     * @returns {string}
+     */
+    getLayout()
+    {
+        if (this.location > -1)
+            return "layout (location = " + this.location + ")";
+        else
+            return "";
+    }
+
+    /**
+     * 获取变量定义字符串
+     * @param {"in" | "out" | "uniform"} variType
+     * @returns {string}
+     */
+    getDefine(variType)
+    {
+        return this.getLayout() + " " + variType + " " + this.type + " " + this.id;
     }
 }

@@ -4,7 +4,8 @@ import { Render2Texture } from "./texture/Render2Texture.js";
 /**
  * Structure Engine的上下文
  * 封装webgl2上下文
- * 通过此上下文以更方便的操作
+ * 此类将储存各种状态
+ * 通过调用此上下文的方法以更方便的进行操作
  */
 export class SEContext
 {

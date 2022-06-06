@@ -53,6 +53,11 @@ export class ObjFaces
      * @type {boolean}
      */
     queryInProgress = false;
+    /**
+     * 此物体被遮挡
+     * @type {boolean}
+     */
+    occluded = false;
 
     /**
      * @param {Float32Array | Array<number>} pos

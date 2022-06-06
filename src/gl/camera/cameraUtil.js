@@ -39,7 +39,6 @@ export function coneCull(obje, bsPos, fov)
  */
 export function occlusionCull(obje, gl, cMat)
 {
-    var ret = false;
     var boundingBoxProgram = obje.scene.ct.program.white;
     var faces = obje.faces;
 
@@ -55,7 +54,7 @@ export function occlusionCull(obje, gl, cMat)
     {
         if (gl.getQueryParameter(faces.query, gl.QUERY_RESULT_AVAILABLE)) // 查询结果可用
         {
-            ret = !gl.getQueryParameter(faces.query, gl.QUERY_RESULT); // 获取遮挡结果
+            faces.occluded = !gl.getQueryParameter(faces.query, gl.QUERY_RESULT); // 获取遮挡结果
             faces.queryInProgress = false; // 下一帧需要重新查询
         }
     }
@@ -69,5 +68,5 @@ export function occlusionCull(obje, gl, cMat)
         faces.queryInProgress = true; // 设置为查询进行中
     }
 
-    return ret;
+    return faces.occluded;
 }

@@ -1,4 +1,4 @@
-import { Camera } from "../Camera.js"
+import { Camera } from "../camera/Camera.js"
 import { SceneObject } from "./SceneObject.js";
 
 /**
@@ -26,15 +26,23 @@ export class Scene
      * @type {WebGL2RenderingContext}
      */
     gl = null;
+    /**
+     * 绑定的引擎上下文
+     * @package
+     * @type {import("../SEContext").SEContext}
+     */
+    ct = null;
 
     /**
-     * @param {WebGL2RenderingContext} gl
+     * @param {import("../SEContext").SEContext} ct
      */
-    constructor(gl)
+    constructor(ct)
     {
+        this.ct = ct;
+        this.gl = ct.gl;
+        
         this.obje = new SceneObject();
         this.obje.scene = this;
-        this.gl = gl;
     }
 
     /**

@@ -134,7 +134,7 @@ var cubeTexOff = new Float32Array([
 /**
  * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
- * @param {import("../texture/Texture.js").Texture} tex
+ * @param {import("../texture/Texture").Texture} tex
  */
 export function create_cube(gl, tex)
 {

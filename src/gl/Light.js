@@ -51,8 +51,7 @@ export class Light
         this.gl = scene.gl;
         this.shadowTex = new Render2Texture(this.gl, 2000, 2000, false, true);
         this.cMat = m4.projection(5, 5, 1.5);
-        var pGenerator = new GlslGenerator(this.gl);
-        this.program = pGenerator.gen();
+        this.program = scene.ct.program.white;
     }
 
     /**

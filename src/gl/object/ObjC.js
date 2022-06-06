@@ -55,7 +55,7 @@ export class ObjC
      * 以此模型创建物体
      * @returns {SceneObject}
      * @param {WebGL2RenderingContext} gl
-     * @param {import("../shader/GlslProgram.js").GlslProgram} program
+     * @param {import("../shader/GlslProgram").GlslProgram} program
      */
     createSceneObject(gl, program)
     {

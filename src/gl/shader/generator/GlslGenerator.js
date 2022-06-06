@@ -93,6 +93,12 @@ export class GlslGenerator
     };
 
     /**
+     * 片段着色器输出的颜色类型
+     * @type {"rgb" | "rgba"}
+     */
+    fOutColorType = "rgb";
+
+    /**
      * @param {WebGL2RenderingContext} [gl]
      */
     constructor(gl)
@@ -264,7 +270,7 @@ export class GlslGenerator
             })(),
 
             "    outColor.a = 1.0;",
-            "    outColor.rgb = (" + this.fOutColor + ");", // 计算最终颜色
+            "    outColor." + this.fOutColorType + " = (" + this.fOutColor + ");", // 计算最终颜色
             // "    outColor.rgb += u_markColor;", // 标记颜色(调试)
             // "    discard;", 丢弃片段
             "}"

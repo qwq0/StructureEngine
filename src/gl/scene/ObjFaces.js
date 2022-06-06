@@ -39,9 +39,20 @@ export class ObjFaces
     vao = null;
     /**
      * 此物体的渲染模式 例如 gl.TRIANGLES
+     * 暂时仅支持gl.TRIANGLES
      * @type {number}
      */
     mode = 0;
+    /**
+     * 遮挡剔除查询
+     * @type {WebGLQuery}
+     */
+    query = null;
+    /**
+     * 遮挡剔除查询正在进行
+     * @type {boolean}
+     */
+    queryInProgress = false;
 
     /**
      * @param {Float32Array | Array<number>} pos

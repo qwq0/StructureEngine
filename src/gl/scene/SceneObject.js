@@ -69,6 +69,7 @@ export class SceneObject
 
     /**
      * 绘制此物体使用的着色器组(渲染程序)
+     * 此属性暂时未使用
      * @type {import("../shader/GlslProgram").GlslProgram}
      */
     program = null;
@@ -203,33 +204,5 @@ export class SceneObject
                 maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
             this.bsR = maxR;
         }
-    }
-
-    /**
-     * 视锥剔除判断
-     * @param {m4} cMat
-     * @param {number} fov
-     * @returns {boolean} 返回true则剔除
-     */
-    coneRemove(cMat, fov)
-    {
-        this.updateBoundingSphere();
-        var bsPos = this.getWPos().mulM4(cMat);
-        /*
-            ndzda推导的球与圆锥不相交的保守剔除原始判断公式
-            圆锥沿着z轴向负方向扩展
-            if (arccos(-z / len(x, y, z)) - Fov / 2 < Math.PI / 2)
-                (sin(arccos(-z / len(x, y, z)) - Fov / 2) * len(x, y, z) >= r) or (z >= r)
-            else
-                len(x, y, z) >= r;
-        */
-        if (bsPos.z >= this.bsR)
-            return true;
-        var bsLen = bsPos.getV3Len(); // 球心和原点距离
-        var angle = Math.acos(-bsPos.z / bsLen) - fov * 0.5; // 原点到球心与圆锥在对应方向母线的夹角
-        if (angle < Math.PI / 2)
-            return (Math.sin(angle) * bsLen >= this.bsR);
-        else
-            return bsLen >= this.bsR;
     }
 }

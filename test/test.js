@@ -10,6 +10,7 @@ import { Light } from "../src/gl/Light.js";
 import { v4 } from "../src/math/v4.js";
 import { create_square } from "../src/gl/shape/square.js";
 import { m4 } from "../src/math/m4.js";
+import { IdBitmap } from "../src/gl/IdBitmap.js";
 
 
 (async function ()
@@ -94,12 +95,13 @@ import { m4 } from "../src/math/m4.js";
             camera.y -= timeChange * speed;
         }
 
-        if(window.lock)
+        if (window.lock) // 将灯光锁定到相机位置
             light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
-            rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
-            translation(-camera.x, -camera.y, -camera.z); // 反向平移
+                rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
+                translation(-camera.x, -camera.y, -camera.z); // 反向平移
         camera.lightMat = light.cMat;
         light.renderShadow();
+
         ct.clearFramebuffer();
         camera.draw();
 

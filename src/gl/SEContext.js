@@ -1,4 +1,5 @@
 import { Scene } from "./scene/Scene.js";
+import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
 /**
@@ -15,12 +16,24 @@ export class SEContext
      * @type {WebGL2RenderingContext}
      */
     gl;
+
     /**
      * canvas对象
      * @package
      * @type {HTMLCanvasElement}
      */
     canvas;
+
+    /**
+     * 通用着色器
+     */
+    program = {
+        /**
+         * 绘制纯白色
+         * @type {import("./shader/GlslProgram").GlslProgram}
+         */
+        white: null
+    };
 
     /**
      * @param {WebGL2RenderingContext} gl
@@ -30,6 +43,9 @@ export class SEContext
     {
         this.gl = gl;
         this.canvas = canvas;
+
+        var pGenerator = new GlslGenerator(gl);
+        this.program.white = pGenerator.gen();
     }
 
     /**
@@ -38,7 +54,7 @@ export class SEContext
      */
     createScene()
     {
-        return new Scene(this.gl);
+        return new Scene(this);
     }
 
     /**

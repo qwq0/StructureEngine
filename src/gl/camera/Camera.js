@@ -1,9 +1,10 @@
-import { m4 } from "../math/m4.js";
-import { debugInfo } from "../tools/debugInfo.js";
-import { Light } from "./Light.js";
-import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
-import { GlslGenParam } from "./shader/generator/GlslGenParam.js";
-import { degToRad } from "./util/math.js";
+import { m4 } from "../../math/m4.js";
+import { debugInfo } from "../../tools/debugInfo.js";
+import { Light } from "../Light.js";
+import { GlslGenerator } from "../shader/generator/GlslGenerator.js";
+import { GlslGenParam } from "../shader/generator/GlslGenParam.js";
+import { degToRad } from "../util/math.js";
+import { coneCull, occlusionCull } from "./cameraUtil.js";
 
 
 /**
@@ -63,7 +64,7 @@ export class Camera
     /**
      * 绑定的场景
      * @private
-     * @type {import("./scene/Scene").Scene}
+     * @type {import("../scene/Scene").Scene}
      */
     scene = null;
     /**
@@ -79,7 +80,7 @@ export class Camera
      * @private
      * @type {m4}
      */
-    npMat = null;
+    npMat = new m4();
 
     /**
      * 相机投影矩阵
@@ -88,13 +89,13 @@ export class Camera
      * @private
      * @type {m4}
      */
-    cMat = null;
+    cMat = new m4();
 
 
     /**
      * 当前着色器
      * @private
-     * @type {import("./shader/GlslProgram").GlslProgram}
+     * @type {import("../shader/GlslProgram").GlslProgram}
      */
     program = null;
     /**
@@ -105,6 +106,16 @@ export class Camera
     pGenerator = null;
 
     /**
+     * 判断函数
+     * 渲染时对于每个遍历到的物体调用进行判断
+     * 要求返回一个标志位整数表示判断结果
+     *  + &1 不渲染此物体的面
+     *  + &2 不遍历此物体的子节点
+     * @type {function(import("../scene/SceneObject").SceneObject) : number}
+     */
+    judge = null;
+
+    /**
      * 灯光列表
      * @type {Array<Light>}
      */
@@ -112,7 +123,7 @@ export class Camera
 
 
     /**
-     * @param {import("./scene/Scene").Scene} scene
+     * @param {import("../scene/Scene").Scene} scene
      */
     constructor(scene)
     {
@@ -146,10 +157,10 @@ export class Camera
             "lightResult = 0.75 + diffLight * 0.2 + reflLight * 0.08" // 光的总影响
         ];
         this.pGenerator.fOutColor = "(lightP.x>=0.0 && lightP.x<=1.0 && lightP.y>=0.0 && lightP.y<=1.0 && lightP.z>=-1.0 && lightP.z<=1.0) ?(texture(u_texS, lightP.xy).r + 0.001 < lightP.z * 0.5 + 0.5) ? vec3(0.0,0.0,0.0) :  texture(u_texture, v_texcoord).rgb + 0.3: texture(u_texture, v_texcoord).rgb";
-        
+
         // this.pGenerator.fPart = GlslGenerator.t_fPart.light;
         // this.pGenerator.fOutColor = GlslGenerator.t_fOutColor.light;
-        
+
         this.program = this.pGenerator.gen();
     }
 
@@ -189,19 +200,27 @@ export class Camera
     /**
      * 递归渲染场景
      * @private
-     * @param {import("./scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
+     * @param {import("../scene/SceneObject").SceneObject} obje 场景中的物体对象(当前位置)
      */
     render(obje)
     {
+        /**
+         * 标志位
+         * 用于阻止一些操作
+         */
+        var flag = (this.judge ? this.judge(obje) : 0);
+
         /*
             绘制图像
         */
-        if (obje.faces) // 有"面数据"
+        if (obje.faces && !(flag & 1)) // 有"面数据"
         {
-
-            if(true)
-            //if (!obje.coneRemove(this.npMat, this.fov)) // 未被剔除
+            if ((!coneCull(obje, obje.getWPos().mulM4(this.npMat), this.fov)) && (!occlusionCull(obje, this.gl, this.cMat))) // 未被视锥剔除 且 未被遮挡剔除
             {
+                this.gl.colorMask(true, true, true, true); // 允许写入颜色
+                this.gl.depthMask(true); // 允许写入深度
+                this.program.use(); // 修改着色器组(渲染程序)
+
                 var faces = obje.faces;
 
                 this.program.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
@@ -219,7 +238,7 @@ export class Camera
         /*
             递归子节点
         */
-        if (obje.c)
+        if (obje.c && !(flag & 2))
             obje.c.forEach(o => this.render(o));
     }
 }

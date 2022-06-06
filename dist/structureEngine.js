@@ -1506,7 +1506,7 @@ var cubeProgram = null;
 /**
  * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
- * @param {import("../texture/Texture.js").Texture} tex
+ * @param {import("../texture/Texture").Texture} tex
  */
 function create_cube(gl, tex)
 {
@@ -2027,7 +2027,7 @@ class ObjC
      * 以此模型创建物体
      * @returns {SceneObject}
      * @param {WebGL2RenderingContext} gl
-     * @param {import("../shader/glslProgram.js").glslProgram} program
+     * @param {import("../shader/glslProgram").glslProgram} program
      */
     createSceneObject(gl, program)
     {

@@ -174,6 +174,8 @@ export class Camera
 
         this.scene.obje.updateMat(); // 更新场景中物体的矩阵
 
+        this.gl.colorMask(true, true, true, true); // 允许写入颜色
+        this.gl.depthMask(true); // 允许写入深度
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // 清除画布颜色和深度缓冲区
 
         this.npMat = new m4().rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转

@@ -32,6 +32,7 @@ export function coneCull(obje, bsPos, fov)
 /**
  * 遮挡剔除判断
  * 在执行遮挡剔除判断前应该按照近到远排序
+ * 注意: 此遮挡判断方案在大多数场景中并不能起到优化作用
  * 注意: 执行此函数会关闭颜色和深度写入
  * @param {import("../scene/SceneObject").SceneObject} obje
  * @param {WebGL2RenderingContext} gl
@@ -50,15 +51,12 @@ export function occlusionCull(obje, gl, cMat)
     boundingBoxProgram.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
     boundingBoxProgram.uniformMatrix4fv("u_cameraMatrix", cMat.a); // 设置相机矩阵
 
-    if (faces.queryInProgress) // 查询进行中
+    if (faces.queryInProgress && gl.getQueryParameter(faces.query, gl.QUERY_RESULT_AVAILABLE)) // 查询已进行 且 结果可用
     {
-        if (gl.getQueryParameter(faces.query, gl.QUERY_RESULT_AVAILABLE)) // 查询结果可用
-        {
-            faces.occluded = !gl.getQueryParameter(faces.query, gl.QUERY_RESULT); // 获取遮挡结果
-            faces.queryInProgress = false; // 下一帧需要重新查询
-        }
+        faces.occluded = !gl.getQueryParameter(faces.query, gl.QUERY_RESULT); // 获取遮挡结果
+        faces.queryInProgress = false; // 设置为查询未进行
     }
-    else // 查询未进行
+    if (!faces.queryInProgress) // 查询未进行
     {
         if (!faces.query) // 没有webgl查询对象则创建
             faces.query = gl.createQuery();

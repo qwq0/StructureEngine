@@ -3,6 +3,7 @@ import { forEach } from "../../util/forEach.js";
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { Texture } from "../texture/Texture.js";
+import { TextureTable } from "../texture/TextureTable.js";
 import { MtlC } from "./MtlC.js";
 import { ObjCFaces } from "./ObjCFaces.js";
 
@@ -55,19 +56,16 @@ export class ObjC
      * 以此模型创建物体
      * @returns {SceneObject}
      * @param {WebGL2RenderingContext} gl
-     * @param {import("../shader/GlslProgram").GlslProgram} program
      */
-    createSceneObject(gl, program)
+    createSceneObject(gl)
     {
         var ret = new SceneObject();
-        var texMap = new Map(); // 防止生成获取相同url的纹理
+        var texTab = new TextureTable(gl); // 防止生成获取相同url的纹理
         forEach(this.faces, o =>
         {
             var obj = new SceneObject();
-            if (!texMap.has(o.tex))
-                texMap.set(o.tex, Texture.fromImage(gl, o.tex));
-            obj.faces = new ObjFaces(o.pos, texMap.get(o.tex), o.texPos, o.norm);
-            obj.faces.update(gl, obj.program = program);
+            obj.faces = new ObjFaces(o.pos, texTab.fromUrl(o.tex), o.texPos, o.norm);
+            obj.faces.update(gl);
             ret.addChild(obj);
         });
         return ret;
@@ -86,9 +84,9 @@ export class ObjC
 
         var faces = new ObjCFaces();
 
-        /** @type {Map<number, v3>} */
+        /** @type {Map<number | string, v3>} */
         var defaultNormalMap = new Map();
-        /** @type {Array<[number, number]>} */
+        /** @type {Array<[number, number | string]>} */
         var defaultNormalList = [];
         /**
          * 添加面
@@ -141,13 +139,13 @@ export class ObjC
                     faces.norm.push(...normals[i]);
                 else
                 { // 缺省法线
-                    var ind = positionsInd[i];
-                    defaultNormalMap.set(ind,
+                    var key = positionsInd[i];
+                    defaultNormalMap.set(key,
                         defaultNormal.add(
-                            defaultNormalMap.has(ind) ? defaultNormalMap.get(ind) : new v3()
+                            defaultNormalMap.has(key) ? defaultNormalMap.get(key) : new v3()
                         )
                     );
-                    defaultNormalList.push([faces.norm.length, ind]);
+                    defaultNormalList.push([faces.norm.length, key]);
                     faces.norm.push(0, 0, 0);
                 }
             }

@@ -10,5 +10,3 @@ export { ObjC } from "./gl/object/ObjC.js"
 export { keyboardBind } from "./controller/keyboard.js";
 export { KeyboardMap } from "./controller/KeyboardMap.js";
 export { touchBind } from "./controller/touch.js";
-
-export { debugInfo } from "./tools/debugInfo.js"

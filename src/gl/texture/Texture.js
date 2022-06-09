@@ -48,7 +48,7 @@ export class Texture
      * @param {string} url
      * @returns {Texture}
      */
-    static fromImage(gl, url)
+    static fromImageUrl(gl, url)
     {
         var ret = new Texture(gl);
         var image = new Image();

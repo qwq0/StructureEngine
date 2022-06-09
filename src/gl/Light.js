@@ -14,7 +14,7 @@ export class Light
      * 带投影
      * @type {m4}
      */
-    cMat = new m4();
+    cMat = m4.zero();
 
     /**
      * 绑定的场景
@@ -50,7 +50,6 @@ export class Light
         this.scene = scene;
         this.gl = scene.gl;
         this.shadowTex = new Render2Texture(this.gl, 2000, 2000, false, true);
-        this.cMat = m4.projection(5, 5, 1.5);
         this.program = scene.ct.program.white;
     }
 
@@ -64,6 +63,8 @@ export class Light
 
         this.shadowTex.bindFramebuffer(); // 渲染到纹理(帧缓冲区)
 
+        this.gl.colorMask(true, true, true, true); // 允许写入颜色
+        this.gl.depthMask(true); // 允许写入深度
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT); // 清除此帧缓冲区的深度缓冲区
 
         this.program.use(); // 修改着色器组(渲染程序)

@@ -99,7 +99,7 @@ export class GlslGenerator
     fOutColorType = "rgb";
 
     /**
-     * @param {WebGL2RenderingContext} [gl]
+     * @param {WebGL2RenderingContext} gl
      */
     constructor(gl)
     {

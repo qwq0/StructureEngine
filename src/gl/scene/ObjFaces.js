@@ -58,6 +58,12 @@ export class ObjFaces
      * @type {boolean}
      */
     occluded = false;
+    /**
+     * 实例标志
+     * 相同代表可以实例化
+     * @type {symbol}
+     */
+    instance = null;
 
     /**
      * @param {Float32Array | Array<number>} pos
@@ -90,6 +96,7 @@ export class ObjFaces
 
     /**
      * 更新vao的值
+     * AttribLocation(变量位置)按照项目结构中的描述
      * @param {WebGL2RenderingContext} gl
      */
     update(gl)

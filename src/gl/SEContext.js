@@ -1,5 +1,7 @@
+import { initShader } from "./init/initShader.js";
 import { Scene } from "./scene/Scene.js";
 import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
+import { GlslProgram } from "./shader/GlslProgram.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
 /**
@@ -32,7 +34,17 @@ export class SEContext
          * 绘制纯白色
          * @type {import("./shader/GlslProgram").GlslProgram}
          */
-        white: null
+        white: null,
+        /**
+         * 相机(绘制纹理色和光照)
+         * @type {import("./shader/GlslProgram").GlslProgram}
+         */
+        camera: null,
+        /**
+         * 相机实例化(绘制纹理色和光照)
+         * @type {import("./shader/GlslProgram").GlslProgram}
+         */
+        cameraInstance: null
     };
 
     /**
@@ -44,8 +56,7 @@ export class SEContext
         this.gl = gl;
         this.canvas = canvas;
 
-        var pGenerator = new GlslGenerator(gl);
-        this.program.white = pGenerator.gen();
+        initShader(gl, this.program);
     }
 
     /**

@@ -132,6 +132,11 @@ var cubeTexOff = new Float32Array([
 ]);
 
 /**
+ * 相同纹理对应相同实例
+ * @type {Map<import("../texture/Texture").Texture, symbol>}
+ */
+var instanceMap = new Map();
+/**
  * @returns {SceneObject}
  * @param {WebGL2RenderingContext} gl
  * @param {import("../texture/Texture").Texture} tex
@@ -142,6 +147,10 @@ export function create_cube(gl, tex)
     var faces = obje.faces = new ObjFaces(cubeVer, tex, cubeTexOff, cubeNormal, gl.TRIANGLES);
 
     faces.update(gl);
+    if(instanceMap.has(tex))
+        faces.instance = instanceMap.get(tex);
+    else
+        instanceMap.set(tex, Symbol());
 
     return obje;
 }

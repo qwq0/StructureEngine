@@ -5,12 +5,11 @@
  */
 import { degToRad } from "../src/gl/util/math.js";
 import { Manager } from "../src/manager/manager.js";
-import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap, debugInfo } from "../src/index.js";
+import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
-import { v4 } from "../src/math/v4.js";
 import { create_square } from "../src/gl/shape/square.js";
 import { m4 } from "../src/math/m4.js";
-import { IdBitmap } from "../src/gl/IdBitmap.js";
+import { TextureTable } from "../src/gl/texture/TextureTable.js";
 
 
 (async function ()
@@ -33,7 +32,6 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
     {
         debugDiv.innerText = ([
             "fps: " + fpsCount,
-            "cullCount: " + debugInfo.cullCount,
             "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
         ]).join("\n");
         fpsCount = 0;
@@ -45,12 +43,13 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
     var camera = scene.createCamera();
     var keyMap = new KeyboardMap();
     var manager = new Manager();
+    var texTab = new TextureTable(ct.gl);
     await manager.waitInit();
     var lastTimeStamp = 0;
     var speed = 0.01;
 
     var light = new Light(scene);
-    camera.shadowTex = light.shadowTex.depthTex;
+    camera.lights.push(light);
 
     /**
      * 绘制函数 每帧调用
@@ -99,7 +98,6 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
             light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
                 rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
                 translation(-camera.x, -camera.y, -camera.z); // 反向平移
-        camera.lightMat = light.cMat;
         light.renderShadow();
 
         ct.clearFramebuffer();
@@ -117,7 +115,7 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
     square.z = 100;
     scene.addChild(square);
 
-    let cubeF = create_cube(ct.gl, Texture.fromImage(scene.gl, "./cube.png"));
+    let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
     cubeF.id = "cubeF";
     cubeF.sx = 16;
     cubeF.y = -10;
@@ -125,7 +123,7 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
 
-    let cube0 = create_cube(ct.gl, Texture.fromImage(scene.gl, "./WoodFloor045_1K_Color.jpg"));
+    let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
     cube0.id = "cube0";
     cube0.x = 0;
     cube0.y = 9;
@@ -137,7 +135,7 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
         for (let y = 0; y < 10; y += 3)
             for (let z = 0; z < 10; z += 3)
             {
-                let cube = create_cube(ct.gl, scene.idMap.get("cube0").faces.tex);
+                let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + z;
                 cube.x = x;
                 cube.y = y;
@@ -152,13 +150,13 @@ import { IdBitmap } from "../src/gl/IdBitmap.js";
             }
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
-        let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        let obj = objObj.createSceneObject(ct.gl);
         obj.id = "yunjin";
         scene.addChild(obj);
     }
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
-        let obj = objObj.createSceneObject(ct.gl, cube0.program);
+        let obj = objObj.createSceneObject(ct.gl);
         obj.id = "ying";
         obj.x = 15;
         scene.addChild(obj);

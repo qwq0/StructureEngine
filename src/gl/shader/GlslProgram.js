@@ -88,7 +88,7 @@ export class GlslProgram
     }
 
     /**
-     * 设置着色器的3维向量值(浮点数)
+     * 设置着色器的3维向量值(32位浮点数)
      * @param {string} name
      * @param {number} x
      * @param {number} y
@@ -102,7 +102,7 @@ export class GlslProgram
     }
 
     /**
-     * 设置着色器的4维向量值(浮点数)
+     * 设置着色器的4维向量值(32位浮点数)
      * @param {string} name
      * @param {number} x
      * @param {number} y

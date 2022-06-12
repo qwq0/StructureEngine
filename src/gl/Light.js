@@ -59,7 +59,7 @@ export class Light
      */
     renderShadow()
     {
-        this.scene.obje.updateMat(); // 更新场景中物体的矩阵
+        this.scene.obje.updateCMat(); // 更新场景中物体的矩阵
 
         this.shadowTex.bindFramebuffer(); // 渲染到纹理(帧缓冲区)
 

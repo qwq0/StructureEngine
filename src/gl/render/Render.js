@@ -1,19 +1,20 @@
 import { m4 } from "../../math/m4.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { GlslProgram } from "../shader/GlslProgram.js";
+import { RenderPool } from "./RenderPool.js";
 import { occlusionCull } from "./renderUtil.js";
 
 /**
  * 渲染器封装(Renderer)
+ * (此类基于webgl渲染)
  */
 export class Render
 {
     /**
-     * 渲染列表
-     * 元素为数组时使用实例化绘图
-     * @type {Array<SceneObject | Array<SceneObject>>}
+     * 渲染池
+     * @type {RenderPool}
      */
-    rList = [];
+    pool = new RenderPool();
 
     /**
      * 绑定的webgl上下文
@@ -77,7 +78,7 @@ export class Render
      */
     render(cb)
     {
-        this.scene.obje.updateMat(); // 更新场景中物体的矩阵
+        this.scene.obje.updateCMat(); // 更新场景中物体的矩阵
         this.rtRList(this.scene.obje, this.judge); // 得到渲染列表
         this.draw(cb); // 绘制图像
     }
@@ -89,7 +90,7 @@ export class Render
      */
     rtRList(sObj, judge)
     {
-        var rList = this.rList;
+        var rList = this.pool.rList;
         rList.length = 0; // 清空渲染列表
 
         /** @type {Map<symbol, Array<SceneObject>>} */
@@ -149,7 +150,7 @@ export class Render
         this.program.uniformMatrix4fv("u_cameraMatrix", this.cMat.a); // 设置相机矩阵
         cb(this.program);
 
-        this.rList.forEach(obje => // 遍历渲染列表
+        this.pool.rList.forEach(obje => // 遍历渲染列表
         {
             if (obje instanceof SceneObject) // 单个物体
             {
@@ -181,72 +182,8 @@ export class Render
                     faces.tex.bindTexture(0); // 绑定纹理
 
                 {
-                    let vao = gl.createVertexArray(); // 创建顶点数组
-                    gl.bindVertexArray(vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-
-
-                    // 初始化顶点数组
-                    // let positionAttributeLocation = gl.getAttribLocation(program.progra, "a_position"); // [着色器变量] 顶点坐标
-                    let positionAttributeLocation = 0; // [着色器变量] 顶点坐标
-
-                    let positionBuffer = gl.createBuffer(); // 创建缓冲区
-                    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-                    gl.bufferData(gl.ARRAY_BUFFER, faces.pos, gl.STATIC_DRAW); // 送入数据
-
-                    gl.enableVertexAttribArray(positionAttributeLocation); // 启用顶点属性数组(顶点坐标数组)
-
-                    gl.vertexAttribPointer( // 顶点属性指针
-                        positionAttributeLocation, // 到顶点坐标
-                        3, // 每个坐标为3个元素
-                        gl.FLOAT, // 浮点数(似乎应该是32位)
-                        false, // 归一化(规范化,正常化)
-                        0, // 坐标间间隔(无间隔)
-                        0 // 缓冲区偏移(从开头开始)
-                    );
-
-
-                    if (faces.tex) // 有纹理
-                    {
-                        // 初始化纹理坐标
-                        //let texcoordAttributeLocation = gl.getAttribLocation(program.progra, "a_texcoord"); // [着色器变量] 纹理坐标
-                        let texcoordAttributeLocation = 1; // [着色器变量] 纹理坐标
-
-                        let texcoordBuffer = gl.createBuffer(); // 创建缓冲区
-                        gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-                        gl.bufferData(gl.ARRAY_BUFFER, faces.texPos, gl.STATIC_DRAW); // 送入数据
-
-                        gl.enableVertexAttribArray(texcoordAttributeLocation); // 启用顶点属性数组(纹理坐标数组)
-
-                        gl.vertexAttribPointer( // 顶点属性指针
-                            texcoordAttributeLocation, // 到纹理坐标
-                            2, // 每个坐标为2个元素
-                            gl.FLOAT, // 浮点数(似乎应该是32位)
-                            false, // 归一化(规范化,正常化)
-                            0, // 坐标间间隔(无间隔)
-                            0 // 缓冲区偏移(从开头开始)
-                        );
-                    }
-
-                    // 初始化法线向量
-                    // let normalAttributeLocation = gl.getAttribLocation(program.progra, "a_normal"); // [着色器变量] 法线向量
-                    let normalAttributeLocation = 2; // [着色器变量] 法线向量
-
-                    let normalBuffer = gl.createBuffer(); // 创建缓冲区
-                    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
-                    gl.bufferData(gl.ARRAY_BUFFER, faces.normal, gl.STATIC_DRAW); // 送入数据
-
-                    gl.enableVertexAttribArray(normalAttributeLocation); // 启用顶点属性数组(法线向量数组)
-
-                    gl.vertexAttribPointer( // 顶点属性指针
-                        normalAttributeLocation, // 到法线向量
-                        3, // 每个坐标为3个元素
-                        gl.FLOAT, // 浮点数(似乎应该是32位)
-                        false, // 归一化(规范化,正常化)
-                        0, // 坐标间间隔(无间隔)
-                        0 // 缓冲区偏移(从开头开始)
-                    );
-
-
+                    // 这里绑定了vao会导致此vao发生污染(因为多了u_worldMatrix的vbo)
+                    gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
 
                     const matrixData = new Float32Array(obje.length * 16); // 每个物体一个矩阵 一个矩阵16个浮点数
 
@@ -266,12 +203,12 @@ export class Render
 
                         const offset = i * 16;
                         gl.vertexAttribPointer(
-                            loc,           
-                            4,             
-                            gl.FLOAT,      
-                            false,         
+                            loc,
+                            4,
+                            gl.FLOAT,
+                            false,
                             bytesPerMatrix,
-                            offset,        
+                            offset,
                         );
 
                         gl.vertexAttribDivisor(loc, 1);

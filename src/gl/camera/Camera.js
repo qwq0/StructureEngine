@@ -109,7 +109,7 @@ export class Camera
         this.render = new Render(scene, scene.ct.program.camera);
         this.render.judge = (obje =>
         {
-            return (obje.faces && coneCull(obje, obje.getWPos().mulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除
+            return (obje.faces && coneCull(obje, obje.getWorldPos().mulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除
         });
     }
 

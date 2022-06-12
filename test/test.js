@@ -5,7 +5,7 @@
  */
 import { degToRad } from "../src/gl/util/math.js";
 import { Manager } from "../src/manager/manager.js";
-import { create_cube, initContext, Texture, ObjC, touchBind, KeyboardMap } from "../src/index.js";
+import { create_cube, initContext, ObjC, touchBind, KeyboardMap } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
 import { m4 } from "../src/math/m4.js";
@@ -98,7 +98,7 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
             light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
                 rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
                 translation(-camera.x, -camera.y, -camera.z); // 反向平移
-        light.renderShadow();
+        //light.renderShadow();
 
         ct.clearFramebuffer();
         camera.draw();
@@ -110,16 +110,14 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     /* 向场景添加物体 */
 
     let square = create_square(ct.gl, light.shadowTex.depthTex);
-    square.sx = 64;
-    square.sy = 64;
-    square.z = 100;
+    square.setScale(64, 64, 1);
+    square.setPosition(0, 0, 100);
     scene.addChild(square);
 
     let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
     cubeF.id = "cubeF";
-    cubeF.sx = 16;
-    cubeF.y = -10;
-    cubeF.sz = 16;
+    cubeF.setScale(16, 1, 16);
+    cubeF.setPosition(0, -10, 0);
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
 
@@ -131,15 +129,13 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     //scene.addChild(cube0);
     //manager.addCube(cube0, 1);
 
-    for (let x = 0; x < 50; x += 3)
-        for (let y = 0; y < 50; y += 3)
-            for (let z = 0; z < 50; z += 3)
+    for (let x = 0; x < 70; x += 3)
+        for (let y = 0; y < 70; y += 3)
+            for (let z = 0; z < 70; z += 3)
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + z;
-                cube.x = x;
-                cube.y = y;
-                cube.z = z + 10;
+                cube.setPosition(x, y, z + 10);
                 //let quat = v4.Euler2Quaternion(0.5, 0, 0);
                 //cube.rx = quat.x;
                 //cube.ry = quat.y;
@@ -158,7 +154,7 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
         let obj = objObj.createSceneObject(ct.gl);
         obj.id = "ying";
-        obj.x = 15;
+        obj.setPosition(15, 0, 0);
         scene.addChild(obj);
     }
     //scene.obje.x = scene.obje.z = camera.x = camera.z = 100000;

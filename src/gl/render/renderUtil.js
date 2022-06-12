@@ -19,14 +19,14 @@ export function coneCull(obje, bsPos, fov)
         else
             len(x, y, z) >= r;
     */
-    if (bsPos.z >= obje.bsR)
+    if (bsPos.z >= obje.boundingSphereR)
         return true;
     var bsLen = bsPos.getV3Len(); // 球心和原点距离
     var angle = Math.acos(-bsPos.z / bsLen) - fov * 0.5; // 原点到球心与圆锥在对应方向母线的夹角
     if (angle < Math.PI / 2)
-        return (Math.sin(angle) * bsLen >= obje.bsR);
+        return (Math.sin(angle) * bsLen >= obje.boundingSphereR);
     else
-        return bsLen >= obje.bsR;
+        return bsLen >= obje.boundingSphereR;
 }
 
 /**

@@ -15,54 +15,98 @@ var snCount = 0;
  */
 export class SceneObject
 {
-    /** 坐标x(相对) @package @type {number} */
+    /**
+     * 坐标x(相对)
+     * @private
+     * @type {number}
+     */
     x = 0;
-    /** 坐标y(相对) @package @type {number} */
+    /**
+     * 坐标y(相对)
+     * @private
+     * @type {number}
+     */
     y = 0;
-    /** 坐标z(相对) @package @type {number} */
+    /**
+     * 坐标z(相对)
+     * @private
+     * @type {number}
+     */
     z = 0;
-    /** 四元数x(相对旋转) @package @type {number} */
+    /**
+     * 四元数x(相对旋转)
+     * @private
+     * @type {number}
+     */
     rx = 0;
-    /** 四元数y(相对旋转) @package @type {number} */
+    /**
+     * 四元数y(相对旋转)
+     * @private
+     * @type {number}
+     */
     ry = 0;
-    /** 四元数z(相对旋转) @package @type {number} */
+    /**
+     * 四元数z(相对旋转)
+     * @private
+     * @type {number}
+     */
     rz = 0;
-    /** 四元数w(相对旋转) @package @type {number} */
+    /**
+     * 四元数w(相对旋转)
+     * @private
+     * @type {number}
+     */
     rw = 1;
-    /** x轴缩放(相对) @package @type {number} */
+    /**
+     * x轴缩放(相对)
+     * @private
+     * @type {number}
+     */
     sx = 1;
-    /** y轴缩放(相对) @package @type {number} */
+    /**
+     * y轴缩放(相对)
+     * @private
+     * @type {number}
+     */
     sy = 1;
-    /** z轴缩放(相对) @package @type {number} */
+    /**
+     * z轴缩放(相对)
+     * @private
+     * @type {number}
+     */
     sz = 1;
 
     /**
      * 世界矩阵
+     * @package
      * @type {m4}
      */
     wMat = new m4();
 
     /**
      * 局部矩阵
+     * @private
      * @type {m4}
      */
     lMat = new m4();
 
-
     /**
      * 子节点
+     * @package
      * @type {Array<SceneObject>}
      */
     c = null;
 
     /**
      * 父节点
+     * @package
      * @type {SceneObject}
      */
     parent = null;
 
     /**
      * 物体所在的场景
+     * @package
      * @type {import("./Scene").Scene}
      */
     scene = null;
@@ -70,12 +114,14 @@ export class SceneObject
     /**
      * 绘制此物体使用的着色器组(渲染程序)
      * 此属性暂时未使用
+     * @package
      * @type {import("../shader/GlslProgram").GlslProgram}
      */
     program = null;
 
     /**
      * 物体id
+     * @package
      * @type {string}
      */
     id = "";
@@ -84,12 +130,14 @@ export class SceneObject
      * 物体的唯一编号
      * 正常时为非负整数
      * 与worker中的对应
+     * @package
      * @type {number}
      */
     sn = -1;
 
     /**
      * [gl]面数据
+     * @package
      * @type {import("./ObjFaces").ObjFaces}
      */
     faces = null;
@@ -97,20 +145,30 @@ export class SceneObject
     /**
      * 包围球半径
      * 包围球中心为局部原点
+     * @package
      * @type {number}
      */
-    bsR = -1;
+    boundingSphereR = -1;
+
+    /**
+     * 矩阵需要更新
+     * 防止反复计算没有移动的物体
+     * @package
+     * @type {boolean}
+     */
+    needUpdate = true;
 
 
     constructor()
     {
         this.sn = snCount++;
-        this.updateMat();
+        this.updateCMat();
     }
 
 
     /**
      * 遍历设置物体所在的场景
+     * 若此节点的场景不需要改变则不继续向下
      * @package
      * @param {import("./Scene").Scene} scene
      */
@@ -142,28 +200,36 @@ export class SceneObject
             this.c = [];
         o.setScene(this.scene);
         o.parent = this;
+        o.needUpdate = true;
         this.c.push(o);
     }
 
     /**
-     * 递归更新矩阵
+     * 更新世界矩阵
+     * 若此物体
+     * @package
      */
-    updateMat()
+    updateCMat()
     {
-        this.lMat = new m4().
-            translation(this.x, this.y, this.z). // 平移
-            rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
-            scale(this.sx, this.sy, this.sz); // 缩放
-        var pMat = null;
-        if (this.parent)
+        if (this.needUpdate) // 需要更新
         {
-            this.wMat = (this.parent.wMat).multiply(this.lMat);
+            this.lMat = new m4().
+                translation(this.x, this.y, this.z). // 平移
+                rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
+                scale(this.sx, this.sy, this.sz); // 缩放
+            if (this.parent)
+                this.wMat = (this.parent.wMat).multiply(this.lMat);
+            else
+                this.wMat = this.lMat;
         }
-        else
-            pMat = this.lMat;
-        // 递归子节点
-        if (this.c)
-            this.c.forEach(o => o.updateMat());
+        if (this.c) // 递归子节点
+            this.c.forEach(o =>
+            {
+                if (this.needUpdate) // 若此节点需要更新
+                    o.needUpdate = true; // 子节点也需要更新
+                o.updateCMat();
+            });
+        this.needUpdate = false; // 标记无需更新
     }
 
     /**
@@ -171,7 +237,7 @@ export class SceneObject
      * 需要先更新矩阵
      * @returns {v4} xyz为坐标 w恒定为1
      */
-    getWPos()
+    getWorldPos()
     {
         var wMat = this.wMat;
         return new v4(wMat.a[12], wMat.a[13], wMat.a[14]);
@@ -192,17 +258,62 @@ export class SceneObject
     /**
      * 更新当前物体的面的包围球
      * 需要先更新矩阵
+     * @package
      */
     updateBoundingSphere()
     {
-        if (this.bsR < 0)
+        if (this.boundingSphereR < 0)
         {
             var pos = this.faces.pos;
             var wvpMat = this.getWorldViewProjectionMat();
             var maxR = 0;
             for (var i = 0; i < pos.length; i += 3)
                 maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
-            this.bsR = maxR;
+            this.boundingSphereR = maxR;
         }
+    }
+
+    /**
+     * 设置坐标
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
+    setPosition(x, y, z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.needUpdate = true;
+    }
+
+    /**
+     * 设置缩放
+     * @param {number} sx
+     * @param {number} sy
+     * @param {number} sz
+     */
+    setScale(sx, sy, sz)
+    {
+        this.sx = sx;
+        this.sy = sy;
+        this.sz = sz;
+        this.needUpdate = true;
+    }
+
+    /**
+     * 设置旋转(四元数)
+     * @param {number} rx
+     * @param {number} ry
+     * @param {number} rz
+     * @param {number} rw
+     */
+    setRotation(rx, ry, rz, rw)
+    {
+        this.rx = rx;
+        this.ry = ry;
+        this.rz = rz;
+        this.rw = rw;
+        this.needUpdate = true;
     }
 }

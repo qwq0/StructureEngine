@@ -1,6 +1,10 @@
 {
     "compilerOptions": {
-        "checkJs": true
+        "checkJs": true,
+        "lib": [
+            "DOM",
+            "ES2022"
+        ]
     },
     "exclude": ["dist"]
 }

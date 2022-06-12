@@ -41,13 +41,13 @@ export class GlslGenParam
     }
 
     /**
-     * 获取layout字符串
+     * 获取layout字符串(包括末尾的空格)
      * @returns {string}
      */
     getLayout()
     {
         if (this.location > -1)
-            return "layout (location = " + this.location + ")";
+            return "layout (location = " + this.location + ") ";
         else
             return "";
     }
@@ -59,6 +59,6 @@ export class GlslGenParam
      */
     getDefine(variType)
     {
-        return this.getLayout() + " " + variType + " " + this.type + " " + this.id;
+        return this.getLayout() + variType + " " + this.type + " " + this.id;
     }
 }

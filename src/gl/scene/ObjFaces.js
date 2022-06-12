@@ -102,17 +102,20 @@ export class ObjFaces
     update(gl)
     {
         let vao = gl.createVertexArray(); // 创建顶点数组
+        this.vao = vao;
         gl.bindVertexArray(vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
 
+
+        // 初始化顶点数组
+        // let positionAttributeLocation = gl.getAttribLocation(program.progra, "a_position"); // [着色器变量] 顶点坐标
+        let positionAttributeLocation = 0; // [着色器变量] 顶点坐标
 
         let positionBuffer = gl.createBuffer(); // 创建缓冲区
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
         gl.bufferData(gl.ARRAY_BUFFER, this.pos, gl.STATIC_DRAW); // 送入数据
 
-        // 初始化顶点数组
-        // let positionAttributeLocation = gl.getAttribLocation(program.progra, "a_position"); // [着色器变量] 顶点坐标
-        let positionAttributeLocation = 0; // [着色器变量] 顶点坐标
         gl.enableVertexAttribArray(positionAttributeLocation); // 启用顶点属性数组(顶点坐标数组)
+
         gl.vertexAttribPointer( // 顶点属性指针
             positionAttributeLocation, // 到顶点坐标
             3, // 每个坐标为3个元素
@@ -122,7 +125,6 @@ export class ObjFaces
             0 // 缓冲区偏移(从开头开始)
         );
 
-        this.vao = vao;
 
         if (this.tex) // 有纹理
         {

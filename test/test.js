@@ -123,17 +123,17 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     scene.addChild(cubeF);
     manager.addCube(cubeF, 0);
 
-    let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
-    cube0.id = "cube0";
-    cube0.x = 0;
-    cube0.y = 9;
-    cube0.z = 0;
-    scene.addChild(cube0);
-    manager.addCube(cube0, 1);
+    //let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+    //cube0.id = "cube0";
+    //cube0.x = 0;
+    //cube0.y = 9;
+    //cube0.z = 0;
+    //scene.addChild(cube0);
+    //manager.addCube(cube0, 1);
 
-    for (let x = 0; x < 10; x += 3)
-        for (let y = 0; y < 10; y += 3)
-            for (let z = 0; z < 10; z += 3)
+    for (let x = 0; x < 50; x += 3)
+        for (let y = 0; y < 50; y += 3)
+            for (let z = 0; z < 50; z += 3)
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + z;

@@ -150,7 +150,7 @@ export function create_cube(gl, tex)
     if(instanceMap.has(tex))
         faces.instance = instanceMap.get(tex);
     else
-        instanceMap.set(tex, Symbol());
+        instanceMap.set(tex, faces.instance = Symbol());
 
     return obje;
 }

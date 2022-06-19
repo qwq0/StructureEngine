@@ -104,8 +104,8 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     {
         let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
         cubeF.id = "cubeF1";
-        cubeF.setScale(70, 1, 70);
-        cubeF.setPosition(35, -10, 45);
+        cubeF.setScale(30, 1, 30);
+        cubeF.setPosition(15, -10, 25);
         scene.addChild(cubeF);
         manager.addCube(cubeF, 0);
     }
@@ -114,7 +114,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
             for (let z = 0; z < 20; z += 3)
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
-                cube.id = "cube" + x + "," + z;
+                cube.id = "cube" + x + "," + y + "," + z;
                 cube.setPosition(x + 10, y, z + 20);
                 //let quat = v4.Euler2Quaternion(0.5, 0, 0);
                 //cube.rx = quat.x;
@@ -147,4 +147,46 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     keyMap.bindUp("c", () => camera.fov = degToRad * 125);
 
     mouseRotatingBind(camera);
+
+    {
+        let LBDiv = document.body.appendChild(document.createElement("div"));
+        LBDiv.style.position = "fixed";
+        LBDiv.style.height = "0";
+        LBDiv.style.width = "0";
+        LBDiv.style.left = "0";
+        LBDiv.style.bottom = "0";
+        let RBDiv = document.body.appendChild(document.createElement("div"));
+        RBDiv.style.position = "fixed";
+        RBDiv.style.height = "0";
+        RBDiv.style.width = "0";
+        RBDiv.style.right = "0";
+        RBDiv.style.bottom = "0";
+        let addButton = (/** @type {HTMLDivElement} */ holder, /** @type {string} */ text,
+            /** @type {string | number} */ x, /** @type {string | number} */ y, /** @type {string | number} */ w, /** @type {string | number} */ h,
+            /** @type {Function} */ callback) =>
+        {
+            let button = holder.appendChild(document.createElement("div"));
+            button.innerText = text;
+            button.style.position = "absolute";
+            button.style.left = x + "px";
+            button.style.top = y + "px";
+            button.style.width = w + "px";
+            button.style.height = h + "px";
+            button.addEventListener("touchstart", () => { callback(true); });
+            button.addEventListener("touchend", () => { callback(false); });
+        };
+        let triggerKeyboardEvent = (key, down) =>
+        {
+            let e = new KeyboardEvent((down ? "keydown" : "keyup"), { key: key });
+            document.body.dispatchEvent(e);
+        };
+        addButton(LBDiv, "A", 0 + 20, -30 - 20, 30, 30, down => triggerKeyboardEvent("A", down));
+        addButton(LBDiv, "W", 30 + 20, -60 - 20, 30, 30, down => triggerKeyboardEvent("W", down));
+        addButton(LBDiv, "S", 30 + 20, -30 - 20, 30, 30, down => triggerKeyboardEvent("S", down));
+        addButton(LBDiv, "D", 60 + 20, -30 - 20, 30, 30, down => triggerKeyboardEvent("D", down));
+        addButton(RBDiv, "N", -60 - 20, -30 - 20, 30, 30, down => triggerKeyboardEvent("N", down));
+        addButton(RBDiv, "_", -30 - 20, -30 - 20, 30, 30, down => triggerKeyboardEvent(" ", down));
+        addButton(RBDiv, "c", -60 - 20, -60 - 20, 30, 30, down => triggerKeyboardEvent("C", down));
+        addButton(RBDiv, "Shift", -30 - 20, -60 - 20, 30, 30, down => triggerKeyboardEvent("Shift", down));
+    }
 })();

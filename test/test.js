@@ -107,6 +107,8 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     }
     requestAnimationFrame(draw);
 
+    scene.obje.setPosition(camera.x = 0, camera.y = 0, camera.z = 0);
+
     /* 向场景添加物体 */
 
     let square = create_square(ct.gl, light.shadowTex.depthTex);
@@ -144,20 +146,21 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
                 scene.addChild(cube);
                 // manager.addCube(cube, 1);
             }
+    (async () =>
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
         let obj = objObj.createSceneObject(ct.gl);
         obj.id = "yunjin";
         scene.addChild(obj);
-    }
+    })();
+    (async () =>
     {
         let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
         let obj = objObj.createSceneObject(ct.gl);
         obj.id = "ying";
         obj.setPosition(15, 0, 0);
         scene.addChild(obj);
-    }
-    //scene.obje.x = scene.obje.z = camera.x = camera.z = 100000;
+    })();
 
 
     /* 添加输入响应处理 */

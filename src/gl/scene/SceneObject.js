@@ -218,8 +218,8 @@ export class SceneObject
                 rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
                 scale(this.sx, this.sy, this.sz); // 缩放
             if (this.parent)
-                this.wMat = (this.parent.wMat).multiply(this.lMat);
-            else
+                this.wMat = this.parent.wMat.multiply(this.lMat);
+            else // 根节点
                 this.wMat = this.lMat;
         }
         if (this.c) // 递归子节点

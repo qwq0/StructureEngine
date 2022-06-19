@@ -1,5 +1,5 @@
 /**
- * 创建一个glsl渲染程序
+ * [gl]创建一个glsl渲染程序
  * 包括一个顶点着色器和一个片段着色器
  */
 export class GlslProgram

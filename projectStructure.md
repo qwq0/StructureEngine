@@ -28,10 +28,10 @@
 
 - 源码 - src/
     - 处理用户操作 - controller
-        - 处理键盘操作 - keyboard.js
-        - 处理鼠标操作 - mouse.js
-        - 处理触摸操作 - touch.js
-    - 执行渲染 - gl
+        - 键盘操作 - keyboard.js
+        - 鼠标操作 - mouse.js
+        - 触摸操作 - touch.js
+    - 处理图形 - gl
         - 相机 - camera/
             - 相机类 - Camera.js
             - 相机实用工具函数 - cameraUtil.js
@@ -69,9 +69,9 @@
         - 场景管理(与worker通信) - manager.js
     - 数学 - math/
         - 4*4矩阵 - m4.js
+        - 3向量 - v3.js
         - 4向量 - v4.js
     - 工具(用于调试等) - tools/
-        - 调试信息 - debugInfo.js
     - 实用工具函数和类 - util/
         - 管理回调 - callbackHandler.js
         - 遍历数组 - forEach.js

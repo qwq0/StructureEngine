@@ -3,10 +3,10 @@
 */
 
 /**
- * 正向遍历数组
- * 在回调中返回不为false或void的值主动结束遍历
- * 主动结束遍历 返回true
- * 未主动结束遍历完全部内容 返回false
+ * 正向遍历数组   
+ * 在回调中返回不为false或void的值主动结束遍历   
+ * 主动结束遍历 并返回true   
+ * 未主动结束遍历完全部内容 返回false   
  * @template T
  * @param {ArrayLike<T>} o
  * @param {function(T, number):(boolean | void)} callback
@@ -23,10 +23,10 @@ export function forEach(o, callback)
 }
 
 /**
- * 反向遍历数组
- * 在回调中返回不为false或void的值主动结束遍历
- * 主动结束遍历 返回true
- * 未主动结束遍历完全部内容 返回false
+ * 反向遍历数组   
+ * 在回调中返回不为false或void的值主动结束遍历   
+ * 主动结束遍历 并返回true   
+ * 未主动结束遍历完全部内容 返回false   
  * @template T
  * @param {ArrayLike<T>} o
  * @param {function(T, number):(boolean | void)} callback
@@ -43,9 +43,9 @@ export function forEachRev(o, callback)
 }
 
 /**
- * 判断第一个参数是否属于之后所有的参数
- * 第一个参数与任何一个之后的参数相等 返回true
- * 与任何一个都不相等 返回false
+ * 判断第一个参数是否属于之后所有的参数   
+ * 第一个参数与任何一个之后的参数相等 返回true   
+ * 与任何一个都不相等 返回false   
  * @param {any} k
  * @param  {...any} s
  * @returns {boolean}
@@ -56,8 +56,8 @@ export function isAmong(k, ...s)
 }
 
 /**
- * 寻找数组中第一个空元素的下标
- * 若没有空元素 返回-1
+ * 寻找数组中第一个空元素的下标   
+ * 若没有空元素 返回-1   
  * @param {Array<any>} o 
  * @returns {number}
  */

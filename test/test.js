@@ -155,12 +155,14 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         LBDiv.style.width = "0";
         LBDiv.style.left = "0";
         LBDiv.style.bottom = "0";
+        LBDiv.style.userSelect = "none";
         let RBDiv = document.body.appendChild(document.createElement("div"));
         RBDiv.style.position = "fixed";
         RBDiv.style.height = "0";
         RBDiv.style.width = "0";
         RBDiv.style.right = "0";
         RBDiv.style.bottom = "0";
+        RBDiv.style.userSelect = "none";
         let addButton = (/** @type {HTMLDivElement} */ holder, /** @type {string} */ text,
             /** @type {string | number} */ x, /** @type {string | number} */ y, /** @type {string | number} */ w, /** @type {string | number} */ h,
             /** @type {Function} */ callback) =>

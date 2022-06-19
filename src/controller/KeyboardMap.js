@@ -21,6 +21,12 @@ export class KeyboardMap
      * @type {Map<string, function(import("./keyData").keyData) : void>}
      */
     upCB = new Map();
+    /**
+     * 监听器函数
+     * 调用此函数以模拟键盘操作
+     * @type {function(import("./keyData").keyData): void}
+     */
+    listener = null;
 
     /**
      * 接管元素的键盘操作
@@ -28,13 +34,30 @@ export class KeyboardMap
      */
     constructor(e = document.body)
     {
-        keyboardBind(e, e =>
+        keyboardBind(e, this.listener = (e =>
         {
+            var key = e.key;
             if (e.hold)
-                this.keySet.add(e.key);
+            {
+                if (!this.keySet.has(key))
+                {
+                    this.keySet.add(key);
+                    let cb = this.downCB.get(key);
+                    if (cb)
+                        cb(e);
+                }
+            }
             else
-                this.keySet.delete(e.key);
-        })
+            {
+                if (this.keySet.has(key))
+                {
+                    this.keySet.delete(e.key);
+                    let cb = this.upCB.get(key);
+                    if (cb)
+                        cb(e);
+                }
+            }
+        }))
     }
 
     /**

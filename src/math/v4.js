@@ -103,7 +103,7 @@ export class v4
      */
     normalize()
     {
-        var multiple = 1 / Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        var multiple = 1 / Math.hypot(this.x, this.y, this.z, this.w);
         if (multiple != Infinity)
             return new v4(
                 this.x * multiple,

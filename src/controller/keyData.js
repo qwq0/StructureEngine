@@ -5,9 +5,18 @@
  */
 export class keyData
 {
-    key = ""; // 键名
-    hold = false; // 当前此指针是否处于按下状态
-    pressing = false; // 当前指针是否正在按下(按下事件)
+    /**
+     * 键名
+     */
+    key = "";
+    /**
+     * 当前此指针是否处于按下状态
+     */
+    hold = false;
+    /**
+     * 当前指针是否正在按下(按下事件)
+     */
+    pressing = false;
     constructor(key, hold, pressing)
     {
         this.key = key;

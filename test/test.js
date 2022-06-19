@@ -10,6 +10,8 @@ import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
 import { m4 } from "../src/math/m4.js";
 import { TextureTable } from "../src/gl/texture/TextureTable.js";
+import { mouseRotatingBind } from "../src/controller/preset/mouseRotating.js";
+import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
 
 
 (async function ()
@@ -31,11 +33,11 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     setInterval(() =>
     {
         debugDiv.innerText = ([
-            "fps: " + fpsCount,
+            "fps: " + Math.floor(fpsCount * (10 / 3)),
             "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
         ]).join("\n");
         fpsCount = 0;
-    }, 1000);
+    }, 300);
 
     /* 创建场景和相机等 */
     var ct = initContext(canvas);
@@ -46,11 +48,11 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     var texTab = new TextureTable(ct.gl);
     await manager.waitInit();
     var lastTimeStamp = 0;
-    var speed = 0.01;
 
     var light = new Light(scene);
     camera.lights.push(light);
 
+    var wasdUpdate = keyboardWASD(camera);
     /**
      * 绘制函数 每帧调用
      * @param {number} timeStamp 
@@ -61,38 +63,7 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
         lastTimeStamp = timeStamp;
         fpsCount++;
 
-        if (keyMap.get("Shift"))
-            speed = 0.03;
-        else
-            speed = 0.01;
-        if (keyMap.get("w"))
-        {
-            camera.x -= timeChange * Math.sin(camera.ry) * speed;
-            camera.z -= timeChange * Math.cos(camera.ry) * speed;
-        }
-        if (keyMap.get("s"))
-        {
-            camera.x += timeChange * Math.sin(camera.ry) * speed;
-            camera.z += timeChange * Math.cos(camera.ry) * speed;
-        }
-        if (keyMap.get("a"))
-        {
-            camera.x -= timeChange * Math.cos(camera.ry) * speed;
-            camera.z += timeChange * Math.sin(camera.ry) * speed;
-        }
-        if (keyMap.get("d"))
-        {
-            camera.x += timeChange * Math.cos(camera.ry) * speed;
-            camera.z -= timeChange * Math.sin(camera.ry) * speed;
-        }
-        if (keyMap.get(" "))
-        {
-            camera.y += timeChange * speed;
-        }
-        if (keyMap.get("n"))
-        {
-            camera.y -= timeChange * speed;
-        }
+        wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 2.1 : 1));
 
         if (window.lock) // 将灯光锁定到相机位置
             light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
@@ -115,36 +86,43 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
     square.setScale(64, 64, 1);
     square.setPosition(0, 0, 100);
     scene.addChild(square);
-
-    let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
-    cubeF.id = "cubeF";
-    cubeF.setScale(16, 1, 16);
-    cubeF.setPosition(0, -10, 0);
-    scene.addChild(cubeF);
-    manager.addCube(cubeF, 0);
-
-    //let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
-    //cube0.id = "cube0";
-    //cube0.x = 0;
-    //cube0.y = 9;
-    //cube0.z = 0;
-    //scene.addChild(cube0);
-    //manager.addCube(cube0, 1);
-
-    for (let x = 0; x < 70; x += 3)
-        for (let y = 0; y < 70; y += 3)
-            for (let z = 0; z < 70; z += 3)
+    {
+        let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
+        cubeF.id = "cubeF";
+        cubeF.setScale(16, 1, 16);
+        cubeF.setPosition(0, -10, 0);
+        scene.addChild(cubeF);
+        manager.addCube(cubeF, 0);
+    }
+    {
+        let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+        cube0.id = "cube0";
+        cube0.setPosition(0, 9, 0);
+        scene.addChild(cube0);
+        manager.addCube(cube0, 1);
+    }
+    {
+        let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
+        cubeF.id = "cubeF1";
+        cubeF.setScale(70, 1, 70);
+        cubeF.setPosition(35, -10, 45);
+        scene.addChild(cubeF);
+        manager.addCube(cubeF, 0);
+    }
+    for (let x = 0; x < 30; x += 3)
+        for (let y = 0; y < 30; y += 3)
+            for (let z = 0; z < 30; z += 3)
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + z;
-                cube.setPosition(x, y, z + 10);
+                cube.setPosition(x + 10, y, z + 20);
                 //let quat = v4.Euler2Quaternion(0.5, 0, 0);
                 //cube.rx = quat.x;
                 //cube.ry = quat.y;
                 //cube.rz = quat.z;
                 //cube.rw = quat.w;
                 scene.addChild(cube);
-                // manager.addCube(cube, 1);
+                manager.addCube(cube, 1);
             }
     (async () =>
     {
@@ -165,47 +143,8 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
 
     /* 添加输入响应处理 */
 
-    keyMap.bind("c", e =>
-    {
-        if (e.hold)
-            camera.fov = degToRad * 80;
-        else
-            camera.fov = degToRad * 125;
-    });
+    keyMap.bindDown("c", () => camera.fov = degToRad * 80);
+    keyMap.bindUp("c", () => camera.fov = degToRad * 125);
 
-    /**
-     * @param {{ movementY: number, movementX: number }} e
-     */
-    function mousemove(e)
-    {
-        var rx = camera.rx - (e.movementY * 0.005);
-        var ry = camera.ry - (e.movementX * 0.005);
-        if (rx < degToRad * -90)
-            rx = degToRad * -90;
-        else if (rx > degToRad * 90)
-            rx = degToRad * 90;
-        if (ry < degToRad * -360)
-            ry += degToRad * 720;
-        else if (ry > degToRad * 360)
-            ry += degToRad * -720;
-        camera.rx = rx;
-        camera.ry = ry;
-    }
-    canvas.addEventListener("click", () =>
-    {
-        canvas.requestPointerLock();
-    });
-    document.addEventListener("pointerlockchange", () =>
-    {
-        if (document.pointerLockElement === canvas)
-            document.addEventListener("mousemove", mousemove, false);
-        else
-            document.removeEventListener("mousemove", mousemove, false);
-    }, false);
-    touchBind(canvas, e => mousemove({
-        movementY: e.vy,
-        movementX: e.vx
-    }));
-
-
+    mouseRotatingBind(camera);
 })();

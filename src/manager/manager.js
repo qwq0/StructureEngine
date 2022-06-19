@@ -44,13 +44,8 @@ export class Manager
                     var obj = this.sMap.get(info[0]);
                     if (obj)
                     {
-                        obj.x = info[1];
-                        obj.y = info[2];
-                        obj.z = info[3];
-                        obj.rx = info[4];
-                        obj.ry = info[5];
-                        obj.rz = info[6];
-                        obj.rw = info[7];
+                        obj.setPosition(info[1], info[2], info[3]);
+                        obj.setRotation(info[4], info[5], info[6], info[7]);
                     }
                 }
             }

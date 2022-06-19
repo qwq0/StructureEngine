@@ -128,16 +128,15 @@ export class SceneObject
         var info = [];
         info[0] = this.sn;
         var body = this.o;
-        body.getMotionState().getWorldTransform(transform);
-        var origin = transform.getOrigin(); // 位置坐标
-        info[1] = origin.x();
-        info[2] = origin.y();
-        info[3] = origin.z();
-        var rotation = transform.getRotation(); // 四元数角度
-        info[4] = rotation.x();
-        info[5] = rotation.y();
-        info[6] = rotation.z();
-        info[7] = rotation.w();
+        var position = body.getPosition(); // 位置坐标
+        info[1] = position.x;
+        info[2] = position.y;
+        info[3] = position.z;
+        var orientation = body.getOrientation(); // 四元数角度
+        info[4] = orientation.x;
+        info[5] = orientation.y;
+        info[6] = orientation.z;
+        info[7] = orientation.w;
         return info;
     }
 

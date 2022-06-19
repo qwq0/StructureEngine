@@ -6,6 +6,7 @@
     - 紧急的
 
     - 活动的(当前)
+        - 切换物理库到oimo
         - 重构渲染结构
         - 将所有渲染封装到渲染类 而不是相机和灯光中
         - 完善glsl着色器生成器
@@ -79,7 +80,7 @@
     - 此引擎的有关信息(版本号等) - infoObj.js
 
 - worker线程 - src/manager/worker/
-    - 处理物理模拟 - Bullet/
+    - 处理物理模拟 - phy/
         - 场景封装 - Scene.js
         - 场景中的物体封装 - SceneObject.js
     - worker线程主程序 - worker.js
@@ -210,5 +211,7 @@ y 垂直坐标轴
 
 # 此项目使用的库
 - 库 - lib/
-    - 使用了ammo.js库以使用bullet作为物理库 - ammojs/
+    - 使用OimoPhysics作为物理库 - OimoPhysics/
+        - https://github.com/saharan/OimoPhysics
+    - (旧)使用了ammo.js库以使用bullet作为物理库 - ammojs/
         - https://github.com/kripken/ammo.js

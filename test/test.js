@@ -4,7 +4,7 @@
  * @file 测试文件
  */
 import { degToRad } from "../src/gl/util/math.js";
-import { Manager } from "../src/manager/manager.js";
+import { Manager } from "../src/manager/Manager.js";
 import { create_cube, initContext, ObjC, touchBind, KeyboardMap } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
@@ -97,7 +97,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     {
         let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
         cube0.id = "cube0";
-        cube0.setPosition(0, 9, 0);
+        cube0.setPosition(0, 3, 0);
         scene.addChild(cube0);
         manager.addCube(cube0, 1);
     }
@@ -109,9 +109,9 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         scene.addChild(cubeF);
         manager.addCube(cubeF, 0);
     }
-    for (let x = 0; x < 30; x += 3)
-        for (let y = 0; y < 30; y += 3)
-            for (let z = 0; z < 30; z += 3)
+    for (let x = 0; x < 20; x += 3)
+        for (let y = 0; y < 20; y += 3)
+            for (let z = 0; z < 20; z += 3)
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + z;

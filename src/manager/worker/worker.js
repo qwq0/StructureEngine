@@ -1,12 +1,10 @@
 /*
     此文件在worker中
 */
-import { initAmmo, Scene } from "./Bullet/Scene.js";
+import { Scene } from "./phy/Scene.js";
 
 (async function ()
 {
-    await initAmmo();
-
     /**
      * 场景上下文
      * @type {Scene}
@@ -17,13 +15,12 @@ import { initAmmo, Scene } from "./Bullet/Scene.js";
     function initLoop()
     {
         scene = new Scene();
-        scene.initscene(); // 初始化
 
         var last = Date.now();
         function mainLoop() // 主循环
         {
             var now = Date.now();
-            var info = scene.simulate(now - last);
+            var info = scene.simulate((now - last) / 1000);
             if (info.objects.length > 0)
                 postMessage(info);
             last = now;

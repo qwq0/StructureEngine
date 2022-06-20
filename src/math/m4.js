@@ -226,9 +226,9 @@ export class m4
      * @param {number} w
      * @returns {m4}
      */
-    static quaternion(x, y, z, w)
+    static quaternion(x, w, z, y)
     {
-        return new m4([
+        /*return new m4([
             1 - 2 * (y * y + z * z),
             2 * (x * y - w * z),
             2 * (x * z + w * y),
@@ -242,6 +242,31 @@ export class m4
             2 * (x * z - w * y),
             2 * (y * z + w * x),
             1 - 2 * (x * x + y * y),
+            0,
+
+            0,
+            0,
+            0,
+            1
+        ]);*/
+        var x2 = 2 * x, y2 = 2 * y, z2 = 2 * z;
+        var xx = x * x2, yy = y * y2, zz = z * z2;
+        var xy = x * y2, yz = y * z2, xz = x * z2;
+        var wx = w * x2, wy = w * y2, wz = w * z2;
+        return new m4([
+            1 - yy - zz,
+            xy - wz,
+            xz + wy,
+            0,
+
+            xy + wz,
+            1 - xx - zz,
+            yz - wx,
+            0,
+
+            xz - wy,
+            yz + wx,
+            1 - xx - yy,
             0,
 
             0,

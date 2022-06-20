@@ -28,7 +28,7 @@ export function mouseRotatingBind(camera)
         camera.rx = rx;
         camera.ry = ry;
     }
-    canvas.addEventListener("click", () =>
+    canvas.addEventListener("mousedown", () =>
     {
         canvas.requestPointerLock();
     });

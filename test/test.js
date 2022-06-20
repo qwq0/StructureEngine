@@ -115,14 +115,14 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + y + "," + z;
-                cube.setPosition(x + 10, y, z + 20);
+                cube.setPosition(x + 10 + Math.random() * 0.3, y, z + 20 + Math.random() * 0.3);
                 //let quat = v4.Euler2Quaternion(0.5, 0, 0);
                 //cube.rx = quat.x;
                 //cube.ry = quat.y;
                 //cube.rz = quat.z;
                 //cube.rw = quat.w;
                 scene.addChild(cube);
-                manager.addCube(cube, 1);
+                manager.addCube(cube, 0.1);
             }
     (async () =>
     {
@@ -156,6 +156,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         LBDiv.style.left = "0";
         LBDiv.style.bottom = "0";
         LBDiv.style.userSelect = "none";
+        LBDiv.addEventListener("contextmenu", e => { e.preventDefault(); return false; });
         let RBDiv = document.body.appendChild(document.createElement("div"));
         RBDiv.style.position = "fixed";
         RBDiv.style.height = "0";
@@ -163,6 +164,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         RBDiv.style.right = "0";
         RBDiv.style.bottom = "0";
         RBDiv.style.userSelect = "none";
+        RBDiv.addEventListener("contextmenu", e => { e.preventDefault(); return false; });
         let addButton = (/** @type {HTMLDivElement} */ holder, /** @type {string} */ text,
             /** @type {string | number} */ x, /** @type {string | number} */ y, /** @type {string | number} */ w, /** @type {string | number} */ h,
             /** @type {Function} */ callback) =>
@@ -191,7 +193,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         addButton(LBDiv, "D", (2 + 1) * btSize, (-1 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("D", down));
         addButton(RBDiv, "N", (-2 - 1) * btSize, (-1 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("N", down));
         addButton(RBDiv, "_", (-1 - 1) * btSize, (-1 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent(" ", down));
-        addButton(RBDiv, "c", (-2 - 1) * btSize, (-2 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("C", down));
+        addButton(RBDiv, "C", (-2 - 1) * btSize, (-2 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("C", down));
         addButton(RBDiv, "Shift", (-1 - 1) * btSize, (-2 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("Shift", down));
     }
 })();

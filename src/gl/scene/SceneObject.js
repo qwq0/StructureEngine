@@ -184,7 +184,8 @@ export class SceneObject
         this.scene = scene;
         if (scene)
         { // 在新区域中建立关联
-            scene.idMap.set(this.id, this);
+            if (this.id)
+                scene.idMap.set(this.id, this);
         }
         if (this.c) // 遍历子节点
             forEach(this.c, (o) => { o.setScene(scene); });
@@ -215,7 +216,7 @@ export class SceneObject
         {
             this.lMat = new m4().
                 translation(this.x, this.y, this.z). // 平移
-                rotateQuat(this.rx, this.ry, this.rz, this.rw). // 旋转
+                rotateQuatRH(this.rx, this.ry, this.rz, this.rw). // 旋转
                 scale(this.sx, this.sy, this.sz); // 缩放
             if (this.parent)
                 this.wMat = this.parent.wMat.multiply(this.lMat);

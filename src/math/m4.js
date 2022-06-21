@@ -220,15 +220,16 @@ export class m4
 
     /**
      * 四元数转矩阵
+     * 按照左手螺旋定则方向旋转
      * @param {number} x
      * @param {number} y
      * @param {number} z
      * @param {number} w
      * @returns {m4}
      */
-    static quaternion(x, w, z, y)
+    static quaternionLH(x, y, z, w)
     {
-        /*return new m4([
+        return new m4([
             1 - 2 * (y * y + z * z),
             2 * (x * y - w * z),
             2 * (x * z + w * y),
@@ -248,25 +249,34 @@ export class m4
             0,
             0,
             1
-        ]);*/
-        var x2 = 2 * x, y2 = 2 * y, z2 = 2 * z;
-        var xx = x * x2, yy = y * y2, zz = z * z2;
-        var xy = x * y2, yz = y * z2, xz = x * z2;
-        var wx = w * x2, wy = w * y2, wz = w * z2;
+        ]);
+    }
+
+    /**
+     * 四元数转矩阵
+     * 按照右手螺旋定则方向旋转
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} w
+     * @returns {m4}
+     */
+    static quaternionRH(x, y, z, w)
+    {
         return new m4([
-            1 - yy - zz,
-            xy - wz,
-            xz + wy,
+            1 - 2 * (y * y + z * z),
+            2 * (x * y + w * z),
+            2 * (x * z - w * y),
             0,
 
-            xy + wz,
-            1 - xx - zz,
-            yz - wx,
+            2 * (x * y - w * z),
+            1 - 2 * (x * x + z * z),
+            2 * (y * z + w * x),
             0,
 
-            xz - wy,
-            yz + wx,
-            1 - xx - yy,
+            2 * (x * z + w * y),
+            2 * (y * z - w * x),
+            1 - 2 * (x * x + y * y),
             0,
 
             0,
@@ -442,7 +452,7 @@ export class m4
         return this;
     }
     /**
-     * 旋转矩阵(根据四元数)
+     * 旋转矩阵(根据四元数旋转(右手螺旋))
      * 不会改变原矩阵
      * @param {number} rx
      * @param {number} ry
@@ -450,9 +460,9 @@ export class m4
      * @param {number} rw
      * @returns {m4}
      */
-    rotateQuat(rx, ry, rz, rw)
+    rotateQuatRH(rx, ry, rz, rw)
     {
-        return this.multiply(m4.quaternion(rx, ry, rz, rw));
+        return this.multiply(m4.quaternionRH(rx, ry, rz, rw));
     }
 
     /**

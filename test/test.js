@@ -115,6 +115,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
             {
                 let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + y + "," + z;
+                cube.setScale(1, 1, 1);
                 cube.setPosition(x + 10 + Math.random() * 0.3, y, z + 20 + Math.random() * 0.3);
                 //let quat = v4.Euler2Quaternion(0.5, 0, 0);
                 //cube.rx = quat.x;
@@ -122,7 +123,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
                 //cube.rz = quat.z;
                 //cube.rw = quat.w;
                 scene.addChild(cube);
-                manager.addCube(cube, 0.1);
+                manager.addCube(cube, 1);
             }
     (async () =>
     {
@@ -139,6 +140,8 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         obj.setPosition(15, 0, 0);
         scene.addChild(obj);
     })();
+
+    console.log(scene);
 
 
     /* 添加输入响应处理 */

@@ -65,10 +65,6 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
 
         wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 2.1 : 1));
 
-        if (window.lock) // 将灯光锁定到相机位置
-            light.cMat = m4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, camera.far). // 透视投影矩阵
-                rotateXYZ(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
-                translation(-camera.x, -camera.y, -camera.z); // 反向平移
         //light.renderShadow();
 
         ct.clearFramebuffer();

@@ -24,7 +24,7 @@ export class KeyboardMap
     /**
      * 监听器函数
      * 调用此函数以模拟键盘操作
-     * @type {function(import("./keyData").keyData): void}
+     * @type {function(import("./keyData").keyData, KeyboardEvent): void}
      */
     listener = null;
 
@@ -34,8 +34,10 @@ export class KeyboardMap
      */
     constructor(e = document.body)
     {
-        keyboardBind(e, this.listener = (e =>
+        keyboardBind(e, this.listener = ((e, ke) =>
         {
+            if (ke.target instanceof HTMLElement && ke.target.tagName == "INPUT")
+                return;
             var key = e.key;
             if (e.hold)
             {
@@ -57,7 +59,7 @@ export class KeyboardMap
                         cb(e);
                 }
             }
-        }))
+        }));
     }
 
     /**

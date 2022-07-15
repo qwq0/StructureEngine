@@ -86,8 +86,10 @@ export class RigidBody
     {
         var Ammo = phyCt.Ammo;
         var force = new Ammo.btVector3(x, y, z);
-        this.body.setLinearFactor(force);
+        var pos = new Ammo.btVector3(0, 0, 0);
+        this.body.applyForce(force, pos);
         Ammo.destroy(force);
+        Ammo.destroy(pos);
         this.body.activate();
     }
 

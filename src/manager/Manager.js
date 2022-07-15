@@ -1,4 +1,5 @@
 import { SceneObject } from "../gl/scene/SceneObject.js";
+import { v3 } from "../math/v3.js";
 import { proxyCallback } from "../util/callbackHandler.js";
 
 /**
@@ -133,6 +134,22 @@ export class Manager
                 e.ry,
                 e.rz,
                 e.rw
+            ]]
+        });
+    }
+
+    /**
+     * @param {SceneObject} e
+     * @param {v3} force
+     */
+    setLinearForce(e, force)
+    {
+        this.worker.postMessage({
+            objects: [[
+                e.sn,
+                force.x,
+                force.y,
+                force.z
             ]]
         });
     }

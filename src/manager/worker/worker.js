@@ -27,10 +27,10 @@ import { Scene } from "./phy/Scene.js";
             var info = scene.simulate(et);
             postMessage(info);
             last = now;
-            setTimeout(mainLoop, Math.floor((1000 / 160) * 2 - (et)));
+            setTimeout(mainLoop, Math.floor((1000 / 60) * 2 - (et)));
         }
         if (timeoutId) clearInterval(timeoutId);
-        timeoutId = setTimeout(mainLoop, Math.floor(1000 / 160));
+        timeoutId = setTimeout(mainLoop, Math.floor(1000 / 60));
     }
 
     onmessage = function (e) // 接受来自主线程的信息

@@ -1,12 +1,13 @@
+import { v3 } from "../../math/v3.js";
 import { KeyboardMap } from "../KeyboardMap.js";
 
 /**
- * 预设wasd移动绑定
- * 绑定键盘移动相机
+ * 预设wasd绑定
+ * 绑定键盘移动
  * 事件绑定到body
- * 返回一个函数 每次渲染前调用 传递移动系数(与时间成正比)
+ * 返回一个函数 每次渲染前调用 传递移动系数(与时间成正比) 返回运动向量
  * @param {import("../../index.js").Camera} camera
- * @returns {function(number): void}
+ * @returns {function(number): v3}
  */
 export function keyboardWASD(camera)
 {
@@ -14,6 +15,8 @@ export function keyboardWASD(camera)
 
     return ((factor) =>
     {
+        var ret = new v3();
+
         var speedX = 0, speedZ = 0;
         if (keyMap.get("w"))
             speedZ -= 1;
@@ -28,17 +31,19 @@ export function keyboardWASD(camera)
             let speedLen = Math.hypot(speedX, speedZ);
             speedX /= speedLen;
             speedZ /= speedLen;
-            camera.x += (speedX * Math.cos(camera.ry) + speedZ * Math.sin(camera.ry)) * factor;
-            camera.z += (speedZ * Math.cos(camera.ry) - speedX * Math.sin(camera.ry)) * factor;
+            ret.x += (speedX * Math.cos(camera.ry) + speedZ * Math.sin(camera.ry)) * factor;
+            ret.z += (speedZ * Math.cos(camera.ry) - speedX * Math.sin(camera.ry)) * factor;
         }
 
         if (keyMap.get(" "))
         {
-            camera.y += factor;
+            ret.y += factor;
         }
         if (keyMap.get("n"))
         {
-            camera.y -= factor;
+            ret.y -= factor;
         }
+
+        return ret;
     });
 }

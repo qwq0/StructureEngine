@@ -27,8 +27,9 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     /* 显示调试信息 */
     var debugDiv = document.body.appendChild(document.createElement("div"));
     debugDiv.style.position = "fixed";
-    debugDiv.style.left = "0px";
-    debugDiv.style.top = "0px";
+    debugDiv.style.left = "0.5em";
+    debugDiv.style.top = "0.3em";
+    debugDiv.style.textShadow = "0 0 2px rgb(255, 255, 255), 0 0 4px rgb(255, 255, 255), 0 0 6px rgb(255, 255, 255)";
     var fpsCount = 0;
     setInterval(() =>
     {
@@ -57,7 +58,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     var wasdUpdate = keyboardWASD(camera);
     /**
      * 绘制函数 每帧调用
-     * @param {number} timeStamp 
+     * @param {number} timeStamp
      */
     function draw(timeStamp)
     {
@@ -65,8 +66,12 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         lastTimeStamp = timeStamp;
         fpsCount++;
 
-        wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 2.1 : 1));
-        cubeC.setPosition(camera.x, camera.y - 8, camera.z);
+        var moveVec = wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 120 : 50));
+        camera.x = cubeC.x;
+        camera.y = cubeC.y + 3;
+        camera.z = cubeC.z;
+        // cubeC.setPosition(camera.x, camera.y - 8, camera.z);
+        manager.setLinearForce(cubeC, moveVec);
 
         //light.renderShadow();
 

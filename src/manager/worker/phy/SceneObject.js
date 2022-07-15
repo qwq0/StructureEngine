@@ -1,6 +1,7 @@
-/**
- * 此文件在worker中
- */
+/*
+    此文件在worker中
+*/
+
 /**
  * 场景中的物体
  */
@@ -8,8 +9,9 @@ export class SceneObject
 {
     /**
      * 物体在物理引擎中的对象
+     * @type {import("./phyInterface/RigidBody").RigidBody}
      */
-    o = null;
+    body = null;
     /**
      * 坐标x(相对)
      * 此处的值为变化前
@@ -80,13 +82,21 @@ export class SceneObject
     sn = -1;
 
     /**
-     * @param {any} o
+     * @param {import("./phyInterface/RigidBody").RigidBody} o
      * @param {number} sn
      */
     constructor(o, sn)
     {
-        this.o = o;
+        this.body = o;
         this.sn = sn;
+        var info = this.body.getPosition(); // 位置
+        this.x = info.x;
+        this.y = info.y;
+        this.z = info.z;
+        this.rx = info.rx;
+        this.ry = info.ry;
+        this.rz = info.rz;
+        this.rw = info.rw;
     }
 
     /**
@@ -101,42 +111,24 @@ export class SceneObject
      */
     setPosition(x, y, z, rx, ry, rz, rw)
     {
-        var obj = this.o;
-        var transform = obj.getWorldTransform();
-        var origin = transform.getOrigin();
-        origin.setX(x);
-        origin.setY(y);
-        origin.setZ(z);
-        if (rx != undefined)
-        {
-            var rotation = transform.getRotation();
-            rotation.setX(rx)
-            rotation.setY(ry);
-            rotation.setZ(rz);
-            rotation.setW(rw);
-            transform.setRotation(rotation);
-        }
-        obj.activate();
+        this.body.setPosition(x, y, z, rx, ry, rz, rw);
     }
 
     /**
      * 获取此物体在引擎中的信息
-     * @param {any} transform
      */
-    getInfoE(transform)
+    getInfoE()
     {
         var info = [];
         info[0] = this.sn;
-        var body = this.o;
-        var position = body.getPosition(); // 位置坐标
+        var position = this.body.getPosition(); // 位置
         info[1] = position.x;
         info[2] = position.y;
         info[3] = position.z;
-        var orientation = body.getOrientation(); // 四元数角度
-        info[4] = orientation.x;
-        info[5] = orientation.y;
-        info[6] = orientation.z;
-        info[7] = orientation.w;
+        info[4] = position.rx;
+        info[5] = position.ry;
+        info[6] = position.rz;
+        info[7] = position.rw;
         return info;
     }
 
@@ -144,11 +136,10 @@ export class SceneObject
      * 获取此物体的信息
      * 并同步当前对象到物理引擎状态
      * 若信息不变则返回null
-     * @param {any} transform
      */
-    getInfoA(transform)
+    getInfoA()
     {
-        var info = this.getInfoE(transform);
+        var info = this.getInfoE();
         if (
             info[1] == this.x &&
             info[2] == this.y &&

@@ -28,21 +28,32 @@
 # 此项目的结构
 
 - 源码 - src/
-    - 处理用户操作 - controller
+    - 处理用户操作 - controller/
+        - 预设操作处理 - preset/
+            - 键盘操作移动 - keyboardWASD.js
+            - 鼠标转动相机 - mouseRotating.js
         - 键盘操作 - keyboard.js
+        - 键盘操作的封装类 - KeyboardMap.js
+        - 键盘对应表 - keyboardTable.js
+        - 按键数据类 - keyData.js.js
         - 鼠标操作 - mouse.js
+        - 指针数据类 - pointerData.js
         - 触摸操作 - touch.js
-    - 处理图形 - gl
+    - 处理图形 - gl/
         - 相机 - camera/
             - 相机类 - Camera.js
-            - 相机实用工具函数 - cameraUtil.js
         - 初始化 - init/
             - 初始化上下文 - initContext.js
+            - 初始化着色器 - initShader.js
         - 物体(模型) - object/
             - mtl材质文件类 - MtlC.js
             - mtl中单个材质信息类 - MtlCMaterial.js
             - obj模型文件类 - ObjC.js
             - ObjC中的一组面类 - ObjCFaces.js
+        - 渲染 - render/
+            - 渲染器类 - Render.js
+            - 渲染池类 - RenderPool.js
+            - 渲染工具函数 - renderUtil.js
         - 场景 - scene/
             - SceneObject的面数据类 - ObjFaces.js
             - 场景类 - Scene.js
@@ -51,13 +62,19 @@
             - 着色器生成器 - generator/
                 - glsl着色器生成器 - GlslGenerator.js
                 - glsl着色器生成器的片段封装 - GlslGenParam.js
+                - 着色器运算符 - ShaderOperate.js
+                - 着色器部分 - ShaderPart.js
+            - 预设着色器 - preset/
+                - 生成相机着色器 - genCameraShader.js
             - glsl着色器封装类 - glslProgram.js
+            - 着色器组类 - ProgramGroup.js
         - 形状 - shape/
             - 正方体 - cube.js
             - 正方形 - square.js
         - 纹理 - texture/
             - 渲染到纹理 - Render2Texture.js
             - 纹理类 - Texture.js
+            - 纹理表类 - TextureTable.js
         - 操作界面 - ui/
             - 用户界面类(管理gui树) - GUI.js
             - gui树中的元素 - GUIObject.js
@@ -65,14 +82,13 @@
             - 数学 - math.js
         - 灯光类 - Light.js
         - 此引擎的上下文类 - SEContext.js
-    - 管理场景(与worker通信) - manager/
+    - 管理场景 - manager/
         - worker线程(详见下方) - worker/
-        - 场景管理(与worker通信) - manager.js
+        - 场景管理(与worker通信) - Manager.js
     - 数学 - math/
         - 4*4矩阵 - m4.js
         - 3向量 - v3.js
         - 4向量 - v4.js
-    - 工具(用于调试等) - tools/
     - 实用工具函数和类 - util/
         - 管理回调 - callbackHandler.js
         - 遍历数组 - forEach.js
@@ -81,6 +97,9 @@
 
 - worker线程 - src/manager/worker/
     - 处理物理模拟 - phy/
+        - 物理引擎接口封装 phyInterface/
+            - 刚体类 - RigidBody.js
+            - 世界类 - World.js
         - 场景封装 - Scene.js
         - 场景中的物体封装 - SceneObject.js
     - worker线程主程序 - worker.js
@@ -211,7 +230,5 @@ y 垂直坐标轴
 
 # 此项目使用的库
 - 库 - lib/
-    - 使用OimoPhysics作为物理库 - OimoPhysics/
-        - https://github.com/saharan/OimoPhysics
-    - (旧)使用了ammo.js库以使用bullet作为物理库 - ammojs/
+    - 使用了ammo.js库以使用bullet作为物理库 - ammojs/
         - https://github.com/kripken/ammo.js

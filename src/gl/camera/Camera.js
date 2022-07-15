@@ -49,7 +49,7 @@ export class Camera
      * 对角线fov
      * @type {number}
      */
-    fov = degToRad * 130;
+    fov = degToRad * 125;
     /**
      * 视锥最近面距离
      * @type {number}

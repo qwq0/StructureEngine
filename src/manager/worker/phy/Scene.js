@@ -1,19 +1,20 @@
 /*
     此文件在worker中
 */
-import { OBoxGeometry, RigidBody, RigidBodyConfig, RigidBodyType, Shape, ShapeConfig, Vec3, World } from "../../../../lib/OimoPhysics/index.js";
+import { RigidBody } from "./phyInterface/RigidBody.js";
+import { Shape } from "./phyInterface/Shape.js";
+import { World } from "./phyInterface/World.js";
 import { SceneObject } from "./SceneObject.js";
 
 
 /**
  * 场景类
- * 对Bullet接口的封装
- * 有重力刚体碰撞世界
  */
 export class Scene
 {
     /**
      * 世界
+     * @type {World}
      */
     world = null;
 
@@ -23,63 +24,100 @@ export class Scene
      */
     objs = [];
 
+    /**
+     * 物体列表
+     * @type {Map<number, import("./SceneObject").SceneObject>}
+     */
+    snMap = new Map();
 
     constructor()
     {
-        var world = new World(); // 世界
-        world.setGravity(new Vec3(0, -10, 0)); // 设置重力
-        this.world = world;
+        this.world = new World();
     }
+
+
+    /**
+     * 添加物体
+     * @param {number} sn
+     * @param {RigidBody} body
+     */
+    addSceneObject(sn, body)
+    {
+        var obj = new SceneObject(body, sn);
+        this.objs.push(obj); // 放入物体列表
+        this.snMap.set(sn, obj); // 放入唯一标识Map
+    }
+
+    /**
+     * 获取物体
+     * @param {number} sn
+     * @returns {SceneObject}
+     */
+    getSceneObject(sn)
+    {
+        return this.snMap.get(sn);
+    }
+
 
     /**
      * 添加一个刚体方块
-     * @param {any} sn 方块id
-     * @param {any} x x坐标
-     * @param {any} y y坐标
-     * @param {any} z z坐标
-     * @param {any} [mass] 质量
-     * @param {any} [sx] x缩放
-     * @param {any} [sy] y缩放
-     * @param {any} [sz] z缩放
+     * @param {number} sn 方块id
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     * @param {number} z z坐标
+     * @param {number} mass 质量
+     * @param {number} [sx] x缩放
+     * @param {number} [sy] y缩放
+     * @param {number} [sz] z缩放
      */
-    addCube(sn, x, y, z, mass = 0, sx = 1, sy = 1, sz = 1)
+    addCube(sn, x, y, z, mass, sx = 1, sy = 1, sz = 1)
     {
-        var shapec = new ShapeConfig();
-        shapec.geometry = new OBoxGeometry(new Vec3(sx / 2, sy / 2, sz / 2));
-        var bodyc = new RigidBodyConfig();
-        bodyc.type = (mass == 0 ? RigidBodyType.STATIC : RigidBodyType.DYNAMIC);
-        bodyc.position = new Vec3(x, y, z);
-        var body = new RigidBody(bodyc);
-        body.addShape(new Shape(shapec));
-        var massData = body.getMassData();
-        massData.mass = mass;
-        body.setMassData(massData);
+        var body = new RigidBody(Shape.cube(sx, sy, sz), mass, x, y, z, 0, 0, 0, 1);
         this.world.addRigidBody(body);
-
-        this.objs.push(new SceneObject(body, sn)); // 放入物体列表
+        body.setDamping(0.01, 0.05);
+        this.addSceneObject(sn, body);
     }
 
     /**
-     * 模拟(一帧)
+     * 添加一个三角网络
+     * @param {number} sn 方块id
+     * @param {Array<number>} pos 顶点数组
+     * @param {number} mass 质量
+     * @param {number} x x坐标
+     * @param {number} y y坐标
+     * @param {number} z z坐标
+     * @param {number} [sx] x缩放
+     * @param {number} [sy] y缩放
+     * @param {number} [sz] z缩放
+     */
+    addMultimaterialTriangleMesh(sn, pos, mass, x, y, z, sx = 1, sy = 1, sz = 1)
+    {
+        var body = new RigidBody(Shape.multimaterialTriangleMesh(pos));
+        this.world.addRigidBody(body);
+        this.addSceneObject(sn, body);
+    }
+
+    /**
+     * 模拟
      * 返回当前变化的物体信息
-     * @param {number} dt 
+     * @param {number} dt 模拟的毫秒数(整数)
      */
     simulate(dt) // 模拟
     {
         dt = dt || 1;
 
-        this.world.step(dt);
+        this.world.simulate(dt);
 
         // 从引擎中获取数据转换到js对象
         var data = { objects: [] };
         var objs = this.objs;
-        var objNum = 0;
         for (var i = 0; i < objs.length; i++)
-        {
-            var info = objs[i].getInfoA();
-            if (info)
-                data.objects[objNum++] = info;
-        }
+            if (objs[i].body.isActive())
+            {
+                var info = objs[i].getInfoA();
+                if (info)
+                    data.objects.push(info);
+            }
         return data;
     }
 }

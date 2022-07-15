@@ -118,7 +118,7 @@ export class Render
             }
 
             if ((!(flag & 2)) && obje.c) // 递归子节点
-                obje.c.forEach(o => rt(o));
+                obje.c.forEach(rt);
         }
         rt(sObj);
 

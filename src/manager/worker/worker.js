@@ -1,17 +1,20 @@
 /*
     此文件在worker中
 */
+import { getPhyCt } from "./phy/phyInterface/phyContext.js";
 import { Scene } from "./phy/Scene.js";
 
 (async function ()
 {
+    await getPhyCt();
+
     /**
      * 场景上下文
      * @type {Scene}
      */
     var scene = null;
 
-    var interval = null; // 定时循环号
+    var timeoutId = null; // 定时循环编号
     function initLoop()
     {
         scene = new Scene();
@@ -20,13 +23,14 @@ import { Scene } from "./phy/Scene.js";
         function mainLoop() // 主循环
         {
             var now = Date.now();
-            var info = scene.simulate((now - last) / 1000);
-            if (info.objects.length > 0)
-                postMessage(info);
+            var et = now - last;
+            var info = scene.simulate(et);
+            postMessage(info);
             last = now;
+            setTimeout(mainLoop, Math.floor((1000 / 160) * 2 - (et)));
         }
-        if (interval) clearInterval(interval);
-        interval = setInterval(mainLoop, 1000 / 60);
+        if (timeoutId) clearInterval(timeoutId);
+        timeoutId = setTimeout(mainLoop, Math.floor(1000 / 160));
     }
 
     onmessage = function (e) // 接受来自主线程的信息
@@ -34,15 +38,18 @@ import { Scene } from "./phy/Scene.js";
         var data = e.data;
         if (data.objects)
         {
-            /**
-             * @type {Array}
-             */
-            var objA = data.objects;
-            for (var i = 0; i < objA.length; i++)
+            (/** @type {Array} */(data.objects)).forEach(o =>
             {
-                var o = objA[i];
-                scene.addCube(o.sn, o.x, o.y, o.z, o.mass, o.sx, o.sy, o.sz);
-            }
+                if (Array.isArray(o))
+                {
+                    if (o.length == 8)
+                        scene.getSceneObject(o[0]).setPosition(o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
+                    else if (o.length == 4)
+                        scene.getSceneObject(o[0]).body.setLinearForce(o[1], o[2], o[3]);
+                }
+                else
+                    scene.addCube(o.sn, o.x, o.y, o.z, o.mass, o.sx, o.sy, o.sz);
+            });
         }
         else if (data.isReady)
             initLoop();

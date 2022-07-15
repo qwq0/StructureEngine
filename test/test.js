@@ -33,11 +33,13 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     setInterval(() =>
     {
         debugDiv.innerText = ([
-            "fps: " + Math.floor(fpsCount * (10 / 3)),
+            "fps: " + fpsCount,
+            "tps: " + manager.simulateCount,
             "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
         ]).join("\n");
         fpsCount = 0;
-    }, 300);
+        manager.simulateCount = 0;
+    }, 1000);
 
     /* 创建场景和相机等 */
     var ct = initContext(canvas);
@@ -64,6 +66,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         fpsCount++;
 
         wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 2.1 : 1));
+        cubeC.setPosition(camera.x, camera.y - 8, camera.z);
 
         //light.renderShadow();
 
@@ -78,15 +81,17 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
 
     /* 向场景添加物体 */
 
-    let square = create_square(ct.gl, light.shadowTex.depthTex);
-    square.setScale(64, 64, 1);
-    square.setPosition(0, 0, 100);
-    scene.addChild(square);
+    {
+        let square = create_square(ct.gl, light.shadowTex.depthTex);
+        square.setScale(64, 64, 1);
+        square.setPosition(0, 0, 100);
+        scene.addChild(square);
+    }
     {
         let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
         cubeF.id = "cubeF";
         cubeF.setScale(16, 1, 16);
-        cubeF.setPosition(0, -10, 0);
+        cubeF.setPosition(0, -9, 0);
         scene.addChild(cubeF);
         manager.addCube(cubeF, 0);
     }
@@ -100,7 +105,7 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
     {
         let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
         cubeF.id = "cubeF1";
-        cubeF.setScale(30, 1, 30);
+        cubeF.setScale(80, 1, 80);
         cubeF.setPosition(15, -10, 25);
         scene.addChild(cubeF);
         manager.addCube(cubeF, 0);
@@ -136,8 +141,15 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         obj.setPosition(15, 0, 0);
         scene.addChild(obj);
     })();
+    let cubeC = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+    {
+        cubeC.id = "cubeC";
+        cubeC.setPosition(0, 3, 0);
+        scene.addChild(cubeC);
+        manager.addCube(cubeC, 1);
+    }
 
-    console.log(scene);
+    // console.log(scene);
 
 
     /* 添加输入响应处理 */

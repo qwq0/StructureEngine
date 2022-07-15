@@ -7,6 +7,11 @@ import { proxyCallback } from "../util/callbackHandler.js";
  */
 export class Manager
 {
+    /**
+     * 模拟次数统计
+     * @type {number}
+     */
+    simulateCount = 0;
 
     /**
      * 物体sn对应表
@@ -45,10 +50,17 @@ export class Manager
                     var obj = this.sMap.get(info[0]);
                     if (obj)
                     {
-                        obj.setPosition(info[1], info[2], info[3]);
-                        obj.setRotation(info[4], info[5], info[6], info[7]);
+                        obj.x = info[1];
+                        obj.y = info[2];
+                        obj.z = info[3];
+                        obj.rx = info[4];
+                        obj.ry = info[5];
+                        obj.rz = info[6];
+                        obj.rw = info[7];
+                        obj.needUpdate = true;
                     }
                 }
+                this.simulateCount++;
             }
             else if (data.isReady)
             {
@@ -90,6 +102,7 @@ export class Manager
      */
     addCube(e, mass)
     {
+        e.spCB = e => this.updatePosition(e);
         this.sMap.set(e.sn, e);
         this.worker.postMessage({
             objects: [{
@@ -102,6 +115,25 @@ export class Manager
                 sy: e.sy,
                 sz: e.sz
             }]
+        });
+    }
+
+    /**
+     * @param {SceneObject} e
+     */
+    updatePosition(e)
+    {
+        this.worker.postMessage({
+            objects: [[
+                e.sn,
+                e.x,
+                e.y,
+                e.z,
+                e.rx,
+                e.ry,
+                e.rz,
+                e.rw
+            ]]
         });
     }
 }

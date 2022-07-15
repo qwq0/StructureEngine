@@ -17,61 +17,61 @@ export class SceneObject
 {
     /**
      * 坐标x(相对)
-     * @private
+     * @package
      * @type {number}
      */
     x = 0;
     /**
      * 坐标y(相对)
-     * @private
+     * @package
      * @type {number}
      */
     y = 0;
     /**
      * 坐标z(相对)
-     * @private
+     * @package
      * @type {number}
      */
     z = 0;
     /**
      * 四元数x(相对旋转)
-     * @private
+     * @package
      * @type {number}
      */
     rx = 0;
     /**
      * 四元数y(相对旋转)
-     * @private
+     * @package
      * @type {number}
      */
     ry = 0;
     /**
      * 四元数z(相对旋转)
-     * @private
+     * @package
      * @type {number}
      */
     rz = 0;
     /**
      * 四元数w(相对旋转)
-     * @private
+     * @package
      * @type {number}
      */
     rw = 1;
     /**
      * x轴缩放(相对)
-     * @private
+     * @package
      * @type {number}
      */
     sx = 1;
     /**
      * y轴缩放(相对)
-     * @private
+     * @package
      * @type {number}
      */
     sy = 1;
     /**
      * z轴缩放(相对)
-     * @private
+     * @package
      * @type {number}
      */
     sz = 1;
@@ -158,6 +158,13 @@ export class SceneObject
      */
     needUpdate = true;
 
+    /**
+     * setPosition回调
+     * @package
+     * @type {function(SceneObject): void}
+     */
+    spCB = null;
+
 
     constructor()
     {
@@ -207,7 +214,7 @@ export class SceneObject
 
     /**
      * 更新世界矩阵
-     * 若此物体
+     * 若此物体需要更新
      * @package
      */
     updateCMat()
@@ -247,6 +254,7 @@ export class SceneObject
     /**
      * 获取世界视图投影矩阵
      * 只包含旋转和缩放没有平移
+     * 需要先更新矩阵
      * @returns {m4}
      */
     getWorldViewProjectionMat()
@@ -286,6 +294,8 @@ export class SceneObject
         this.y = y;
         this.z = z;
         this.needUpdate = true;
+        if(this.spCB)
+            this.spCB(this);
     }
 
     /**
@@ -316,5 +326,7 @@ export class SceneObject
         this.rz = rz;
         this.rw = rw;
         this.needUpdate = true;
+        if(this.spCB)
+            this.spCB(this);
     }
 }

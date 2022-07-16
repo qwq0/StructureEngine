@@ -1,4 +1,4 @@
-import { m4 } from "../../math/m4.js";
+import { Mat4 } from "../../math/Mat4.js";
 import { Light } from "../Light.js";
 import { Render } from "../render/Render.js";
 import { coneCull } from "../render/renderUtil.js";
@@ -67,18 +67,18 @@ export class Camera
      * 不含投影的相机矩阵
      * 仅变换坐标到相对相机坐标 不含投影矩阵
      * @private
-     * @type {m4}
+     * @type {Mat4}
      */
-    npMat = new m4();
+    npMat = new Mat4();
 
     /**
      * 相机投影矩阵
      *  + 含变换坐标到相对相机坐标
      *  + 含投影矩阵
      * @private
-     * @type {m4}
+     * @type {Mat4}
      */
-    cMat = new m4();
+    cMat = new Mat4();
 
     /**
      * 判断函数
@@ -119,10 +119,10 @@ export class Camera
      */
     draw()
     {
-        this.npMat = new m4(). // 新矩阵
+        this.npMat = new Mat4(). // 新矩阵
             rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
             translation(-this.x, -this.y, -this.z) // 反向平移
-        this.cMat = m4.perspective(this.fov, this.gl.canvas.clientHeight / this.gl.canvas.clientWidth, this.near, this.far). // 透视投影矩阵
+        this.cMat = Mat4.perspective(this.fov, this.gl.canvas.clientHeight / this.gl.canvas.clientWidth, this.near, this.far). // 透视投影矩阵
             rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
             translation(-this.x, -this.y, -this.z) // 反向平移
         this.render.cMat = this.cMat; // 设置渲染器的相机矩阵

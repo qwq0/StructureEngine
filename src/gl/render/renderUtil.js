@@ -1,10 +1,10 @@
-import { m4 } from "../../math/m4.js";
-import { v4 } from "../../math/v4.js";
+import { Mat4 } from "../../math/Mat4.js";
+import { Vec4 } from "../../math/Vec4.js";
 
 /**
  * 视锥剔除判断
  * @param {import("../scene/SceneObject").SceneObject} obje 物体
- * @param {v4} bsPos 物体的包围球中心相对相机坐标(不含投影)
+ * @param {Vec4} bsPos 物体的包围球中心相对相机坐标(不含投影)
  * @param {number} fov 相机的角视场
  * @returns {boolean} 返回true则剔除
  */
@@ -36,7 +36,7 @@ export function coneCull(obje, bsPos, fov)
  * 注意: 执行此函数会关闭颜色和深度写入
  * @param {import("../scene/SceneObject").SceneObject} obje
  * @param {WebGL2RenderingContext} gl
- * @param {m4} cMat
+ * @param {Mat4} cMat
  */
 export function occlusionCull(obje, gl, cMat)
 {

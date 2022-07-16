@@ -35,9 +35,9 @@ export function mouseRotatingBind(camera)
     document.addEventListener("pointerlockchange", () =>
     {
         if (document.pointerLockElement === canvas)
-            document.addEventListener("mousemove", mousemove, false);
+            window.addEventListener("mousemove", mousemove, false);
         else
-            document.removeEventListener("mousemove", mousemove, false);
+            window.removeEventListener("mousemove", mousemove, false);
     }, false);
     touchBind(canvas, e => mousemove({
         movementY: e.vy,

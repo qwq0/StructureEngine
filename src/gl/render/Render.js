@@ -1,4 +1,4 @@
-import { m4 } from "../../math/m4.js";
+import { Mat4 } from "../../math/Mat4.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { GlslProgram } from "../shader/GlslProgram.js";
 import { RenderPool } from "./RenderPool.js";
@@ -33,9 +33,9 @@ export class Render
      * 相机投影矩阵
      *  + 含变换坐标到相对相机坐标
      *  + 含投影矩阵
-     * @type {m4}
+     * @type {Mat4}
      */
-    cMat = new m4();
+    cMat = new Mat4();
 
     /**
      * 绑定的场景

@@ -1,7 +1,7 @@
 /**
- * 3向量类
+ * 3轴向量类
  */
-export class v3
+export class Vec3
 {
     /**
      * 向量中的第个1值
@@ -34,25 +34,25 @@ export class v3
     /**
      * 归一化(使向量长度为1 不改变方向)
      * 不改变原向量
-     * @returns {v3}
+     * @returns {Vec3}
      */
     normalize()
     {
         var multiple = 1 / Math.hypot(this.x, this.y, this.z);
         if (multiple != Infinity)
-            return new v3(
+            return new Vec3(
                 this.x * multiple,
                 this.y * multiple,
                 this.z * multiple
             );
         else
-            return new v3();
+            return new Vec3();
     }
 
     /**
      * 向量点乘
      * 不改变原向量
-     * @param {v3} v
+     * @param {Vec3} v
      * @returns {number}
      */
     dot(v)
@@ -63,34 +63,34 @@ export class v3
     /**
      * 向量相加
      * 不改变原向量
-     * @param {v3} v
-     * @returns {v3}
+     * @param {Vec3} v
+     * @returns {Vec3}
      */
     add(v)
     {
-        return new v3(this.x + v.x, this.y + v.y, this.z + v.z);
+        return new Vec3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
     /**
-     * 向量相加
+     * 向量相减
      * 不改变原向量
-     * @param {v3} v
-     * @returns {v3}
+     * @param {Vec3} v
+     * @returns {Vec3}
      */
     sub(v)
     {
-        return new v3(this.x - v.x, this.y - v.y, this.z - v.z);
+        return new Vec3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
     /**
      * 向量叉乘
      * 不改变原向量
-     * @param {v3} v
-     * @returns {v3}
+     * @param {Vec3} v
+     * @returns {Vec3}
      */
     cross(v)
     {
-        return new v3(
+        return new Vec3(
             this.y * v.z - this.z * v.y,
             this.z * v.x - this.x * v.z,
             this.x * v.y - this.y * v.x
@@ -100,11 +100,11 @@ export class v3
     /**
      * 向量乘标量
      * @param {number} a
-     * @returns {v3}
+     * @returns {Vec3}
      */
     mulNum(a)
     {
-        return new v3(this.x * a, this.y * a, this.z * a);
+        return new Vec3(this.x * a, this.y * a, this.z * a);
     }
 
     /**
@@ -130,7 +130,7 @@ export class v3
     /**
      * 取两个向量的夹角
      * 单位为弧度
-     * @param {v3} v
+     * @param {Vec3} v
      * @returns {number}
      */
     angleTo(v)
@@ -146,7 +146,7 @@ export class v3
  * 通过数组构造一个v3类
  * @param {Array<number>} a
  */
-export function V3(a)
+export function newV3(a)
 {
-    return new v3(a[0], a[1], a[2]);
+    return new Vec3(a[0], a[1], a[2]);
 }

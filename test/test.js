@@ -8,7 +8,7 @@ import { Manager } from "../src/manager/Manager.js";
 import { create_cube, initContext, ObjC, touchBind, KeyboardMap } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
-import { m4 } from "../src/math/m4.js";
+import { Mat4 } from "../src/math/Mat4.js";
 import { TextureTable } from "../src/gl/texture/TextureTable.js";
 import { mouseRotatingBind } from "../src/controller/preset/mouseRotating.js";
 import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
@@ -67,11 +67,11 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         fpsCount++;
 
         var moveVec = wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 120 : 50));
+        manager.setLinearForce(cubeC, moveVec);
+        manager.tick();
         camera.x = cubeC.x;
         camera.y = cubeC.y + 3;
         camera.z = cubeC.z;
-        // cubeC.setPosition(camera.x, camera.y - 8, camera.z);
-        manager.setLinearForce(cubeC, moveVec);
 
         //light.renderShadow();
 

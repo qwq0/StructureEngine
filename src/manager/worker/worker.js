@@ -24,9 +24,12 @@ import { Scene } from "./phy/Scene.js";
         {
             var now = Date.now();
             var et = now - last;
-            var info = scene.simulate(et);
-            postMessage(info);
             last = now;
+            if (et > 0)
+            {
+                var info = scene.simulate(et);
+                postMessage(info);
+            }
             setTimeout(mainLoop, Math.floor((1000 / 60) * 2 - (et)));
         }
         if (timeoutId) clearInterval(timeoutId);

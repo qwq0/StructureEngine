@@ -1,9 +1,9 @@
-import { v4 } from "./v4.js";
+import { Vec4 } from "./Vec4.js";
 
 /**
  * 4*4矩阵类
  */
-export class m4
+export class Mat4
 {
     /**
      * 矩阵原始数据
@@ -36,11 +36,11 @@ export class m4
 
     /**
      * 复制矩阵
-     * @returns {m4}
+     * @returns {Mat4}
      */
     copy()
     {
-        return new m4(this.a);
+        return new Mat4(this.a);
     }
 
     /**
@@ -49,14 +49,14 @@ export class m4
      * 注意 此乘法与一般矩阵乘法的ab相反
      * 此函数为b*a 也就是矩阵变换乘
      * c[i][j] = sum(a[k][j] + b[i][k])
-     * @param {m4} matrix
-     * @returns {m4}
+     * @param {Mat4} matrix
+     * @returns {Mat4}
      */
     multiply(matrix)
     {
         var a = this.a;
         var b = matrix.a;
-        return new m4([
+        return new Mat4([
             (a[0 * 4 + 0] * b[0 * 4 + 0]) + (a[1 * 4 + 0] * b[0 * 4 + 1]) + (a[2 * 4 + 0] * b[0 * 4 + 2]) + (a[3 * 4 + 0] * b[0 * 4 + 3]),
             (a[0 * 4 + 1] * b[0 * 4 + 0]) + (a[1 * 4 + 1] * b[0 * 4 + 1]) + (a[2 * 4 + 1] * b[0 * 4 + 2]) + (a[3 * 4 + 1] * b[0 * 4 + 3]),
             (a[0 * 4 + 2] * b[0 * 4 + 0]) + (a[1 * 4 + 2] * b[0 * 4 + 1]) + (a[2 * 4 + 2] * b[0 * 4 + 2]) + (a[3 * 4 + 2] * b[0 * 4 + 3]),
@@ -82,7 +82,7 @@ export class m4
     /**
      * 矩阵求逆
      * 不会改变原矩阵
-     * @returns {m4}
+     * @returns {Mat4}
      */
     inverse()
     {
@@ -120,7 +120,7 @@ export class m4
         var t2 = (k2 * m01 + k7 * m11 + k10 * m31) - (k3 * m01 + k6 * m11 + k11 * m31);
         var t3 = (k5 * m01 + k8 * m11 + k11 * m21) - (k4 * m01 + k9 * m11 + k10 * m21);
         var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
-        return new m4([
+        return new Mat4([
             d * t0,
             d * t1,
             d * t2,
@@ -146,12 +146,12 @@ export class m4
     /**
      * 矩阵转置
      * 不会改变原矩阵
-     * @returns {m4}
+     * @returns {Mat4}
      */
     transpose()
     {
         var a = this.a;
-        return new m4([
+        return new Mat4([
             a[0 * 4 + 0], a[1 * 4 + 0], a[2 * 4 + 0], a[3 * 4 + 0],
             a[0 * 4 + 1], a[1 * 4 + 1], a[2 * 4 + 1], a[3 * 4 + 1],
             a[0 * 4 + 2], a[1 * 4 + 2], a[2 * 4 + 2], a[3 * 4 + 2],
@@ -161,11 +161,11 @@ export class m4
 
     /**
      * 创建零矩阵(全部为0)
-     * @returns {m4}
+     * @returns {Mat4}
      */
     static zero()
     {
-        return new m4([
+        return new Mat4([
             0, 0, 0, 0,
             0, 0, 0, 0,
             0, 0, 0, 0,
@@ -182,14 +182,14 @@ export class m4
      * @param {number} aspect 视口垂直长度与水平长度的比例
      * @param {number} near 视锥最近处
      * @param {number} far 视锥最远处
-     * @returns {m4}
+     * @returns {Mat4}
      */
     static perspective(fov, aspect, near, far)
     {
         var f = 1 / Math.tan(fov * 0.5);
         var rangeInv = 1.0 / (near - far);
 
-        return new m4([
+        return new Mat4([
             Math.sqrt(1 + (aspect * aspect)) * f, 0, 0, 0,
             0, Math.sqrt(1 + 1 / (aspect * aspect)) * f, 0, 0,
             0, 0, 1 + 2 * far * rangeInv, -1, // 1 + ((2far) / (near - far))
@@ -206,11 +206,11 @@ export class m4
      * @param {number} w 宽
      * @param {number} h 高
      * @param {number} d 深
-     * @returns {m4}
+     * @returns {Mat4}
      */
     static projection(w, h, d)
     {
-        return new m4([
+        return new Mat4([
             2 / w, 0, 0, 0,
             0, 2 / h, 0, 0,
             0, 0, -2 / d, 0,
@@ -225,11 +225,11 @@ export class m4
      * @param {number} y
      * @param {number} z
      * @param {number} w
-     * @returns {m4}
+     * @returns {Mat4}
      */
     static quaternionLH(x, y, z, w)
     {
-        return new m4([
+        return new Mat4([
             1 - 2 * (y * y + z * z),
             2 * (x * y - w * z),
             2 * (x * z + w * y),
@@ -259,11 +259,11 @@ export class m4
      * @param {number} y
      * @param {number} z
      * @param {number} w
-     * @returns {m4}
+     * @returns {Mat4}
      */
     static quaternionRH(x, y, z, w)
     {
-        return new m4([
+        return new Mat4([
             1 - 2 * (y * y + z * z),
             2 * (x * y + w * z),
             2 * (x * z - w * y),
@@ -297,7 +297,7 @@ export class m4
      * @param {number} x
      * @param {number} y
      * @param {number} z
-     * @returns {m4}
+     * @returns {Mat4}
      */
     translation(x, y, z)
     {
@@ -427,7 +427,7 @@ export class m4
      * @param {number} rx
      * @param {number} ry
      * @param {number} rz
-     * @returns {m4}
+     * @returns {Mat4}
      */
     rotateZYX(rx, ry, rz)
     {
@@ -442,7 +442,7 @@ export class m4
      * @param {number} rx
      * @param {number} ry
      * @param {number} rz
-     * @returns {m4}
+     * @returns {Mat4}
      */
     rotateXYZ(rx, ry, rz)
     {
@@ -458,11 +458,11 @@ export class m4
      * @param {number} ry
      * @param {number} rz
      * @param {number} rw
-     * @returns {m4}
+     * @returns {Mat4}
      */
     rotateQuatRH(rx, ry, rz, rw)
     {
-        return this.multiply(m4.quaternionRH(rx, ry, rz, rw));
+        return this.multiply(Mat4.quaternionRH(rx, ry, rz, rw));
     }
 
     /**
@@ -471,7 +471,7 @@ export class m4
      * @param {number} sx
      * @param {number} sy
      * @param {number} sz
-     * @returns {m4}
+     * @returns {Mat4}
      */
     scale(sx, sy, sz)
     {
@@ -493,12 +493,12 @@ export class m4
     /**
      * 乘v4向量
      * (矩阵 乘 向量)
-     * @param {import("./v4").v4} v
+     * @param {import("./Vec4").Vec4} v
      */
     mulV4(v)
     {
         var a = this.a;
-        return new v4(
+        return new Vec4(
             (v.x * a[0]) + (v.y * a[1]) + (v.z * a[2]) + (v.w * a[3]),
             (v.x * a[4]) + (v.y * a[5]) + (v.z * a[6]) + (v.w * a[7]),
             (v.x * a[8]) + (v.y * a[9]) + (v.z * a[10]) + (v.w * a[11]),

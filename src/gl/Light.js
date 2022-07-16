@@ -1,4 +1,4 @@
-import { m4 } from "../math/m4.js";
+import { Mat4 } from "../math/Mat4.js";
 import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
@@ -12,9 +12,9 @@ export class Light
      * 灯光矩阵
      * 绘制阴影贴图时使用
      * 带投影
-     * @type {m4}
+     * @type {Mat4}
      */
-    cMat = m4.zero();
+    cMat = Mat4.zero();
 
     /**
      * 绑定的场景

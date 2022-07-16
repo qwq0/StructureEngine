@@ -1,5 +1,6 @@
-import { m4 } from "../../math/m4.js";
-import { v4 } from "../../math/v4.js";
+import { smoothMoveSymbol } from "../../manager/SmoothMove.js";
+import { Mat4 } from "../../math/Mat4.js";
+import { Vec4 } from "../../math/Vec4.js";
 import { forEach } from "../../util/forEach.js";
 
 /**
@@ -79,16 +80,16 @@ export class SceneObject
     /**
      * 世界矩阵
      * @package
-     * @type {m4}
+     * @type {Mat4}
      */
-    wMat = new m4();
+    wMat = new Mat4();
 
     /**
      * 局部矩阵
      * @private
-     * @type {m4}
+     * @type {Mat4}
      */
-    lMat = new m4();
+    lMat = new Mat4();
 
     /**
      * 子节点
@@ -141,6 +142,14 @@ export class SceneObject
      * @type {import("./ObjFaces").ObjFaces}
      */
     faces = null;
+
+    /**
+     * 附加数据
+     * 如物理引擎的数据等
+     * @package
+     * @type {Object<symbol | string, any>}
+     */
+    addi = {};
 
     /**
      * 包围球半径
@@ -221,7 +230,7 @@ export class SceneObject
     {
         if (this.needUpdate) // 需要更新
         {
-            this.lMat = new m4().
+            this.lMat = new Mat4().
                 translation(this.x, this.y, this.z). // 平移
                 rotateQuatRH(this.rx, this.ry, this.rz, this.rw). // 旋转
                 scale(this.sx, this.sy, this.sz); // 缩放
@@ -243,19 +252,19 @@ export class SceneObject
     /**
      * 获取世界坐标
      * 需要先更新矩阵
-     * @returns {v4} xyz为坐标 w恒定为1
+     * @returns {Vec4} xyz为坐标 w恒定为1
      */
     getWorldPos()
     {
         var wMat = this.wMat;
-        return new v4(wMat.a[12], wMat.a[13], wMat.a[14]);
+        return new Vec4(wMat.a[12], wMat.a[13], wMat.a[14]);
     }
 
     /**
      * 获取世界视图投影矩阵
      * 只包含旋转和缩放没有平移
      * 需要先更新矩阵
-     * @returns {m4}
+     * @returns {Mat4}
      */
     getWorldViewProjectionMat()
     {
@@ -277,7 +286,7 @@ export class SceneObject
             var wvpMat = this.getWorldViewProjectionMat();
             var maxR = 0;
             for (var i = 0; i < pos.length; i += 3)
-                maxR = Math.max(maxR, (new v4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
+                maxR = Math.max(maxR, (new Vec4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
             this.boundingSphereR = maxR;
         }
     }
@@ -294,22 +303,8 @@ export class SceneObject
         this.y = y;
         this.z = z;
         this.needUpdate = true;
-        if(this.spCB)
+        if (this.spCB)
             this.spCB(this);
-    }
-
-    /**
-     * 设置缩放
-     * @param {number} sx
-     * @param {number} sy
-     * @param {number} sz
-     */
-    setScale(sx, sy, sz)
-    {
-        this.sx = sx;
-        this.sy = sy;
-        this.sz = sz;
-        this.needUpdate = true;
     }
 
     /**
@@ -326,7 +321,21 @@ export class SceneObject
         this.rz = rz;
         this.rw = rw;
         this.needUpdate = true;
-        if(this.spCB)
+        if (this.spCB)
             this.spCB(this);
+    }
+
+    /**
+     * 设置缩放
+     * @param {number} sx
+     * @param {number} sy
+     * @param {number} sz
+     */
+    setScale(sx, sy, sz)
+    {
+        this.sx = sx;
+        this.sy = sy;
+        this.sz = sz;
+        this.needUpdate = true;
     }
 }

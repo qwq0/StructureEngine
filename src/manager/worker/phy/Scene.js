@@ -74,7 +74,7 @@ export class Scene
     {
         var body = new RigidBody(Shape.cube(sx, sy, sz), mass, x, y, z, 0, 0, 0, 1);
         this.world.addRigidBody(body);
-        body.setDamping(0.01, 0.05);
+        body.setDamping(0.02, 0.05);
         this.addSceneObject(sn, body);
     }
 

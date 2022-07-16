@@ -1,4 +1,4 @@
-import { v3, V3 } from "../../math/v3.js";
+import { Vec3, newV3 } from "../../math/Vec3.js";
 import { forEach } from "../../util/forEach.js";
 import { ObjFaces } from "../scene/ObjFaces.js";
 import { SceneObject } from "../scene/SceneObject.js";
@@ -84,7 +84,7 @@ export class ObjC
 
         var faces = new ObjCFaces();
 
-        /** @type {Map<number | string, v3>} */
+        /** @type {Map<number | string, Vec3>} */
         var defaultNormalMap = new Map();
         /** @type {Array<[number, number | string]>} */
         var defaultNormalList = [];
@@ -95,7 +95,7 @@ export class ObjC
         function addFace(vert)
         {
             var positionsInd = [-1, -1, -1];
-            /** @type {Array<v3>} */
+            /** @type {Array<Vec3>} */
             var positions = [null, null, null];
             var texcoords = [null, null, null];
             var normals = [null, null, null];
@@ -105,12 +105,12 @@ export class ObjC
                 if (parts[0]) // 顶点索引
                 {
                     var objInd = parseInt(parts[0]);
-                    positions[i] = V3(ret.positions[
+                    positions[i] = newV3(ret.positions[
                         positionsInd[i] = (objInd + (objInd >= 0 ? 0 : ret.positions.length))
                     ]);
                 }
                 else
-                    positions[i] = new v3();
+                    positions[i] = new Vec3();
                 if (parts[1]) // 纹理索引
                 {
                     var objInd = parseInt(parts[1]);
@@ -142,7 +142,7 @@ export class ObjC
                     var key = positionsInd[i];
                     defaultNormalMap.set(key,
                         defaultNormal.add(
-                            defaultNormalMap.has(key) ? defaultNormalMap.get(key) : new v3()
+                            defaultNormalMap.has(key) ? defaultNormalMap.get(key) : new Vec3()
                         )
                     );
                     defaultNormalList.push([faces.norm.length, key]);

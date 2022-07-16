@@ -1,6 +1,7 @@
 import { SceneObject } from "../gl/scene/SceneObject.js";
-import { v3 } from "../math/v3.js";
+import { Vec3 } from "../math/Vec3.js";
 import { proxyCallback } from "../util/callbackHandler.js";
+import { SmoothMove, smoothMoveSymbol } from "./SmoothMove.js";
 
 /**
  * 场景管理类
@@ -36,9 +37,13 @@ export class Manager
     {
         this.worker = new Worker("../src/manager/worker/worker.js", { type: "module" });
 
+        var last = Date.now();
         this.worker.addEventListener("message", (e) => // 从worker发来的数据
         {
             var data = e.data;
+            var now = Date.now();
+            var et = now - last;
+            last = now;
             if (data.objects)
             {
                 /**
@@ -51,14 +56,12 @@ export class Manager
                     var obj = this.sMap.get(info[0]);
                     if (obj)
                     {
-                        obj.x = info[1];
-                        obj.y = info[2];
-                        obj.z = info[3];
-                        obj.rx = info[4];
-                        obj.ry = info[5];
-                        obj.rz = info[6];
-                        obj.rw = info[7];
-                        obj.needUpdate = true;
+                        /**
+                         * @type {SmoothMove}
+                         */
+                        var sm = obj.addi[smoothMoveSymbol];
+                        sm.setPosition(info[1], info[2], info[3]);
+                        sm.setRotation(info[4], info[5], info[6], info[7]);
                     }
                 }
                 this.simulateCount++;
@@ -98,12 +101,25 @@ export class Manager
     }
 
     /**
+     * 每帧调用
+     */
+    tick()
+    {
+        this.sMap.forEach(o =>
+        {
+            if (o.addi[smoothMoveSymbol])
+                o.addi[smoothMoveSymbol].tick(Date.now());
+        });
+    }
+
+    /**
      * @param {SceneObject} e
      * @param {number} mass
      */
     addCube(e, mass)
     {
         e.spCB = e => this.updatePosition(e);
+        e.addi[smoothMoveSymbol] = new SmoothMove(e);
         this.sMap.set(e.sn, e);
         this.worker.postMessage({
             objects: [{
@@ -140,7 +156,7 @@ export class Manager
 
     /**
      * @param {SceneObject} e
-     * @param {v3} force
+     * @param {Vec3} force
      */
     setLinearForce(e, force)
     {

@@ -1,4 +1,4 @@
-import { v3 } from "../../math/v3.js";
+import { Vec3 } from "../../math/Vec3.js";
 import { KeyboardMap } from "../KeyboardMap.js";
 
 /**
@@ -7,7 +7,7 @@ import { KeyboardMap } from "../KeyboardMap.js";
  * 事件绑定到body
  * 返回一个函数 每次渲染前调用 传递移动系数(与时间成正比) 返回运动向量
  * @param {import("../../index.js").Camera} camera
- * @returns {function(number): v3}
+ * @returns {function(number): Vec3}
  */
 export function keyboardWASD(camera)
 {
@@ -15,7 +15,7 @@ export function keyboardWASD(camera)
 
     return ((factor) =>
     {
-        var ret = new v3();
+        var ret = new Vec3();
 
         var speedX = 0, speedZ = 0;
         if (keyMap.get("w"))

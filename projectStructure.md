@@ -8,9 +8,10 @@
     - 活动的(当前)
         - 重构渲染结构
         - 将所有渲染封装到渲染类 而不是相机和灯光中
-        - 完善glsl着色器生成器
+        - 添加骨骼
         - 更新项目结构描述
         - 优化渲染
+        - 添加屏幕空间环境光遮蔽
 
     - 重要的
         - 绘制gui
@@ -84,10 +85,12 @@
     - 管理场景 - manager/
         - worker线程(详见下方) - worker/
         - 场景管理(与worker通信) - Manager.js
+        - 平滑运动 - SmoothMove.js
     - 数学 - math/
-        - 4*4矩阵 - m4.js
-        - 3向量 - v3.js
-        - 4向量 - v4.js
+        - 4*4矩阵 - Mat4.js
+        - 四元数 - Quaternion.js.js
+        - 3轴向量 - Vec3.js
+        - 4轴向量 - Vec4.js
     - 实用工具函数和类 - util/
         - 管理回调 - callbackHandler.js
         - 遍历数组 - forEach.js
@@ -107,6 +110,7 @@
 # 渲染流程
 
 ## 图像的原始渲染
+(此部分与项目不同步 需要更新)
 由相机类完成
 - 相机 - src/gl/Camera.js
     - 调用 draw 方法 (绘制图像)
@@ -147,13 +151,19 @@
 - 渲染线程 -> worker
     - isReady
         - 作为worker发送的isReady的回应
-    - objects
-        - 添加物体到worker中
+    - objects 一个数组
+        - 一个对象
+            - 添加物体到worker中
+        - 一个数组 长度为8
+            - 修改物体的位置角度
+        - 一个数组 长度为4
+            - 设置物体的力
 - worker -> 渲染进程
     - isReady
         - 当worker初始化完成后发送
-    - objects
-        - 传递物体的位置角度等数据
+    - objects 一个数组
+        - 一个数组 长度为8
+            - 传递物体的位置角度数据
 
 # 坐标规范
 x z 水平坐标轴   

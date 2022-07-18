@@ -194,12 +194,14 @@ export class SceneObject
             return;
         if (this.scene)
         { // 清除原区域中的关联
+            scene.snMap.delete(this.sn);
             if (this.id)
                 this.scene.idMap.delete(this.id);
         }
         this.scene = scene;
         if (scene)
         { // 在新区域中建立关联
+            scene.snMap.set(this.sn, this);
             if (this.id)
                 scene.idMap.set(this.id, this);
         }
@@ -219,6 +221,21 @@ export class SceneObject
         o.parent = this;
         o.needUpdate = true;
         this.c.push(o);
+    }
+
+    /**
+     * 从所在场景中删除此节点
+     */
+    remove()
+    {
+        var parentC = this.parent.c;
+        for (var i = 0, Li = parentC.length; i < Li; i++)
+            if (parentC[i] == this)
+            {
+                parentC.splice(i, 1);
+                break;
+            }
+        this.setScene(null);
     }
 
     /**

@@ -19,7 +19,7 @@ export class Manager
      * 物体sn对应表
      * @type {Map<number, SceneObject>}
      */
-    sMap = new Map();
+    snMap = new Map();
 
     /**
      * 场景管理worker(线程)
@@ -53,7 +53,7 @@ export class Manager
                 for (var i = 0; i < objA.length; i++)
                 {
                     var info = objA[i];
-                    var obj = this.sMap.get(info[0]);
+                    var obj = this.snMap.get(info[0]);
                     if (obj)
                     {
                         /**
@@ -105,7 +105,7 @@ export class Manager
      */
     tick()
     {
-        this.sMap.forEach(o =>
+        this.snMap.forEach(o =>
         {
             if (o.addi[smoothMoveSymbol])
                 o.addi[smoothMoveSymbol].tick(Date.now());
@@ -120,7 +120,7 @@ export class Manager
     {
         e.spCB = e => this.updatePosition(e);
         e.addi[smoothMoveSymbol] = new SmoothMove(e);
-        this.sMap.set(e.sn, e);
+        this.snMap.set(e.sn, e);
         this.worker.postMessage({
             objects: [{
                 sn: e.sn,

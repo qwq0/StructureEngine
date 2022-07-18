@@ -13,6 +13,13 @@ export class ObjFaces
      */
     pos = null;
     /**
+     * 顶点相对坐标向量
+     * 每个顶点3个(1个向量)
+     * 每个面9个(每个面3个顶点)
+     * @type {Uint32Array}
+     */
+    ind = null;
+    /**
      * 法线方向向量(每个顶点3个(1个向量), 每个面9个(每个面3个顶点))
      * @type {Float32Array}
      */
@@ -71,8 +78,9 @@ export class ObjFaces
      * @param {Float32Array | Array<number>} texPos
      * @param {Float32Array | Array<number>} normal
      * @param {number} [mode]
+     * @param {Uint32Array | Array<number>} [ind]
      */
-    constructor(pos, tex, texPos, normal, mode = WebGL2RenderingContext.TRIANGLES)
+    constructor(pos, tex, texPos, normal, mode = WebGL2RenderingContext.TRIANGLES, ind = null)
     {
         if (pos instanceof Float32Array)
             this.pos = pos;
@@ -92,6 +100,13 @@ export class ObjFaces
         else
             this.normal = new Float32Array(normal);
         this.mode = mode;
+        if (ind)
+        {
+            if (ind instanceof Uint32Array)
+                this.ind = ind;
+            else
+                this.ind = new Uint32Array(ind);
+        }
     }
 
     /**
@@ -166,5 +181,37 @@ export class ObjFaces
             0, // 坐标间间隔(无间隔)
             0 // 缓冲区偏移(从开头开始)
         );
+
+        if (this.ind) // 有索引
+        {
+            let indexBuffer = gl.createBuffer(); // 创建缓冲区
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer); // 绑定缓冲区(切换当前正在操作的缓冲区)
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.ind, gl.STATIC_DRAW); // 送入数据
+        }
+    }
+
+    /**
+     * 转换使用索引数组的面信息
+     * [!] 不建议使用
+     * @param {Float32Array | Array<number>} pos
+     * @param {import("../texture/Texture").Texture} tex
+     * @param {Float32Array | Array<number>} texPos
+     * @param {Float32Array | Array<number>} normal
+     * @param {number} mode
+     * @param {Uint32Array | Array<number>} ind
+     */
+    static convertInd(pos, tex, texPos, normal, mode, ind)
+    {
+        var nPos = new Float32Array(ind.length * 3);
+        var nTexPos = new Float32Array(ind.length * 2);
+        var nNormal = new Float32Array(ind.length * 3);
+        ind.forEach((/** @type {number} */ o, /** @type {number} */ i) =>
+        {
+            [nPos[i * 3 + 0], nPos[i * 3 + 1], nPos[i * 3 + 2]] = [pos[o * 3 + 0], pos[o * 3 + 1], pos[o * 3 + 2]];
+            [nTexPos[i * 2 + 0], nTexPos[i * 2 + 1]] = [texPos[o * 2 + 0], texPos[o * 2 + 1]];
+            [nNormal[i * 3 + 0], nNormal[i * 3 + 1], nNormal[i * 3 + 2]] = [normal[o * 3 + 0], normal[o * 3 + 1], normal[o * 3 + 2]];
+        });
+        var ret = new ObjFaces(nPos, tex, nTexPos, nNormal, mode);
+        return ret;
     }
 }

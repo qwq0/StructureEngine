@@ -8,10 +8,10 @@ import { Manager } from "../src/manager/Manager.js";
 import { create_cube, initContext, ObjC, touchBind, KeyboardMap } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
-import { Mat4 } from "../src/math/Mat4.js";
 import { TextureTable } from "../src/gl/texture/TextureTable.js";
 import { mouseRotatingBind } from "../src/controller/preset/mouseRotating.js";
 import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
+import { loadGLTF } from "../src/gl/object/GltfC.js";
 
 
 (async function ()
@@ -67,11 +67,15 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
         fpsCount++;
 
         var moveVec = wasdUpdate(timeChange * 0.02 * (keyMap.get("Shift") ? 120 : 50));
-        manager.setLinearForce(cubeC, moveVec);
+        // manager.setLinearForce(cubeC, moveVec);
         manager.tick();
-        camera.x = cubeC.x;
-        camera.y = cubeC.y + 3;
-        camera.z = cubeC.z;
+        // camera.x = cubeC.x;
+        // camera.y = cubeC.y + 3;
+        // camera.z = cubeC.z;
+
+        camera.x += moveVec.x * 0.01;
+        camera.y += moveVec.y * 0.01;
+        camera.z += moveVec.z * 0.01;
 
         //light.renderShadow();
 
@@ -133,17 +137,25 @@ import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
             }
     (async () =>
     {
-        let objObj = await ObjC.fromWavefrontObj(await (await fetch("./yunjin/yunjin.obj")).text(), "./yunjin/");
-        let obj = objObj.createSceneObject(ct.gl);
+        let obj = await loadGLTF("./yunjin/yunjin.gltf", ct.gl);
         obj.id = "yunjin";
+        obj.setScale(10, 10, 10);
         scene.addChild(obj);
     })();
+    // (async () =>
+    // {
+    //     let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
+    //     let obj = objObj.createSceneObject(ct.gl);
+    //     obj.id = "ying";
+    //     obj.setPosition(15, 0, 0);
+    //     scene.addChild(obj);
+    // })();
     (async () =>
     {
-        let objObj = await ObjC.fromWavefrontObj(await (await fetch("./ying/ying.obj")).text(), "./ying/");
-        let obj = objObj.createSceneObject(ct.gl);
+        let obj = await loadGLTF("./ying/ying.gltf", ct.gl);
         obj.id = "ying";
         obj.setPosition(15, 0, 0);
+        obj.setScale(10, 10, 10);
         scene.addChild(obj);
     })();
     let cubeC = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));

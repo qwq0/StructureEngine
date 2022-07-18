@@ -166,7 +166,10 @@ export class Render
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理
                 gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-                gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
+                if (faces.ind)
+                    gl.drawElements(faces.mode, faces.ind.length, gl.UNSIGNED_INT, 0); // 绘制数据(使用索引数组)
+                else
+                    gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
             }
             else // 实例化绘图
             {

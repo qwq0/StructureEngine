@@ -21,6 +21,12 @@ export class Scene
      */
     idMap = new Map();
     /**
+     * 场景中物体sn与物品对象的对应map
+     * @package
+     * @type {Map<number, SceneObject>}
+     */
+    snMap = new Map();
+    /**
      * 绑定的webgl上下文
      * @package
      * @type {WebGL2RenderingContext}

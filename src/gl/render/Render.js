@@ -1,6 +1,7 @@
 import { Mat4 } from "../../math/Mat4.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { GlslProgram } from "../shader/GlslProgram.js";
+import { instantiatedDraw } from "./InstantiatedDraw.js";
 import { RenderPool } from "./RenderPool.js";
 import { occlusionCull } from "./renderUtil.js";
 
@@ -14,7 +15,7 @@ export class Render
      * 渲染池
      * @type {RenderPool}
      */
-    pool = new RenderPool();
+    pool = null;
 
     /**
      * 绑定的webgl上下文
@@ -39,7 +40,7 @@ export class Render
 
     /**
      * 绑定的场景
-     * @private
+     * @package
      * @type {import("../scene/Scene").Scene}
      */
     scene = null;
@@ -56,6 +57,7 @@ export class Render
 
     /**
      * 开启遮挡剔除
+     * 通常不建议开启 可能使性能降低
      * @type {boolean}
      */
     occlusion = false;
@@ -70,6 +72,7 @@ export class Render
         this.scene = scene;
         this.gl = scene.gl;
         this.program = program;
+        this.pool = new RenderPool(this.gl);
     }
 
     /**
@@ -81,10 +84,12 @@ export class Render
         this.scene.obje.updateCMat(); // 更新场景中物体的矩阵
         this.rtRList(this.scene.obje, this.judge); // 得到渲染列表
         this.draw(cb); // 绘制图像
+        this.pool.clear(Date.now()); // 清理缓存
     }
 
     /**
-     * 递归遍历 获取渲染列表
+     * 递归遍历场景树
+     * 获取渲染列表
      * @param {SceneObject} sObj
      * @param {function(SceneObject): number} [judge]
      */
@@ -165,64 +170,14 @@ export class Render
                 this.program.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理
-                gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
+                gl.bindVertexArray(this.pool.getVao(faces, Date.now())); // 绑定顶点数组(切换当前正在操作的顶点数组)
                 if (faces.ind)
                     gl.drawElements(faces.mode, faces.ind.length, gl.UNSIGNED_INT, 0); // 绘制数据(使用索引数组)
                 else
                     gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制数据
             }
             else // 实例化绘图
-            {
-                let program = this.scene.ct.program.cameraInstance;
-                program.use(); // 切换着色器组(渲染程序)
-                program.uniformMatrix4fv("u_cameraMatrix", this.cMat.a); // 设置相机矩阵
-                gl.colorMask(true, true, true, true); // 允许写入颜色
-                gl.depthMask(true); // 允许写入深度
-
-                var faces = obje[0].faces; // 面数据
-
-                if (faces.tex) // 如果有纹理
-                    faces.tex.bindTexture(0); // 绑定纹理
-
-                {
-                    // 这里绑定了vao会导致此vao发生污染(因为多了u_worldMatrix的vbo)
-                    gl.bindVertexArray(faces.vao); // 绑定顶点数组(切换当前正在操作的顶点数组)
-
-                    const matrixData = new Float32Array(obje.length * 16); // 每个物体一个矩阵 一个矩阵16个浮点数
-
-                    obje.forEach((o, i) => matrixData.set(o.wMat.a, i * 16)); // 设置矩阵数据
-
-                    const matrixLoc = gl.getAttribLocation(program.progra, "u_worldMatrix");
-                    const matrixBuffer = gl.createBuffer();
-                    gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
-
-                    gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, gl.DYNAMIC_DRAW);
-
-                    const bytesPerMatrix = 4 * 16;
-                    for (let i = 0; i < 4; i++)
-                    {
-                        const loc = matrixLoc + i;
-                        gl.enableVertexAttribArray(loc);
-
-                        const offset = i * 16;
-                        gl.vertexAttribPointer(
-                            loc,
-                            4,
-                            gl.FLOAT,
-                            false,
-                            bytesPerMatrix,
-                            offset,
-                        );
-
-                        gl.vertexAttribDivisor(loc, 1);
-                    }
-
-                    gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
-                    gl.bufferSubData(gl.ARRAY_BUFFER, 0, matrixData);
-                }
-
-                gl.drawArraysInstanced(faces.mode, 0, faces.posLen, obje.length); // 绘制数据(实例化绘制多个物体)
-            }
+                instantiatedDraw(gl, obje, this);
         });
     }
 }

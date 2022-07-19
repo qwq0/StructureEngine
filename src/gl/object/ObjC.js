@@ -65,7 +65,6 @@ export class ObjC
         {
             var obj = new SceneObject();
             obj.faces = new ObjFaces(o.pos, texTab.fromUrl(o.tex), o.texPos, o.norm);
-            obj.faces.update(gl);
             ret.addChild(obj);
         });
         return ret;

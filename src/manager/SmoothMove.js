@@ -1,7 +1,10 @@
 import { SceneObject } from "../gl/scene/SceneObject.js";
 import { Quaternion } from "../math/Quaternion.js";
 
-
+/**
+ * 平滑移动标志
+ * 将SmoothMove绑定到SceneObject.addi上
+ */
 export const smoothMoveSymbol = Symbol("smoothMoveSymbol");
 /**
  * 平滑移动场景中的物体

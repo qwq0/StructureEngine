@@ -91,13 +91,13 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
     /* 向场景添加物体 */
 
     {
-        let square = create_square(ct.gl, light.shadowTex.depthTex);
+        let square = create_square(light.shadowTex.depthTex);
         square.setScale(64, 64, 1);
         square.setPosition(0, 0, 100);
         scene.addChild(square);
     }
     {
-        let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
+        let cubeF = create_cube(texTab.fromUrl("./cube.png"));
         cubeF.id = "cubeF";
         cubeF.setScale(16, 1, 16);
         cubeF.setPosition(0, -9, 0);
@@ -105,14 +105,14 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         manager.addCube(cubeF, 0);
     }
     {
-        let cube0 = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+        let cube0 = create_cube(texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
         cube0.id = "cube0";
         cube0.setPosition(0, 3, 0);
         scene.addChild(cube0);
         manager.addCube(cube0, 1);
     }
     {
-        let cubeF = create_cube(ct.gl, texTab.fromUrl("./cube.png"));
+        let cubeF = create_cube(texTab.fromUrl("./cube.png"));
         cubeF.id = "cubeF1";
         cubeF.setScale(80, 1, 80);
         cubeF.setPosition(15, -10, 25);
@@ -123,7 +123,7 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         for (let y = 0; y < 20; y += 3)
             for (let z = 0; z < 20; z += 3)
             {
-                let cube = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+                let cube = create_cube(texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
                 cube.id = "cube" + x + "," + y + "," + z;
                 cube.setScale(1, 1, 1);
                 cube.setPosition(x + 10 + Math.random() * 0.3, y, z + 20 + Math.random() * 0.3);
@@ -158,7 +158,7 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         obj.setScale(10, 10, 10);
         scene.addChild(obj);
     })();
-    let cubeC = create_cube(ct.gl, texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
+    let cubeC = create_cube(texTab.fromUrl("./WoodFloor045_1K_Color.jpg"));
     {
         cubeC.id = "cubeC";
         cubeC.setPosition(0, 3, 0);
@@ -195,7 +195,7 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         RBDiv.addEventListener("contextmenu", e => { e.preventDefault(); return false; });
         let addButton = (/** @type {HTMLDivElement} */ holder, /** @type {string} */ text,
             /** @type {string | number} */ x, /** @type {string | number} */ y, /** @type {string | number} */ w, /** @type {string | number} */ h,
-            /** @type {Function} */ callback) =>
+            /** @type {function(boolean): void} */ callback) =>
         {
             let button = holder.appendChild(document.createElement("div"));
             button.innerText = text;

@@ -138,15 +138,13 @@ var cubeTexOff = new Float32Array([
 var instanceMap = new Map();
 /**
  * @returns {SceneObject}
- * @param {WebGL2RenderingContext} gl
  * @param {import("../texture/Texture").Texture} tex
  */
-export function create_cube(gl, tex)
+export function create_cube(tex)
 {
     var obje = new SceneObject();
-    var faces = obje.faces = new ObjFaces(cubeVer, tex, cubeTexOff, cubeNormal, gl.TRIANGLES);
+    var faces = obje.faces = new ObjFaces(cubeVer, tex, cubeTexOff, cubeNormal, WebGL2RenderingContext.TRIANGLES);
 
-    faces.update(gl);
     if(instanceMap.has(tex))
         faces.instance = instanceMap.get(tex);
     else

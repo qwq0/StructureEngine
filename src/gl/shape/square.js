@@ -28,15 +28,13 @@ var squareTexOff = new Float32Array([
 
 /**
  * @returns {SceneObject}
- * @param {WebGL2RenderingContext} gl
  * @param {import("../texture/Texture").Texture} tex
  */
-export function create_square(gl, tex)
+export function create_square(tex)
 {
     var obje = new SceneObject();
-    var faces = obje.faces = new ObjFaces(squareVer, tex, squareTexOff, squareNormal, gl.TRIANGLES);
+    var faces = obje.faces = new ObjFaces(squareVer, tex, squareTexOff, squareNormal, WebGL2RenderingContext.TRIANGLES);
 
-    faces.update(gl);
 
     return obje;
 }

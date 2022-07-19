@@ -112,7 +112,6 @@ export async function loadGLTF(url, gl)
                         WebGL2RenderingContext.TRIANGLES,
                         accessors[p.indices]
                     );
-                    sObj.faces.update(gl);
                     obj.addChild(sObj);
                 }
             });

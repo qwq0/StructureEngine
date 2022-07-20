@@ -452,6 +452,36 @@ export class Mat4
         return this;
     }
     /**
+     * 旋转矩阵(旋转顺序ZXY)
+     * 将改变原矩阵
+     * @param {number} rx
+     * @param {number} ry
+     * @param {number} rz
+     * @returns {Mat4}
+     */
+    rotateZXY(rx, ry, rz)
+    {
+        this.rotateZ(rz);
+        this.rotateX(rx);
+        this.rotateY(ry);
+        return this;
+    }
+    /**
+     * 旋转矩阵(旋转顺序YXZ)
+     * 将改变原矩阵
+     * @param {number} rx
+     * @param {number} ry
+     * @param {number} rz
+     * @returns {Mat4}
+     */
+    rotateYXZ(rx, ry, rz)
+    {
+        this.rotateY(ry);
+        this.rotateX(rx);
+        this.rotateZ(rz);
+        return this;
+    }
+    /**
      * 旋转矩阵(根据四元数旋转(右手螺旋))
      * 不会改变原矩阵
      * @param {number} rx

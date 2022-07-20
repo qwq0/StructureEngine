@@ -1,3 +1,5 @@
+import { Mat4 } from "./Mat4.js";
+
 /**
  * 3轴向量类
  */
@@ -109,7 +111,6 @@ export class Vec3
 
     /**
      * 取三维向量的模(长度)
-     * 只使用xyz
      * @returns {number}
      */
     len()
@@ -118,8 +119,40 @@ export class Vec3
     }
 
     /**
+     * 乘以一个Mat4矩阵左上角的3*3矩阵
+     * (向量 乘 矩阵)
+     * @param {Mat4} m
+     * @returns {Vec3}
+     */
+    mulPartOfM4(m)
+    {
+        var a = m.a;
+        return new Vec3(
+            (this.x * a[0]) + (this.y * a[4]) + (this.z * a[8]),
+            (this.x * a[1]) + (this.y * a[5]) + (this.z * a[9]),
+            (this.x * a[2]) + (this.y * a[6]) + (this.z * a[10])
+        );
+    }
+
+    /**
+     * 补全为Vec4后乘Mat4矩阵
+     * 返回前三维组成的Vec3
+     * (向量 乘 矩阵)
+     * @param {Mat4} m
+     * @returns {Vec3}
+     */
+    v4MulM4(m)
+    {
+        var a = m.a;
+        return new Vec3(
+            (this.x * a[0]) + (this.y * a[4]) + (this.z * a[8]) + a[12],
+            (this.x * a[1]) + (this.y * a[5]) + (this.z * a[9]) + a[13],
+            (this.x * a[2]) + (this.y * a[6]) + (this.z * a[10]) + a[14]
+        );
+    }
+
+    /**
      * 取三维向量的模(长度)的平方
-     * 只使用xyz
      * @returns {number}
      */
     lenSq()
@@ -140,6 +173,24 @@ export class Vec3
             return Math.acos(this.dot(v) / productOfLen);
         else
             return Math.PI * 0.5;
+    }
+
+    /**
+     * 欧拉角到方向向量
+     * 单位弧度
+     * [!]此方法可能存在错误
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @returns {Vec3}
+     */
+    static EulerToDirection(x, y, z)
+    {
+        return new Vec3(
+            -((Math.cos(y) * Math.sin(x) * Math.sin(z)) + (Math.sin(y) * Math.cos(z))),
+            (Math.cos(y) * Math.cos(z)) - (Math.sin(y) * Math.sin(x) * Math.sin(z)),
+            Math.cos(x) * Math.sin(z)
+        );
     }
 }
 /**

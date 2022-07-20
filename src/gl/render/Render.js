@@ -82,25 +82,25 @@ export class Render
     render(cb)
     {
         this.scene.obje.updateCMat(); // 更新场景中物体的矩阵
-        this.rtRList(this.scene.obje, this.judge); // 得到渲染列表
+        this.trRList(this.scene.obje, this.judge); // 得到渲染列表
         this.draw(cb); // 绘制图像
         this.pool.clear(Date.now()); // 清理缓存
     }
 
     /**
-     * 递归遍历场景树
+     * 遍历场景树
      * 获取渲染列表
      * @param {SceneObject} sObj
      * @param {function(SceneObject): number} [judge]
      */
-    rtRList(sObj, judge)
+    trRList(sObj, judge)
     {
         var rList = this.pool.rList;
         rList.length = 0; // 清空渲染列表
 
         /** @type {Map<symbol, Array<SceneObject>>} */
         var instanceMap = new Map();
-        const rt = (/** @type {SceneObject} */ obje) => // 递归遍历
+        const tr = (/** @type {SceneObject} */ obje) => // 遍历
         {
             /**
              * 标志位
@@ -123,9 +123,9 @@ export class Render
             }
 
             if ((!(flag & 2)) && obje.c) // 递归子节点
-                obje.c.forEach(rt);
-        }
-        rt(sObj);
+                obje.c.forEach(tr);
+        };
+        tr(sObj);
 
         instanceMap.forEach(o =>
         {

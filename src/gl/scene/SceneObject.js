@@ -1,5 +1,6 @@
 import { smoothMoveSymbol } from "../../manager/SmoothMove.js";
 import { Mat4 } from "../../math/Mat4.js";
+import { Vec3 } from "../../math/Vec3.js";
 import { Vec4 } from "../../math/Vec4.js";
 import { forEach } from "../../util/forEach.js";
 
@@ -297,14 +298,19 @@ export class SceneObject
      */
     updateBoundingSphere()
     {
-        if (this.boundingSphereR < 0)
+        if (this.boundingSphereR < 0) // 若没有生成包围圈
         {
             var pos = this.faces.pos;
             var wvpMat = this.getWorldViewProjectionMat();
-            var maxR = 0;
-            for (var i = 0; i < pos.length; i += 3)
-                maxR = Math.max(maxR, (new Vec4(pos[i], pos[i + 1], pos[i + 2])).mulM4(wvpMat).getV3Len());
-            this.boundingSphereR = maxR;
+            var maxR = 0; // 未缩放前的包围球大小
+            for (var i = 0; i < pos.length; i += 3) // 枚举每个顶点 取距离局部原点的最大距离
+                maxR = Math.max(maxR, Math.hypot(pos[i], pos[i + 1], pos[i + 2]));
+            var scaling = Math.max(
+                Math.hypot(wvpMat.a[0], wvpMat.a[4], wvpMat.a[8]),
+                Math.hypot(wvpMat.a[1], wvpMat.a[5], wvpMat.a[9]),
+                Math.hypot(wvpMat.a[2], wvpMat.a[6], wvpMat.a[10])
+            ); // 缩放比例
+            this.boundingSphereR = maxR * scaling;
         }
     }
 

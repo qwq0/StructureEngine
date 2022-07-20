@@ -14,6 +14,7 @@ export class SmoothMove
 {
     /**
      * 对应的SceneObject
+     * @package
      * @type {SceneObject}
      */
     obj = null;
@@ -70,12 +71,14 @@ export class SmoothMove
 
     /**
      * 预计完成时的毫秒时间戳
+     * @package
      * @type {number}
      */
     ecTs = 0;
 
     /**
      * 开始移动时的毫秒时间戳
+     * @package
      * @type {number}
      */
     stTs = 0;

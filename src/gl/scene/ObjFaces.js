@@ -9,19 +9,20 @@ export class ObjFaces
     /**
      * 顶点相对坐标向量
      * 每个顶点3个(1个向量)
-     * 每个面9个(每个面3个顶点)
+     * (无索引时)每个面9个(每个面3个顶点)
      * @type {Float32Array}
      */
     pos = null;
     /**
      * 顶点相对坐标向量
-     * 每个顶点3个(1个向量)
-     * 每个面9个(每个面3个顶点)
+     * 每个面3个
      * @type {Uint32Array}
      */
     ind = null;
     /**
-     * 法线方向向量(每个顶点3个(1个向量), 每个面9个(每个面3个顶点))
+     * 法线方向向量
+     * 每个顶点3个(1个向量)
+     * (无索引时)每个面9个(每个面3个顶点)
      * @type {Float32Array}
      */
     normal = null;
@@ -36,7 +37,9 @@ export class ObjFaces
      */
     tex = null;
     /**
-     * 纹理坐标向量(每个顶点2个(1个向量), 每个面6个(每个面3个纹理坐标))
+     * 纹理坐标向量
+     * 每个顶点2个(1个向量)
+     * (无索引时)每个面6个(每个面3个纹理坐标)
      * @type {Float32Array}
      */
     texPos = null;
@@ -46,16 +49,6 @@ export class ObjFaces
      * @type {number}
      */
     mode = 0;
-    /**
-     * 遮挡剔除查询
-     * @type {WebGLQuery}
-     */
-    query = null;
-    /**
-     * 遮挡剔除查询正在进行
-     * @type {boolean}
-     */
-    queryInProgress = false;
     /**
      * 此物体被遮挡
      * @type {boolean}

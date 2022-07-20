@@ -120,10 +120,10 @@ export class Camera
     draw()
     {
         this.npMat = new Mat4(). // 新矩阵
-            rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
+            rotateZXY(-this.rx, -this.ry, -this.rz). // 反向旋转
             translation(-this.x, -this.y, -this.z) // 反向平移
         this.cMat = Mat4.perspective(this.fov, this.gl.canvas.clientHeight / this.gl.canvas.clientWidth, this.near, this.far). // 透视投影矩阵
-            rotateXYZ(-this.rx, -this.ry, -this.rz). // 反向旋转
+            rotateZXY(-this.rx, -this.ry, -this.rz). // 反向旋转
             translation(-this.x, -this.y, -this.z) // 反向平移
         this.render.cMat = this.cMat; // 设置渲染器的相机矩阵
 

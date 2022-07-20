@@ -12,8 +12,12 @@ import { TextureTable } from "../src/gl/texture/TextureTable.js";
 import { mouseRotatingBind } from "../src/controller/preset/mouseRotating.js";
 import { keyboardWASD } from "../src/controller/preset/keyboardWASD.js";
 import { loadGLTF } from "../src/gl/object/GltfC.js";
+import { Ray } from "../src/manager/Ray.js";
+import { Vec3 } from "../src/math/Vec3.js";
+import { Mat4 } from "../src/math/Mat4.js";
+import { SceneObject } from "../src/gl/scene/SceneObject.js";
 
-
+console.time("Start-up Time");
 (async function ()
 {
     /* 初始化 */
@@ -30,17 +34,50 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
     debugDiv.style.left = "0.5em";
     debugDiv.style.top = "0.3em";
     debugDiv.style.textShadow = "0 0 2px rgb(255, 255, 255), 0 0 4px rgb(255, 255, 255), 0 0 6px rgb(255, 255, 255)";
+    var debugDiv1 = debugDiv.appendChild(document.createElement("div"));
+    var debugDiv2 = debugDiv.appendChild(document.createElement("div"));
     var fpsCount = 0;
     setInterval(() =>
     {
-        debugDiv.innerText = ([
+        debugDiv1.innerText = ([
             "fps: " + fpsCount,
             "tps: " + manager.simulateCount,
-            "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
         ]).join("\n");
         fpsCount = 0;
         manager.simulateCount = 0;
     }, 1000);
+    /**
+     * 获取祖先到当前节点的id列表
+     * @param {SceneObject} obj
+     */
+    function getObjAncestorId(obj)
+    {
+        return (obj.parent ? getObjAncestorId(obj.parent) + "->" : "") + (obj.id || obj["-REMARK-"] || "anon");
+    }
+    setInterval(() =>
+    {
+        var lookAtList = ray.traverseTest(scene.obje);
+        debugDiv2.innerText = ([
+            "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
+            "lookDirection: " + ray.direction.x.toFixed(2) + ", " + ray.direction.y.toFixed(2) + ", " + ray.direction.z.toFixed(2),
+            "lookAt: " + lookAtList.length,
+            "lookAtObj[0]: " + (lookAtList[0] ? getObjAncestorId(lookAtList[0].obj) : null),
+        ]).join("\n");
+    }, 80);
+    canvas.addEventListener("click", e => { console.log(ray.traverseTest(scene.obje)); });
+
+    var crosshair = document.body.appendChild(document.createElement("div"));
+    crosshair.innerText = "+";
+    crosshair.style.position = "fixed";
+    crosshair.style.fontSize = "19px";
+    crosshair.style.left = "50%";
+    crosshair.style.top = "50%";
+    crosshair.style.height = "1em";
+    crosshair.style.width = "1em";
+    crosshair.style.lineHeight = "1em";
+    crosshair.style.textAlign = "center";
+    crosshair.style.textShadow = "0px 1px 0 rgba(255, 255, 255, 0.3), 1px 0px 0 rgba(255, 255, 255, 0.3), -1px 0px 0 rgba(255, 255, 255, 0.3), 0px -1px 0 rgba(255, 255, 255, 0.3)";
+    crosshair.style.transform = "translate(-50%,-50%)";
 
     /* 创建场景和相机等 */
     var ct = initContext(canvas);
@@ -54,6 +91,10 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
 
     var light = new Light(scene);
     camera.lights.push(light);
+
+    console.log(camera);
+
+    var ray = new Ray();
 
     var wasdUpdate = keyboardWASD(camera);
     /**
@@ -76,6 +117,9 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         camera.x += moveVec.x * 0.01;
         camera.y += moveVec.y * 0.01;
         camera.z += moveVec.z * 0.01;
+
+        ray.setOrigin(camera.x, camera.y, camera.z);
+        ray.direction = (new Vec3(0, 0, -1)).mulPartOfM4(new Mat4().rotateYXZ(camera.rx, camera.ry, camera.rz));
 
         //light.renderShadow();
 
@@ -224,4 +268,5 @@ import { loadGLTF } from "../src/gl/object/GltfC.js";
         addButton(RBDiv, "C", (-2 - 1) * btSize, (-2 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("C", down));
         addButton(RBDiv, "Shift", (-1 - 1) * btSize, (-2 - 1) * btSize, btSize, btSize, down => triggerKeyboardEvent("Shift", down));
     }
+    console.timeEnd("Start-up Time");
 })();

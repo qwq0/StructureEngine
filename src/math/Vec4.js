@@ -1,3 +1,5 @@
+import { Mat4 } from "./Mat4.js";
+
 /**
  * 4轴向量类
  */
@@ -39,9 +41,9 @@ export class Vec4
     }
 
     /**
-     * 乘m4矩阵
+     * 乘Mat4矩阵
      * (向量 乘 矩阵)
-     * @param {import("./Mat4").Mat4} m
+     * @param {Mat4} m
      */
     mulM4(m)
     {
@@ -84,24 +86,6 @@ export class Vec4
     sub(v)
     {
         return new Vec4(this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w);
-    }
-
-
-    /**
-     * 欧拉角到方向向量
-     * 单位弧度
-     * @param {number} x
-     * @param {number} y
-     * @param {number} z
-     */
-    static Euler2Direction(x, y, z)
-    {
-        return new Vec4(
-            -((Math.cos(y) * Math.sin(x) * Math.sin(z)) + (Math.sin(y) * Math.cos(z))),
-            (Math.cos(y) * Math.cos(z)) - (Math.sin(y) * Math.sin(x) * Math.sin(z)),
-            Math.cos(x) * Math.sin(z),
-            0
-        );
     }
 
     /**

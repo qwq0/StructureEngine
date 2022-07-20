@@ -30,6 +30,16 @@ export function coneCull(obje, bsPos, fov)
 }
 
 /**
+ * 遮挡剔除查询标志
+ * 将 遮挡查询使用的WebGLQuery 绑定到ObjFaces上
+ */
+const querySymbol = Symbol("querySymbol");
+/**
+ * 遮挡剔除查询正在进行标志
+ * 将 遮挡查询是否正在进行boolean 绑定到ObjFaces上
+ */
+const queryInProgressSymbol = Symbol("queryInProgressSymbol");
+/**
  * 遮挡剔除判断
  * 在执行遮挡剔除判断前应该按照近到远排序
  * 注意: 此遮挡判断方案在大多数场景中并不能起到优化作用
@@ -51,19 +61,19 @@ export function occlusionCull(obje, gl, cMat)
     boundingBoxProgram.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
     boundingBoxProgram.uniformMatrix4fv("u_cameraMatrix", cMat.a); // 设置相机矩阵
 
-    if (faces.queryInProgress && gl.getQueryParameter(faces.query, gl.QUERY_RESULT_AVAILABLE)) // 查询已进行 且 结果可用
+    if (faces[queryInProgressSymbol] && gl.getQueryParameter(faces[querySymbol], gl.QUERY_RESULT_AVAILABLE)) // 查询已进行 且 结果可用
     {
-        faces.occluded = !gl.getQueryParameter(faces.query, gl.QUERY_RESULT); // 获取遮挡结果
-        faces.queryInProgress = false; // 设置为查询未进行
+        faces.occluded = !gl.getQueryParameter(faces[querySymbol], gl.QUERY_RESULT); // 获取遮挡结果
+        faces[queryInProgressSymbol] = false; // 设置为查询未进行
     }
-    if (!faces.queryInProgress) // 查询未进行
+    if (!faces[queryInProgressSymbol]) // 查询未进行
     {
-        if (!faces.query) // 没有webgl查询对象则创建
-            faces.query = gl.createQuery();
-        gl.beginQuery(gl.ANY_SAMPLES_PASSED_CONSERVATIVE, faces.query); // 启动异步查询 保守查询遮挡
+        if (!faces[querySymbol]) // 没有webgl查询对象则创建
+            faces[querySymbol] = gl.createQuery();
+        gl.beginQuery(gl.ANY_SAMPLES_PASSED_CONSERVATIVE, faces[querySymbol]); // 启动异步查询 保守查询遮挡
         gl.drawArrays(faces.mode, 0, faces.posLen); // 绘制顶点 此处绘制的内容将被查询
         gl.endQuery(gl.ANY_SAMPLES_PASSED_CONSERVATIVE); // 结束查询
-        faces.queryInProgress = true; // 设置为查询进行中
+        faces[queryInProgressSymbol] = true; // 设置为查询进行中
     }
 
     return faces.occluded;

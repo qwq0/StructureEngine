@@ -86,7 +86,7 @@ export class Camera
      * 要求返回一个标志位整数表示判断结果
      *  + &1 不渲染此物体的面
      *  + &2 不遍历此物体的子节点
-     * @type {function(import("../scene/SceneObject").SceneObject) : number}
+     * @type {function(import("../scene/SceneObject").SceneObject): number}
      */
     judge = null;
 
@@ -109,7 +109,7 @@ export class Camera
         this.render = new Render(scene, scene.ct.program.camera);
         this.render.judge = (obje =>
         {
-            return (obje.faces && coneCull(obje, obje.getWorldPos().mulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除
+            return (obje.faces && coneCull(obje, obje.getWorldPos().v4MulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除
         });
     }
 

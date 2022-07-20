@@ -1,11 +1,11 @@
 import { Mat4 } from "../../math/Mat4.js";
-import { Vec4 } from "../../math/Vec4.js";
+import { Vec3 } from "../../math/Vec3.js";
 
 /**
  * 视锥剔除判断
  * @param {import("../scene/SceneObject").SceneObject} obje 物体
- * @param {Vec4} bsPos 物体的包围球中心相对相机坐标(不含投影)
- * @param {number} fov 相机的角视场
+ * @param {Vec3} bsPos 物体的包围球中心相对相机坐标(不含投影)
+ * @param {number} fov 相机的(对角线)角视场 单位为弧度
  * @returns {boolean} 返回true则剔除
  */
 export function coneCull(obje, bsPos, fov)
@@ -21,7 +21,7 @@ export function coneCull(obje, bsPos, fov)
     */
     if (bsPos.z >= obje.boundingSphereR)
         return true;
-    var bsLen = bsPos.getV3Len(); // 球心和原点距离
+    var bsLen = bsPos.len(); // 球心和原点距离
     var angle = Math.acos(-bsPos.z / bsLen) - fov * 0.5; // 原点到球心与圆锥在对应方向母线的夹角
     if (angle < Math.PI / 2)
         return (Math.sin(angle) * bsLen >= obje.boundingSphereR);

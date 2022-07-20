@@ -270,12 +270,12 @@ export class SceneObject
     /**
      * 获取世界坐标
      * 需要先更新矩阵
-     * @returns {Vec4} xyz为坐标 w恒定为1
+     * @returns {Vec3} xyz为坐标
      */
     getWorldPos()
     {
         var wMat = this.wMat;
-        return new Vec4(wMat.a[12], wMat.a[13], wMat.a[14]);
+        return new Vec3(wMat.a[12], wMat.a[13], wMat.a[14]);
     }
 
     /**

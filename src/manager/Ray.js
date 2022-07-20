@@ -57,7 +57,9 @@ export class Ray
      */
     test(obj)
     {
-        // TODO 包围球优化
+        obj.updateBoundingSphere(); // 更新包围球
+        if (!raySphereIntersection(this.origin, this.direction, obj.getWorldPos(), obj.boundingSphereR)) // 若射线不与包围球相交则一定不与物体相交
+            return -1;
         var iwMat = obj.wMat.inverse(); // 物体世界矩阵的逆矩阵
         var origin = this.origin.v4MulM4(iwMat); // 将逆矩阵应用于射线方向
         var direction = this.direction.mulPartOfM4(iwMat); // 将逆向旋转和缩放应用于射线方向
@@ -131,6 +133,8 @@ export class Ray
 
 /**
  * 射线与三角形相交判断
+ * 若相交返回长度 否则返回undefined
+ * 若射线反向延长线相交则返回负数长度
  * @param {Vec3} orig 射线起点
  * @param {Vec3} dir 射线方向
  * @param {Vec3} v0 三角形的顶点0
@@ -203,4 +207,29 @@ function rayTriangleIntersection(orig, dir, v0, v1, v2)
     u *= fInvDet;
     v *= fInvDet;
     return t;
+}
+
+/**
+ * 射线与球体相交判断
+ * @param {Vec3} orig 射线起点
+ * @param {Vec3} dir 射线方向
+ * @param {Vec3} center 球的中心
+ * @param {number} radius 球的半径
+ * @returns {boolean}
+ */
+function raySphereIntersection(orig, dir, center, radius)
+{
+    var l = center.sub(orig);
+    var s = l.dot(dir);
+    var l2 = l.lenSq();
+    var r2 = radius * radius;
+    if (s < 0 && l2 > r2)
+        return false;
+    var s2 = s * s;
+    var m2 = l2 - s2;
+    if (m2 > r2)
+        return false;
+    var q = Math.sqrt(r2 - m2);
+    var t = (l2 > r2 ? s + q : s - q);
+    return true;
 }

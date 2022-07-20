@@ -1,7 +1,7 @@
 import { Mat4 } from "../../math/Mat4.js";
 import { SceneObject } from "../scene/SceneObject.js";
 import { GlslProgram } from "../shader/GlslProgram.js";
-import { instantiatedDraw } from "./InstantiatedDraw.js";
+import { instantiatedDraw } from "./instantiatedDraw.js";
 import { RenderPool } from "./RenderPool.js";
 import { occlusionCull } from "./renderUtil.js";
 

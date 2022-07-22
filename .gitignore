@@ -4,3 +4,4 @@ dist/structureEngine.iife.js
 dist/structureEngine.js.map
 dist/structureEngine.iife.js.map
 dist/worker.js.map
+node_modules/

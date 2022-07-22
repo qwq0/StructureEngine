@@ -1,4 +1,13 @@
 # Structure Engine 项目结构说明
+本项目使用的开发语言
+- JavaScript
+- Rust
+
+构建项目使用的工具
+- npm包
+    - rollup
+- cargo包
+    - wasm-pack
 
 # 此项目的当前状态
 

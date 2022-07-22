@@ -1,0 +1,26 @@
+{
+    "name": "structureengine",
+    "version": "1.0.0",
+    "description": "一个3d游戏引擎",
+    "main": "src/index.js",
+    "directories": {
+        "lib": "lib",
+        "test": "test"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/qwq0/StructureEngine.git"
+    },
+    "author": "qwq0 & ndzda",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/qwq0/StructureEngine/issues"
+    },
+    "homepage": "https://github.com/qwq0/StructureEngine#readme",
+    "devDependencies": {
+        "rollup": "^2.77.0"
+    }
+}

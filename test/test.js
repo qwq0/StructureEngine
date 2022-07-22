@@ -63,7 +63,7 @@ console.time("Start-up Time");
             "lookAt: " + lookAtList.length,
             "lookAtObj[0]: " + (lookAtList[0] ? getObjAncestorId(lookAtList[0].obj) : null),
         ]).join("\n");
-    }, 90);
+    }, 115);
     canvas.addEventListener("click", e => { console.log(ray.traverseTest(scene.obje)); });
 
     var crosshair = document.body.appendChild(document.createElement("div"));

@@ -100,12 +100,13 @@ export class Ray
     }
 
     /**
-     * 遍历子树检测相交
-     * @param {SceneObject} objRoot 需遍历的子树的根节点
+     * 遍历物体树检测相交
+     * @param {SceneObject} objRoot 需遍历的物体树的根节点
      * @returns {Array<{obj: SceneObject, distance: number}>} 从近到远的相交物体列表
      */
     traverseTest(objRoot)
     {
+        objRoot.updateCMat(); // 更新场景中物体树的矩阵
         /**
          * @type {Array<{obj: SceneObject, distance: number}>}
          */
@@ -165,11 +166,9 @@ function rayTriangleIntersection(orig, dir, v0, v1, v2)
     /**
      * @type {Vec3}
      */
-    let T = new Vec3();
+    let T = null;
     if (det > 0)
-    {
         T = orig.sub(v0);
-    }
     else
     {
         T = v0.sub(orig);
@@ -178,11 +177,12 @@ function rayTriangleIntersection(orig, dir, v0, v1, v2)
 
     if (det < 0.000001)
         return undefined;
-
+    /**
+     * @type {number}
+     */
     let u = T.dot(P);
     if (u < 0 || u > det)
         return undefined;
-
     /**
      * @type {Vec3}
      */
@@ -193,7 +193,6 @@ function rayTriangleIntersection(orig, dir, v0, v1, v2)
     let v = dir.dot(Q);
     if (v < 0 || u + v > det)
         return undefined;
-
     /**
      * @type {number}
      */

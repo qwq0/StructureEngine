@@ -27,4 +27,4 @@ jobs:
                   access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
                   
             - name: cp files to aliyun
-              run: ossutil cp -rf public oss://structureengine/
+              run: ossutil cp -rf ./ oss://structureengine/

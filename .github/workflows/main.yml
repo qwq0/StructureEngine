@@ -23,8 +23,8 @@ jobs:
               uses: manyuanrong/setup-ossutil@master
               with:
                   endpoint: oss-cn-hongkong.aliyuncs.com
-                  access-key-id: ${{ secrets.KEY }}
-                  access-key-secret: ${{ secrets.SECRET }}
+                  access-key-id: ${{ secrets.OSS_KEY_ID }}
+                  access-key-secret: ${{ secrets.OSS_KEY_SECRET }}
                   
             - name: cp files to aliyun
               run: ossutil cp -rf public oss://structureengine/

@@ -1,0 +1,30 @@
+# workflow name
+name: CI
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Repository master branch
+              uses: actions/checkout@master
+
+            - name: Setup Node.js 16.x
+              uses: actions/setup-node@master
+              with:
+                  node-version: '16.x'
+                  
+            - name: setup aliyun oss
+              uses: manyuanrong/setup-ossutil@master
+              with:
+                  endpoint: oss-cn-hongkong.aliyuncs.com
+                  access-key-id: ${{ secrets.KEY }}
+                  access-key-secret: ${{ secrets.SECRET }}
+                  
+            - name: cp files to aliyun
+              run: ossutil cp -rf public oss://structureengine/

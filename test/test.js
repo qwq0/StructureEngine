@@ -56,14 +56,21 @@ console.time("Start-up Time");
     }
     setInterval(() =>
     {
-        var lookAtList = ray.traverseTest(scene.obje);
-        debugDiv2.innerText = ([
-            "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
-            "lookDirection: " + ray.direction.x.toFixed(2) + ", " + ray.direction.y.toFixed(2) + ", " + ray.direction.z.toFixed(2),
-            "lookAt: " + lookAtList.length,
-            "lookAtObj[0]: " + (lookAtList[0] ? getObjAncestorId(lookAtList[0].obj) : null),
-        ]).join("\n");
-    }, 115);
+        try
+        {
+            var lookAtList = ray.traverseTest(scene.obje);
+            debugDiv2.innerText = ([
+                "cameraPos: " + camera.x.toFixed(2) + ", " + camera.y.toFixed(2) + ", " + camera.z.toFixed(2),
+                "lookDirection: " + ray.direction.x.toFixed(2) + ", " + ray.direction.y.toFixed(2) + ", " + ray.direction.z.toFixed(2),
+                "lookAt: " + lookAtList.length,
+                "lookAtObj[0]: " + (lookAtList[0] ? getObjAncestorId(lookAtList[0].obj) : null),
+            ]).join("\n");
+        }
+        catch
+        {
+            debugDiv2.innerText = "Waiting for loading...\n";
+        }
+    }, 125);
     canvas.addEventListener("click", e => { console.log(ray.traverseTest(scene.obje)); });
 
     var crosshair = document.body.appendChild(document.createElement("div"));

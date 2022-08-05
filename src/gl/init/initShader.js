@@ -42,7 +42,7 @@ export function initShader(gl, program)
             "const vec3 lightDir = normalize(vec3(0.3, -0.3, -1.0))", // 灯光方向向量
             "float diffLight = max(dot(normal, -lightDir), 0.0)", // 平行光漫反射
             "float reflLight = pow(max(dot(reflect(normalize(u_viewPos - v_thisPos), normal), lightDir), 0.0), 5.0)", // 平行光镜面反射
-            "float factorLight = (lightP.x>=0.0 && lightP.x<=1.0 && lightP.y>=0.0 && lightP.y<=1.0 && lightP.z>=-1.0 && lightP.z<=1.0 && texture(u_texS, lightP.xy).r + 0.001 * (1.0 - dot(normal,-lightDir)) < lightP.z * 0.5 + 0.5) ? 0.0 : 1.0", // 阴影
+            "float factorLight = (lightP.x>=0.0 && lightP.x<=1.0 && lightP.y>=0.0 && lightP.y<=1.0 && lightP.z>=-1.0 && lightP.z<=1.0 && texture(u_texS, lightP.xy).r + 0.01 * (1.0 - dot(normal,-lightDir)) < lightP.z * 0.5 + 0.5) ? 0.0 : 1.0", // 阴影
             "lightResult = 0.45 + (diffLight * 0.5 + reflLight * 0.08) * factorLight" // 光的总影响
         ];
         pGenerator.fOutColor = GlslGenerator.t_fOutColor.light;

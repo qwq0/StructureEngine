@@ -227,6 +227,7 @@ export class GlslGenerator
         return ([
             "#version 300 es",
             "precision highp float;",
+            // "precision highp sampler2D;",
 
             (() => // 片段着色器uniform
             {

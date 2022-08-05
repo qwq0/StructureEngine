@@ -21,12 +21,8 @@ export function instantiatedDraw(gl, objeArr, render)
 
     var faces = objeArr[0].faces; // 面数据
 
-    if (faces.tex) // 如果有纹理
-        faces.tex.bindTexture(0); // 绑定纹理
-
     {
-        // FIXME 这里绑定了vao会导致此vao发生污染(因为多了u_worldMatrix的vbo)
-        gl.bindVertexArray(render.pool.getVao(faces, Date.now())); // 绑定顶点数组(切换当前正在操作的顶点数组)
+        gl.bindVertexArray(render.pool.getInstanceVao(faces, Date.now())); // 绑定顶点数组(切换当前正在操作的顶点数组)
 
         const matrixData = new Float32Array(objeArr.length * 16); // 每个物体一个矩阵 一个矩阵16个浮点数
 
@@ -61,5 +57,7 @@ export function instantiatedDraw(gl, objeArr, render)
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, matrixData);
     }
 
+    if (faces.tex) // 如果有纹理
+        faces.tex.bindTexture(0); // 绑定纹理
     gl.drawArraysInstanced(faces.mode, 0, faces.posLen, objeArr.length); // 绘制数据(实例化绘制多个物体)
 }

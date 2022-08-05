@@ -1,7 +1,6 @@
 import { initShader } from "./init/initShader.js";
+import { RenderPool } from "./render/RenderPool.js";
 import { Scene } from "./scene/Scene.js";
-import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
-import { GlslProgram } from "./shader/GlslProgram.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
 /**
@@ -17,14 +16,22 @@ export class SEContext
      * @package
      * @type {WebGL2RenderingContext}
      */
-    gl;
+    gl = null;
 
     /**
      * canvas对象
      * @package
      * @type {HTMLCanvasElement}
      */
-    canvas;
+    canvas = null;
+
+    /**
+     * 渲染池对象
+     * 通常此上下文的所有渲染器共用此渲染池
+     * @package
+     * @type {RenderPool}
+     */
+    renderPool = null;
 
     /**
      * 通用着色器

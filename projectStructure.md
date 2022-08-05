@@ -1,12 +1,12 @@
 # Structure Engine 项目结构说明
 本项目使用的开发语言
 - JavaScript
-- Rust
+- Rust(即将)
 
 构建项目使用的工具
 - npm包
     - rollup
-- cargo包
+- cargo包(即将)
     - wasm-pack
 
 # 此项目的当前状态
@@ -26,9 +26,11 @@
         - 绘制gui
         - 渲染流程封装类
         - 将面信息中的标志从场景中的物体对象移动至渲染类
+        - 优化实例化绘图
 
     - 循环(定期)
         - 优化项目结构
+        - 更新项目结构描述
 
     - 未来
         - 将游戏逻辑允许移动到worker线程
@@ -55,11 +57,13 @@
             - 初始化上下文 - initContext.js
             - 初始化着色器 - initShader.js
         - 物体(模型) - object/
+            - gltf模型文件类 - GltfC.js
             - mtl材质文件类 - MtlC.js
             - mtl中单个材质信息类 - MtlCMaterial.js
             - obj模型文件类 - ObjC.js
             - ObjC中的一组面类 - ObjCFaces.js
         - 渲染 - render/
+            - 实例化绘图 - instantiatedDraw.js
             - 渲染器类 - Render.js
             - 渲染池类 - RenderPool.js
             - 渲染工具函数 - renderUtil.js
@@ -94,10 +98,11 @@
     - 管理场景 - manager/
         - worker线程(详见下方) - worker/
         - 场景管理(与worker通信) - Manager.js
+        - 射线类 - Ray.js
         - 平滑运动 - SmoothMove.js
     - 数学 - math/
         - 4*4矩阵 - Mat4.js
-        - 四元数 - Quaternion.js.js
+        - 四元数 - Quaternion.js
         - 3轴向量 - Vec3.js
         - 4轴向量 - Vec4.js
     - 实用工具函数和类 - util/
@@ -109,8 +114,10 @@
 - worker线程 - src/manager/worker/
     - 处理物理模拟 - phy/
         - 物理引擎接口封装 phyInterface/
-            - 刚体类 - RigidBody.js
-            - 世界类 - World.js
+            - 管理物理引擎上下文 - phyContext.js
+            - 刚体 - RigidBody.js
+            - 形状 - Shape.js
+            - 世界 - World.js
         - 场景封装 - Scene.js
         - 场景中的物体封装 - SceneObject.js
     - worker线程主程序 - worker.js
@@ -225,6 +232,7 @@ y 垂直坐标轴
                 - (默认未启用)标记颜色(调试)
 
 # glsl着色器生成器规范
+- 着色器生成器 - src/gl/shader/builder/ShaderBuilder.js
 - glsl着色器生成
     - 顶点着色器
         - 计算 屏幕空间顶点坐标

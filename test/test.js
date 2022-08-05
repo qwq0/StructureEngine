@@ -17,6 +17,14 @@ import { Vec3 } from "../src/math/Vec3.js";
 import { Mat4 } from "../src/math/Mat4.js";
 import { SceneObject } from "../src/gl/scene/SceneObject.js";
 
+if (location.hostname != "localhost" && location.hostname != "127.0.0.1")
+    alert([
+        "此页面为StructureEngine测试页",
+        `您正在访问来自 ${location.hostname} 的镜像页面`,
+        "这可能不是最新的测试页",
+        "最新测试页请到源代码仓库中获取",
+        "https://github.com/qwq0/StructureEngine"
+    ].join("\n"));
 console.time("Start-up Time");
 (async function ()
 {
@@ -128,7 +136,10 @@ console.time("Start-up Time");
         ray.setOrigin(camera.x, camera.y, camera.z);
         ray.direction = (new Vec3(0, 0, -1)).mulPartOfM4(new Mat4().rotateYXZ(camera.rx, camera.ry, camera.rz));
 
-        //light.renderShadow();
+        light.cMat = Mat4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, 85). // 透视投影矩阵
+            rotateZXY(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
+            translation(-camera.x, -camera.y, -camera.z) // 反向平移;
+        light.renderShadow();
 
         ct.clearFramebuffer();
         camera.draw();
@@ -143,8 +154,9 @@ console.time("Start-up Time");
 
     {
         let square = create_square(light.shadowTex.depthTex);
-        square.setScale(64, 64, 1);
-        square.setPosition(0, 0, 100);
+        square.id = "debugScreen";
+        square.setScale(64, -64, 1);
+        square.setPosition(0, 50, 100);
         scene.addChild(square);
     }
     {

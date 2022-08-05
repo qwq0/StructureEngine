@@ -1,5 +1,3 @@
-import { GlslProgram } from "../shader/GlslProgram.js";
-
 /**
  * [gl]物体的面数据
  * 此类的名称应为ObjMesh
@@ -14,7 +12,8 @@ export class ObjFaces
      */
     pos = null;
     /**
-     * 顶点相对坐标向量
+     * 顶点索引数组
+     * 可以没有此数组
      * 每个面3个
      * @type {Uint32Array}
      */
@@ -44,22 +43,19 @@ export class ObjFaces
      */
     texPos = null;
     /**
-     * 此物体的渲染模式 例如 gl.TRIANGLES
+     * 此物体的渲染模式
+     * 例如 gl.TRIANGLES
      * 暂时仅支持gl.TRIANGLES
      * @type {number}
      */
     mode = 0;
     /**
      * 此物体被遮挡
+     * 当物体实例化渲染时无效
+     * 当关闭遮挡剔除时不会被更新且无效
      * @type {boolean}
      */
     occluded = false;
-    /**
-     * 实例标志
-     * 相同代表可以实例化
-     * @type {symbol}
-     */
-    instance = null;
 
     /**
      * @param {Float32Array | Array<number>} pos

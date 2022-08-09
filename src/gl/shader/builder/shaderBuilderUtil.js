@@ -28,7 +28,7 @@ export const shaderBuilderUtil = {
      * 定义变量
      * @param {keyof shaderVariableType} type 类型
      * @param {string} name 变量名
-     * @param {SBENode} initValue 初始值
+     * @param {SBENode} [initValue] 初始值
      * @returns {ShaderBStatement}
      */
     defineVariable: (type, name, initValue) =>

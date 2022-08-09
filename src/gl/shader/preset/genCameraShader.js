@@ -10,12 +10,10 @@ export function genCameraShader()
     var builder = new ShaderBuilder();
     var vertexShaderPart = new ShaderBPart();
     vertexShaderPart.setPart([
-        sbt.defineVariable("mat3", "normalMatrix", SBENode.raw("transpose(inverse(mat3(u_worldMatrix)))")), // 得到法线矩阵(世界矩阵逆矩阵的转置矩阵)
-
         sbt.raw("gl_Position = u_cameraMatrix * u_worldMatrix * a_position"), // 转换到视图中坐标
         sbt.raw("v_texcoord = a_texcoord"), // 纹理坐标(插值)
         sbt.raw("v_thisPos = (u_worldMatrix * a_position).xyz"), // 顶点世界坐标(插值)
-        sbt.raw("v_normal = normalMatrix * a_normal"), // 法线(插值)
+        sbt.raw("v_normal = a_normalMatrix * a_normal"), // 法线(插值)
 
         sbt.raw("v_lightP = u_lightMat * u_worldMatrix * a_position"), // 物体在灯光视图中的坐标
     ]);

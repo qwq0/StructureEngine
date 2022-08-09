@@ -17,6 +17,7 @@ import { Vec3 } from "../src/math/Vec3.js";
 import { Mat4 } from "../src/math/Mat4.js";
 import { SceneObject } from "../src/gl/scene/SceneObject.js";
 
+/*
 if (location.hostname != "localhost" && location.hostname != "127.0.0.1")
     alert([
         "此页面为StructureEngine测试页",
@@ -25,6 +26,7 @@ if (location.hostname != "localhost" && location.hostname != "127.0.0.1")
         "最新测试页请到源代码仓库中获取",
         "https://github.com/qwq0/StructureEngine"
     ].join("\n"));
+*/
 console.time("Start-up Time");
 (async function ()
 {

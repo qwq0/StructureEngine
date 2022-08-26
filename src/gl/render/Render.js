@@ -15,6 +15,7 @@ export class Render
 {
     /**
      * 渲染池
+     * 所有渲染器类共用
      * @type {RenderPool}
      */
     pool = null;
@@ -82,8 +83,6 @@ export class Render
         this.scene = scene;
         this.gl = scene.gl;
         this.program = program;
-        if (!scene.ct.renderPool)
-            scene.ct.renderPool = new RenderPool(this.gl);
         this.pool = scene.ct.renderPool;
     }
 
@@ -158,9 +157,17 @@ function trRList(sObj, rList, judge)
 {
     rList.length = 0; // 清空渲染列表
 
-    /** @type {Map<ObjFaces, Array<SceneObject>>} */
+    /**
+     * 实例化map
+     * 面数据 到 使用此面数据的物体列表
+     * @type {Map<ObjFaces, Array<SceneObject>>}
+    */
     var instanceMap = new Map();
-    const tr = (/** @type {SceneObject} */ obje) => // 遍历
+    /**
+     * 遍历
+     * @param {SceneObject} obje 
+     */
+    const tr = (obje) =>
     {
         /**
          * 标志位
@@ -184,9 +191,10 @@ function trRList(sObj, rList, judge)
 
     instanceMap.forEach(o =>
     {
-        if (o.length == 1)
-            rList.push(o[0]);
-        else if (o.length > 1)
-            rList.push(o);
+        // if (o.length == 1)
+        //     rList.push(o[0]);
+        // else if (o.length > 1)
+        //     rList.push(o); // 实例化绘图
+        o.forEach(e => { rList.push(e); });
     });
 }

@@ -25,7 +25,7 @@ export class Scene
     objs = [];
 
     /**
-     * 物体列表
+     * 场景中物体sn与物品对象的对应map
      * @type {Map<number, import("./SceneObject").SceneObject>}
      */
     snMap = new Map();

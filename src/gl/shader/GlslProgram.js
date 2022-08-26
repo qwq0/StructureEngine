@@ -16,7 +16,8 @@ export class GlslProgram
 
     /**
      * uniform变量表
-     * @type {Object<string, object>}
+     * uniform名 到 uniform位置 映射
+     * @type {Object<string, WebGLUniformLocation>}
      */
     unif = Object.create(null);
 
@@ -31,15 +32,15 @@ export class GlslProgram
         this.progra = gl.createProgram(); // 创建渲染程序
 
         gl.attachShader(this.progra, // 绑定顶点着色器
-            createShader(gl, vertexShader, gl.VERTEX_SHADER)
+            createShader(gl, vertexShader, gl.VERTEX_SHADER) // 编译顶点着色器
         );
         gl.attachShader(this.progra, // 绑定片段着色器
-            createShader(gl, fragmentShader, gl.FRAGMENT_SHADER)
+            createShader(gl, fragmentShader, gl.FRAGMENT_SHADER) // 编译片段着色器
         );
 
         gl.linkProgram(this.progra); // 链接渲染程序
 
-        if (!gl.getProgramParameter(this.progra, gl.LINK_STATUS))
+        if (!gl.getProgramParameter(this.progra, gl.LINK_STATUS)) // 如果获取不到链接状态
         {
             var info = gl.getProgramInfoLog(this.progra);
             throw "Could not link WebGL program:\n" + info;
@@ -118,7 +119,7 @@ export class GlslProgram
 }
 
 /**
- * 创建一个着色器
+ * 创建(编译)一个着色器
  * @param {WebGL2RenderingContext} gl webgl上下文
  * @param {string} sourceCode 着色器源码
  * @param {number} type 着色器类型 gl.VERTEX_SHADER 或 gl.FRAGMENT_SHADER
@@ -130,7 +131,7 @@ function createShader(gl, sourceCode, type)
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))  // 如果获取不到编译状态
     {
         var info = gl.getShaderInfoLog(shader);
         throw "Could not compile WebGL program:\n" + info;

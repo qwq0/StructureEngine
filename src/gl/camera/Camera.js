@@ -2,13 +2,12 @@ import { Mat4 } from "../../math/Mat4.js";
 import { Light } from "../Light.js";
 import { Render } from "../render/Render.js";
 import { coneCull } from "../render/renderUtil.js";
-import { GlslGenerator } from "../shader/generator/GlslGenerator.js";
-import { GlslGenParam } from "../shader/generator/GlslGenParam.js";
 import { degToRad } from "../util/math.js";
 
 
 /**
  * 相机类
+ * 透视投影相机
  * 需要绑定到 场景类 和 webgl上下文
  */
 export class Camera
@@ -106,7 +105,7 @@ export class Camera
         this.gl = scene.gl;
 
 
-        this.render = new Render(scene, scene.ct.program.camera);
+        this.render = new Render(scene, scene.ct.shaderProgramManage.getProgram(["color"]));
         this.render.judge = (obje =>
         {
             return (obje.faces && coneCull(obje, obje.getWorldPos().v4MulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除

@@ -1,6 +1,5 @@
 import { Mat4 } from "../math/Mat4.js";
 import { Render } from "./render/Render.js";
-import { GlslGenerator } from "./shader/generator/GlslGenerator.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
 /**
@@ -44,7 +43,7 @@ export class Light
         this.scene = scene;
         this.gl = scene.gl;
         this.shadowTex = new Render2Texture(this.gl, 2000, 2000, false, true);
-        this.render = new Render(this.scene, scene.ct.program.white);
+        this.render = new Render(this.scene, scene.ct.shaderProgramManage.getProgram([]));
     }
 
     /**

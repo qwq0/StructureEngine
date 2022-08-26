@@ -66,7 +66,7 @@ export class Render2Texture
                 null // 图像源
             );
 
-            /* 设置筛选器 不需要使用贴图 */
+            // 设置过滤 不需要使用贴图
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -98,7 +98,7 @@ export class Render2Texture
                 null // 图像源
             );
 
-            /* 设置筛选器 不需要使用贴图 */
+            // 设置过滤 不需要使用贴图
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

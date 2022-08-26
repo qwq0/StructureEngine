@@ -1,6 +1,7 @@
-import { initShader } from "./init/initShader.js";
 import { RenderPool } from "./render/RenderPool.js";
 import { Scene } from "./scene/Scene.js";
+import { presetShader } from "./shader/preset/presetShader.js";
+import { ShaderProgramManage } from "./shader/ShaderProgramManage.js";
 import { Render2Texture } from "./texture/Render2Texture.js";
 
 /**
@@ -34,25 +35,12 @@ export class SEContext
     renderPool = null;
 
     /**
-     * 通用着色器
+     * 渲染池对象
+     * 通常此上下文的所有渲染器共用此渲染池
+     * @package
+     * @type {ShaderProgramManage}
      */
-    program = {
-        /**
-         * 绘制纯白色
-         * @type {import("./shader/GlslProgram").GlslProgram}
-         */
-        white: null,
-        /**
-         * 相机(绘制纹理色和光照)
-         * @type {import("./shader/GlslProgram").GlslProgram}
-         */
-        camera: null,
-        /**
-         * 相机实例化(绘制纹理色和光照)
-         * @type {import("./shader/GlslProgram").GlslProgram}
-         */
-        cameraInstance: null
-    };
+    shaderProgramManage = null;
 
     /**
      * @param {WebGL2RenderingContext} gl
@@ -63,7 +51,9 @@ export class SEContext
         this.gl = gl;
         this.canvas = canvas;
 
-        initShader(gl, this.program);
+        this.renderPool = new RenderPool(gl);
+        this.shaderProgramManage = new ShaderProgramManage(gl);
+        presetShader(this.shaderProgramManage.builder); // 预设着色器
     }
 
     /**

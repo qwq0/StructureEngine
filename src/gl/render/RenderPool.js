@@ -24,8 +24,12 @@ export const instanceVaoUsedSymbol = Symbol("vaoUsedSymbol");
 /**
  * 渲染池类
  * 多个渲染器类共享一个渲染池类
- * 管理webgl2接口的资源
  * 通常一个引擎上下文对应一个渲染池类
+ * 
+ * 管理webgl2接口的资源如:
+ *  + vao对象
+ *  + 着色器程序
+ * 
  * (此类基于webgl渲染)
  */
 export class RenderPool

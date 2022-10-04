@@ -132,6 +132,7 @@ export class Render
                 var faces = obje.faces; // 面数据
 
                 this.program.uniformMatrix4fv("u_worldMatrix", obje.wMat.a); // 设置世界矩阵
+                this.program.uniformMatrix3fv("u_normalMatrix", obje.wMat.ltMat3().inverse().transpose().a); // 设置法线矩阵
                 if (faces.tex) // 如果有纹理
                     faces.tex.bindTexture(0); // 绑定纹理
                 gl.bindVertexArray(this.pool.getVao(faces, Date.now())); // 绑定顶点数组(切换当前正在操作的顶点数组)
@@ -191,10 +192,10 @@ function trRList(sObj, rList, judge)
 
     instanceMap.forEach(o =>
     {
-        // if (o.length == 1)
-        //     rList.push(o[0]);
-        // else if (o.length > 1)
-        //     rList.push(o); // 实例化绘图
-        o.forEach(e => { rList.push(e); });
+        if (o.length == 1)
+            rList.push(o[0]);
+        else if (o.length > 1)
+            rList.push(o); // 实例化绘图
+        // o.forEach(e => { rList.push(e); });
     });
 }

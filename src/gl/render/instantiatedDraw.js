@@ -13,7 +13,7 @@ import { Render } from "./Render.js";
 export function instantiatedDraw(gl, objeArr, render)
 {
     // TODO 优化实例化绘图
-    let program = render.scene.ct.program.cameraInstance;
+    let program = render.scene.ct.shaderProgramManage.getProgram(["color", "instantiated"]);
     program.use(); // 切换着色器组(渲染程序)
     program.uniformMatrix4fv("u_cameraMatrix", render.cMat.a); // 设置相机矩阵
     gl.colorMask(true, true, true, true); // 允许写入颜色

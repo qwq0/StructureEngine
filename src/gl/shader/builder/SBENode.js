@@ -1,3 +1,4 @@
+import { SBStatement } from "./SBStatement.js";
 import { SBUse } from "./SBUse.js";
 
 /**
@@ -123,13 +124,14 @@ export class SBENode
     getUse()
     {
         var ret = new SBUse();
-        this.child.forEach(o =>
-        {
-            if (o instanceof SBENode)
+        if (this.child)
+            this.child.forEach(o =>
             {
-                ret.mix(o.getUse());
-            }
-        });
+                if (o instanceof SBENode)
+                {
+                    ret.mix(o.getUse());
+                }
+            });
         if (this.use)
             ret.mix(this.use);
         return ret;
@@ -227,7 +229,8 @@ export class SBENode
     static callFunc(name, ...param)
     {
         var ret = new SBENode("()", [name, ...param]);
-        ret.use = SBUse.create(o => { o.addReferenceFunction(name); });
+        ret.use = new SBUse();
+        ret.use.addReferenceFunction(name);
         return ret;
     }
     /**
@@ -236,10 +239,11 @@ export class SBENode
      * @param {string} type
      * @returns {SBENode}
      */
-    static in(name, type)
+    static in(name, type, local)
     {
         var ret = new SBENode("raw", [name]);
-        ret.use = SBUse.create(o => { o.addIn(name, type); });
+        ret.use = new SBUse();
+        ret.use.addIn(name, SBStatement.defineGlobalParameter(type, name, "in", local));
         return ret;
     }
     /**
@@ -251,7 +255,8 @@ export class SBENode
     static out(name, type)
     {
         var ret = new SBENode("raw", [name]);
-        ret.use = SBUse.create(o => { o.addOut(name, type); });
+        ret.use = new SBUse();
+        ret.use.addOut(name, SBStatement.defineGlobalParameter(type, name, "out"));
         return ret;
     }
     /**
@@ -263,7 +268,8 @@ export class SBENode
     static uniform(name, type)
     {
         var ret = new SBENode("raw", [name]);
-        ret.use = SBUse.create(o => { o.addUniform(name, type); });
+        ret.use = new SBUse();
+        ret.use.addUniform(name, SBStatement.defineGlobalParameter(type, name, "uniform"));
         return ret;
     }
     /**

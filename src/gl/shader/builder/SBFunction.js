@@ -27,6 +27,7 @@ export class SBFunction
     returnValueType = "void";
     /**
      * 函数的片段
+     * 此片段不用标记为代码块
      * @type {SBPart}
      */
     part = null;

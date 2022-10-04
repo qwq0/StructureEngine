@@ -2,15 +2,14 @@ import { SceneObject } from "../gl/scene/SceneObject.js";
 import { Quaternion } from "../math/Quaternion.js";
 
 /**
- * 平滑移动标志
- * 将SmoothMove绑定到SceneObject.addi上
+ * 运动动画标志
+ * 将Motion绑定到SceneObject.addi上
  */
-export const smoothMoveSymbol = Symbol("smoothMoveSymbol");
+export const MotionSymbol = Symbol("MotionSymbol");
 /**
- * 平滑移动场景中的物体
- * 因为物理引擎的tps小于渲染fps
+ * 给场景中的物体添加运动动画
  */
-export class SmoothMove
+export class Motion
 {
     /**
      * 对应的SceneObject
@@ -137,20 +136,15 @@ export class SmoothMove
             //     this.needUpdate = false;
             //     return;
             // }
-            var factorT = 0.25; // 新坐标比例
-            var factorO = 1 - factorT; // 原坐标比例
-
-            // 位置坐标插值
+            var factorT = 0.25;
+            var factorO = 1 - factorT;
             o.x = this.x * factorT + o.x * factorO;
             o.y = this.y * factorT + o.y * factorO;
             o.z = this.z * factorT + o.z * factorO;
-
-            // 四元数插值
             var qO = new Quaternion(o.rx, o.ry, o.rz, o.rw);
             var qT = new Quaternion(this.rx, this.ry, this.rz, this.rw);
             var qN = qT.slerp(qO, factorT);
             ({ x: o.rx, y: o.ry, z: o.rz, w: o.rw } = qN);
-
             o.needUpdate = true;
         }
     }

@@ -83,19 +83,19 @@ export class ShaderBuilder
                 (() => // 定义uniform
                 {
                     var ret = [];
-                    allUse.uniform.forEach((type, name) => { ret.push(`uniform ${type} ${name};`); });
+                    allUse.uniform.forEach(o => { ret.push(o.getStr() + ";"); });
                     return ret;
                 })(),
                 (() => // 定义in
                 {
                     var ret = [];
-                    allUse.in.forEach((type, name) => { ret.push(`in ${type} ${name};`); });
+                    allUse.in.forEach(o => { ret.push(o.getStr() + ";"); });
                     return ret;
                 })(),
                 (() => // 定义out
                 {
                     var ret = [];
-                    allUse.out.forEach((type, name) => { ret.push(`out ${type} ${name};`); });
+                    allUse.out.forEach(o => { ret.push(o.getStr() + ";"); });
                     return ret;
                 })(),
 
@@ -127,5 +127,7 @@ export class ShaderBuilder
  */
 function addLineNumber(str)
 {
-    return str.split("\n").map((o, i) => (i + 1).toString().padStart(5, "0") + " | " + o).join("\n");
+    var arr = str.split("\n");
+    var fillLength = arr.length.toString().length;
+    return arr.map((o, i) => (i + 1).toString().padStart(fillLength, "0") + " | " + o).join("\n");
 }

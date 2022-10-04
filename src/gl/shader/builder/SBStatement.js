@@ -72,6 +72,7 @@ export class SBStatement
         }
         return ret;
     }
+
     /**
      * 定义常量
      * @param {`${("float"|"int"|"bool"|"vec4"|"vec3"|"vec2"|"mat4"|"mat3"|"mat2"|"imat4"|"ivec4")}${(""|"[]"|`[${number}]`)}`} type 类型
@@ -90,10 +91,11 @@ export class SBStatement
         }
         return ret;
     }
+
     /**
      * 直接使用表达式字符串创建ShaderBStatement
      * shaderRawStatement
-     * @param {Array<string>} code
+     * @param {Array<string | SBENode>} code
      * @returns {SBStatement}
      */
     static raw(...code)
@@ -102,7 +104,7 @@ export class SBStatement
         ret.contentNode = SBENode.raw(...code);
         return ret;
     }
-    
+
     /**
      * 使用SBENode对象创建ShaderBStatement
      * @param {SBENode} node
@@ -112,6 +114,21 @@ export class SBStatement
     {
         var ret = new SBStatement();
         ret.contentNode = node;
+        return ret;
+    }
+
+    /**
+     * 定义全局参数
+     * @param {string} type 类型
+     * @param {string} name 常量名
+     * @param {"uniform" | "in" | "out"} paramType 参数类型
+     * @param {number} [location] 位置
+     * @returns {SBStatement}
+     */
+    static defineGlobalParameter(type, name, paramType, location) 
+    {
+        var ret = new SBStatement();
+        ret.prefixString = `${(location != undefined ? `layout (location=${location}) ` : "")}${paramType} ${type} ${name}`;
         return ret;
     }
 }

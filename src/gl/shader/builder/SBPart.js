@@ -26,6 +26,13 @@ export class SBPart
     useArr = [];
 
     /**
+     * 代码块
+     * 非代码块不会生成大括号
+     * @type {boolean}
+     */
+    codeBlock = false;
+
+    /**
      * 获取此片段的字符串
      * @returns {string}
      */
@@ -37,11 +44,17 @@ export class SBPart
             if (o instanceof SBStatement)
                 return strArr.push(o.getStr() + ";");
             else if (o instanceof SBPart)
-                return strArr.push("{\n" + o.getStr() + "\n}");
+                return strArr.push(o.getStr());
             else
                 throw "ShaderBPart(ShaderBuilderPart) error: getStr error";
         });
-        return strArr.join("\n");
+        var ret = strArr.join("\n");
+        if (ret == "")
+            return "";
+        else if (this.codeBlock)
+            return "{\n" + ret + "\n}";
+        else
+            return ret;
     }
 
     /**
@@ -55,7 +68,7 @@ export class SBPart
         {
             if (o instanceof SBStatement || o instanceof SBPart)
                 this.content.push(o);
-            else if(o instanceof SBENode)
+            else if (o instanceof SBENode)
                 this.content.push(SBStatement.node(o));
             else if (o instanceof SBUse)
                 this.useArr.push(o);

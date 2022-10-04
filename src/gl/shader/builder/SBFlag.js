@@ -108,14 +108,11 @@ export class SBFlag
             {
                 var targetThis = (this.flagStateSet.has(flagSN) ? ifTrue : ifFalse);
                 var ret = targetThis[property];
-                if (typeof (ret) == "function")
-                    return (/** @type {function} */(ret)).bind(targetThis);
-                else
-                    return ret;
+                return ret;
             },
             set: (_target, property, value) =>
             {
-                (this.flagStateSet.has(this.flagMap.get(flagName)) ? ifTrue : ifFalse)[property] = value;
+                (this.flagStateSet.has(flagSN) ? ifTrue : ifFalse)[property] = value;
                 return true;
             }
         }));

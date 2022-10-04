@@ -1,3 +1,4 @@
+import { SBFlag } from "./builder/SBFlag.js";
 import { ShaderBuilder } from "./builder/ShaderBuilder.js";
 import { GlslProgram } from "./GlslProgram.js";
 

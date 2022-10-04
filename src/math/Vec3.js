@@ -137,6 +137,7 @@ export class Vec3
     /**
      * 补全为Vec4后乘Mat4矩阵
      * 返回前三维组成的Vec3
+     * 等效于与Mat4矩阵左上角Mat3相乘
      * (向量 乘 矩阵)
      * @param {Mat4} m
      * @returns {Vec3}

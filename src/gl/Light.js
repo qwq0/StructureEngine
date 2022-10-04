@@ -42,7 +42,7 @@ export class Light
     {
         this.scene = scene;
         this.gl = scene.gl;
-        this.shadowTex = new Render2Texture(this.gl, 2000, 2000, false, true);
+        this.shadowTex = new Render2Texture(this.gl, 1500, 1500, false, true);
         this.render = new Render(this.scene, scene.ct.shaderProgramManage.getProgram([]));
     }
 
@@ -55,6 +55,8 @@ export class Light
         this.shadowTex.bindFramebuffer(); // 渲染到纹理(帧缓冲区)
 
         this.render.cMat = this.cMat;
+        this.gl.enable(this.gl.CULL_FACE); // (三角形方向)面剔除
+        this.gl.cullFace(this.gl.FRONT); // 剔除正面 渲染背面
         this.render.render();
     }
 }

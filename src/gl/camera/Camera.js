@@ -58,7 +58,7 @@ export class Camera
      * 视锥最远面距离
      * @type {number}
      */
-    far = 450;
+    far = 5000;
 
 
 
@@ -108,7 +108,16 @@ export class Camera
         this.render = new Render(scene, scene.ct.shaderProgramManage.getProgram(["color"]));
         this.render.judge = (obje =>
         {
-            return (obje.faces && coneCull(obje, obje.getWorldPos().v4MulM4(this.npMat), this.fov) ? 1 : 0); // 视锥剔除
+            if (obje.faces)
+            {
+                var worldPos = obje.getWorldPos(); // 世界坐标
+                var cameraSpatialPos = worldPos.v4MulM4(this.npMat); // 相机(不包含投影)空间坐标 (相对相机坐标)
+                if (coneCull(obje, cameraSpatialPos, this.fov)) // 视锥剔除
+                    return 1;
+                if (cameraSpatialPos.len() > 1000) // 远距离剔除
+                    return 1;
+            }
+            return 0;
         });
     }
 
@@ -126,6 +135,8 @@ export class Camera
             translation(-this.x, -this.y, -this.z) // 反向平移
         this.render.cMat = this.cMat; // 设置渲染器的相机矩阵
 
+        this.gl.enable(this.gl.CULL_FACE); // (三角形方向)面剔除
+        this.gl.cullFace(this.gl.BACK); // 剔除背面 渲染正面
         this.render.render(program => // 渲染
         { // 设置着色器uniform
             program.uniform3f("u_viewPos", this.x, this.y, this.z); // 视点坐标(相机坐标)
@@ -135,6 +146,7 @@ export class Camera
             {
                 this.lights[0].shadowTex.depthTex.bindTexture(1); // 绑定阴影贴图
                 program.uniformMatrix4fv("u_lightMat", this.lights[0].cMat.a); // 设置灯光投影
+                program.uniform3f("u_lightPos", this.x, this.y, this.z); // 设置灯光坐标
             }
         });
     }

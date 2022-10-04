@@ -5,7 +5,7 @@
  */
 import { degToRad } from "../src/gl/util/math.js";
 import { Manager } from "../src/manager/Manager.js";
-import { create_cube, initContext, ObjC, touchBind, KeyboardMap } from "../src/index.js";
+import { create_cube, initContext, KeyboardMap, Texture } from "../src/index.js";
 import { Light } from "../src/gl/Light.js";
 import { create_square } from "../src/gl/shape/square.js";
 import { TextureTable } from "../src/gl/texture/TextureTable.js";
@@ -138,10 +138,8 @@ console.time("Start-up Time");
         ray.setOrigin(camera.x, camera.y, camera.z);
         ray.direction = (new Vec3(0, 0, -1)).mulPartOfM4(new Mat4().rotateYXZ(camera.rx, camera.ry, camera.rz));
 
-        light.cMat = Mat4.perspective(camera.fov, camera.gl.canvas.clientHeight / camera.gl.canvas.clientWidth, camera.near, 85). // 透视投影矩阵
-            rotateZXY(-camera.rx, -camera.ry, -camera.rz). // 反向旋转
-            translation(-camera.x, -camera.y, -camera.z) // 反向平移;
-        light.renderShadow();
+        light.cMat = camera.cMat;
+        // light.renderShadow();
 
         ct.clearFramebuffer();
         camera.draw();
@@ -157,7 +155,7 @@ console.time("Start-up Time");
     {
         let square = create_square(light.shadowTex.depthTex);
         square.id = "debugScreen";
-        square.setScale(64, -64, 1);
+        square.setScale(64, 64, 1);
         square.setPosition(0, 50, 100);
         scene.addChild(square);
     }
@@ -200,6 +198,20 @@ console.time("Start-up Time");
                 scene.addChild(cube);
                 manager.addCube(cube, 1);
             }
+    for (let x = -150; x < 150; x++)
+        for (let z = -150; z < 150; z++)
+        {
+            let cube = create_cube(texTab.fromUrl("./cube.png"));
+            cube.id = "cubeF" + x + "," + z;
+            cube.setScale(30, 1, 30);
+            cube.setPosition(x * 30, -15, z * 30);
+            //let quat = v4.Euler2Quaternion(0.5, 0, 0);
+            //cube.rx = quat.x;
+            //cube.ry = quat.y;
+            //cube.rz = quat.z;
+            //cube.rw = quat.w;
+            scene.addChild(cube);
+        }
     (async () =>
     {
         let obj = await loadGLTF("./yunjin/yunjin.gltf", ct.gl);
@@ -229,6 +241,28 @@ console.time("Start-up Time");
         cubeC.setPosition(0, 3, 0);
         scene.addChild(cubeC);
         manager.addCube(cubeC, 1);
+    }
+    {
+        let debugElementSquare = create_square(new Texture(ct.gl));
+        debugElementSquare.id = "debugElement";
+        debugElementSquare.setScale(16 * 1.6, 16 * 0.9, 1);
+        debugElementSquare.setPosition(0, 50, 50);
+        scene.addChild(debugElementSquare);
+        //let debugElementDiv = document.createElement("div");
+        //debugElementDiv.innerText = "test";
+        //debugElementDiv.style.backgroundColor = "white";
+        //debugElementDiv.style.position = "fixed";
+        //debugElementDiv.style.left = "-0.5px";
+        //debugElementDiv.style.top = "-0.5px";
+        //debugElementDiv.style.width = "1px";
+        //debugElementDiv.style.height = "1px";
+        //document.body.appendChild(debugElementDiv);
+        //setInterval(() =>
+        //{
+        //    debugElementDiv.style.transform = "matrix3d(" +
+        //        debugElementSquare.wMat.multiply(camera.cMat).
+        //            translation(1, 1, 0).scale(document.body.clientWidth / 2, document.body.clientHeight / 2, 1).a.map(o => o.toFixed(3)).join(",") + ")";
+        //}, 100);
     }
 
     // console.log(scene);

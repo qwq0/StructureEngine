@@ -1,26 +1,27 @@
+import { SBStatement } from "./SBStatement.js";
+
 /**
  * 着色器使用到的变量信息
  * ShaderBuilderUse
  */
 export class SBUse
 {
-    // TODO 改成变量名到定义语句的映射
     /**
      * 此函数需要的uniform参数列表
      * 参数名到参数类型的映射
-     * @type {Map<string, string>}
+     * @type {Map<string, SBStatement>}
      */
     uniform = new Map();
     /**
      * 此函数需要的in参数列表
      * 参数名到参数类型的映射
-     * @type {Map<string, string>}
+     * @type {Map<string, SBStatement>}
      */
     in = new Map();
     /**
      * 此函数需要的out参数列表
      * 参数名到参数类型的映射
-     * @type {Map<string, string>}
+     * @type {Map<string, SBStatement>}
      */
     out = new Map();
     /**
@@ -55,32 +56,32 @@ export class SBUse
 
     /**
      * 添加uniform参数
-     * @param {string} name
-     * @param {string} type
+     * @param {string} name 参数名
+     * @param {SBStatement} statement 参数定义语句
      */
-    addUniform(name, type)
+    addUniform(name, statement)
     {
-        this.uniform.set(name, type);
+        this.uniform.set(name, statement);
     }
 
     /**
      * 添加in参数
-     * @param {string} name
-     * @param {string} type
+     * @param {string} name 参数名
+     * @param {SBStatement} statement 参数定义语句
      */
-    addIn(name, type)
+    addIn(name, statement)
     {
-        this.in.set(name, type);
+        this.in.set(name, statement);
     }
 
     /**
      * 添加out参数
-     * @param {string} name
-     * @param {string} type
+     * @param {string} name 参数名
+     * @param {SBStatement} statement 参数定义语句
      */
-    addOut(name, type)
+    addOut(name, statement)
     {
-        this.out.set(name, type);
+        this.out.set(name, statement);
     }
 
     /**
@@ -90,19 +91,6 @@ export class SBUse
     addReferenceFunction(functionName)
     {
         this.referenceFunction.add(functionName);
-    }
-
-    /**
-     * 创建SBUse对象
-     * 此函数使用创建的SBUse对象调用回调
-     * 并返回创建的SBUse对象
-     * @param {function(SBUse): void} cb 回调
-     */
-    static create(cb)
-    {
-        var ret = new SBUse();
-        cb(ret);
-        return ret;
     }
 }
 

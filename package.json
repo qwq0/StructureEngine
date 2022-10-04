@@ -21,6 +21,6 @@
     },
     "homepage": "https://github.com/qwq0/StructureEngine#readme",
     "devDependencies": {
-        "rollup": "^2.77.0"
+        "rollup": "^2.79.1"
     }
 }

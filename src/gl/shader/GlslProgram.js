@@ -64,26 +64,38 @@ export class GlslProgram
     }
 
     /**
-     * 设置着色器的uniformMatrix4值(32位浮点数)
+     * 设置着色器的uniform Matrix4值(32位浮点数)
      * @param {string} name 
      * @param {Float32Array | Array<number>} value 
      */
     uniformMatrix4fv(name, value)
     {
-        if (!this.unif[name])
+        if (this.unif[name] === undefined)
             this.unif[name] = this.gl.getUniformLocation(this.progra, name);
         this.gl.uniformMatrix4fv(this.unif[name], false, value);
     }
 
     /**
-     * 设置着色器的uniformMatrix4值(32位浮点数)
+     * 设置着色器的uniform Matrix3值(32位浮点数)
+     * @param {string} name 
+     * @param {Float32Array | Array<number>} value 
+     */
+    uniformMatrix3fv(name, value)
+    {
+        if (this.unif[name] === undefined)
+            this.unif[name] = this.gl.getUniformLocation(this.progra, name);
+        this.gl.uniformMatrix3fv(this.unif[name], false, value);
+    }
+
+    /**
+     * 设置着色器的uniform Matrix4值(32位浮点数)
      * 开启转置
      * @param {string} name 
      * @param {Float32Array | Array<number>} value 
      */
     uniformMatrix4fv_tr(name, value)
     {
-        if (!this.unif[name])
+        if (this.unif[name] === undefined)
             this.unif[name] = this.gl.getUniformLocation(this.progra, name);
         this.gl.uniformMatrix4fv(this.unif[name], true, value);
     }
@@ -97,7 +109,7 @@ export class GlslProgram
      */
     uniform3f(name, x, y, z)
     {
-        if (!this.unif[name])
+        if (this.unif[name] === undefined)
             this.unif[name] = this.gl.getUniformLocation(this.progra, name);
         this.gl.uniform3f(this.unif[name], x, y, z);
     }
@@ -112,7 +124,7 @@ export class GlslProgram
      */
     uniform4f(name, x, y, z, w)
     {
-        if (!this.unif[name])
+        if (this.unif[name] === undefined)
             this.unif[name] = this.gl.getUniformLocation(this.progra, name);
         this.gl.uniform4f(this.unif[name], x, y, z, w);
     }

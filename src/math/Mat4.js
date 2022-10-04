@@ -1,3 +1,4 @@
+import { Mat3 } from "./Mat3.js";
 import { Vec4 } from "./Vec4.js";
 
 /**
@@ -476,18 +477,12 @@ export class Mat4
      */
     scale(sx, sy, sz)
     {
-        this.a[0 * 4 + 0] *= sx;
-        this.a[0 * 4 + 1] *= sx;
-        this.a[0 * 4 + 2] *= sx;
-        this.a[0 * 4 + 3] *= sx;
-        this.a[1 * 4 + 0] *= sy;
-        this.a[1 * 4 + 1] *= sy;
-        this.a[1 * 4 + 2] *= sy;
-        this.a[1 * 4 + 3] *= sy;
-        this.a[2 * 4 + 0] *= sz;
-        this.a[2 * 4 + 1] *= sz;
-        this.a[2 * 4 + 2] *= sz;
-        this.a[2 * 4 + 3] *= sz;
+        for (var i = 0; i < 4; i++)
+        {
+            this.a[0 * 4 + i] *= sx;
+            this.a[1 * 4 + i] *= sy;
+            this.a[2 * 4 + i] *= sz;
+        }
         return this;
     }
 
@@ -505,5 +500,20 @@ export class Mat4
             (v.x * a[8]) + (v.y * a[9]) + (v.z * a[10]) + (v.w * a[11]),
             (v.x * a[12]) + (v.y * a[13]) + (v.z * a[14]) + (v.w * a[15])
         );
+    }
+
+    /**
+     * 取左上角的Mat3矩阵
+     * 新矩阵不会影响原矩阵
+     * @returns {Mat3}
+     */
+    ltMat3()
+    {
+        var a = this.a;
+        return new Mat3([
+            a[0 * 4 + 0], a[0 * 4 + 1], a[0 * 4 + 2],
+            a[1 * 4 + 0], a[1 * 4 + 1], a[1 * 4 + 2],
+            a[2 * 4 + 0], a[2 * 4 + 1], a[2 * 4 + 2]
+        ]);
     }
 }

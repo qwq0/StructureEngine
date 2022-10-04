@@ -50,7 +50,7 @@ export class Render2Texture
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer); // 绑定帧缓冲
         this.frameBuffer = frameBuffer;
 
-        if(useColorTexture)
+        if (useColorTexture)
         { // 颜色
             let colorTexture = gl.createTexture(); // 创建颜色纹理
             gl.bindTexture(gl.TEXTURE_2D, colorTexture); // 绑定颜色纹理
@@ -67,7 +67,8 @@ export class Render2Texture
             );
 
             // 设置过滤 不需要使用贴图
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
@@ -82,7 +83,7 @@ export class Render2Texture
             this.colorTex = new Texture(gl, colorTexture);
         }
 
-        if(useDepthTexture)
+        if (useDepthTexture)
         { // 深度缓冲
             let depthTexture = gl.createTexture(); // 创建深度纹理
             gl.bindTexture(gl.TEXTURE_2D, depthTexture); // 绑定深度纹理
@@ -124,5 +125,30 @@ export class Render2Texture
     {
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
         this.gl.viewport(0, 0, this.textureWidth, this.textureHeight);
+    }
+
+    /**
+     * 绘制此帧缓冲区到屏幕
+     * 可用于调试
+     * 仅绘制颜色缓冲区
+     * 禁用抗锯齿
+     * @param {number} x0
+     * @param {number} y0
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} [srcX0]
+     * @param {number} [srcY0]
+     * @param {number} [srcX1]
+     * @param {number} [srcY1]
+     */
+    drawToScreen(x0, y0, x1, y1, srcX0 = 0, srcY0 = 0, srcX1 = this.textureWidth, srcY1 = this.textureHeight)
+    {
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
+        this.gl.viewport(0, 0, this.textureWidth, this.textureHeight);
+        this.gl.blitFramebuffer(
+            srcX0, srcY0, srcX1, srcY1,
+            x0, y0, x1, y1,
+            this.gl.COLOR_BUFFER_BIT, this.gl.NEAREST
+        );
     }
 }
